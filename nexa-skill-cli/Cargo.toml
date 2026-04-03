@@ -1,0 +1,61 @@
+# Nexa Skill CLI - Command Line Interface
+#
+# The main entry point for the Nexa Skill Compiler.
+# Provides commands for building, checking, and validating SKILL.md files.
+
+[package]
+name = "nexa-skill-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "CLI for Nexa Skill Compiler - Build and validate Agent Skill files"
+keywords.workspace = true
+categories.workspace = true
+
+[[bin]]
+name = "nexa-skill"
+path = "src/main.rs"
+
+[dependencies]
+# Internal crates
+nexa-skill-core.workspace = true
+nexa-skill-templates.workspace = true
+
+# CLI framework
+clap.workspace = true
+
+# Error handling
+miette.workspace = true
+thiserror.workspace = true
+
+# Async runtime
+tokio.workspace = true
+
+# Logging
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+# Configuration
+config.workspace = true
+dotenvy.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
+pretty_assertions.workspace = true
+
+[features]
+default = []
+# Enable LLM semantic check feature
+semantic-check = ["nexa-skill-core/semantic-check"]
+
+[lints]
+workspace = true
