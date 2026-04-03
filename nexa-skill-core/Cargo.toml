@@ -1,0 +1,76 @@
+# Nexa Skill Core - Core Compiler Logic
+#
+# This crate contains the core compilation pipeline:
+# - Frontend (parsing)
+# - IR (intermediate representation)
+# - Analyzer (semantic analysis)
+# - Backend (code emission)
+
+[package]
+name = "nexa-skill-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Core library for Nexa Skill Compiler - Parsing, IR, Analysis, and Emission"
+keywords.workspace = true
+categories.workspace = true
+
+[lib]
+name = "nexa_skill_core"
+path = "src/lib.rs"
+
+[dependencies]
+# Internal crates
+nexa-skill-templates.workspace = true
+
+# Serialization
+serde.workspace = true
+serde_json.workspace = true
+serde_yaml.workspace = true
+
+# Markdown parsing
+pulldown-cmark.workspace = true
+
+# Error handling
+thiserror.workspace = true
+miette.workspace = true
+
+# Async runtime
+tokio.workspace = true
+async-trait.workspace = true
+
+# Logging
+tracing.workspace = true
+
+# Crypto (for source hash)
+sha2.workspace = true
+
+# Time
+chrono.workspace = true
+
+# Regex
+regex.workspace = true
+
+# Parallel processing
+rayon.workspace = true
+
+# HTTP client (optional, for LLM semantic check)
+reqwest = { workspace = true, optional = true }
+
+[dev-dependencies]
+tempfile.workspace = true
+pretty_assertions.workspace = true
+serial_test.workspace = true
+tokio-test.workspace = true
+
+[features]
+default = []
+# Enable LLM semantic check (requires HTTP client)
+semantic-check = ["reqwest"]
+
+[lints]
+workspace = true
