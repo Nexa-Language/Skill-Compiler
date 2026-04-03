@@ -1,0 +1,121 @@
+# Nexa Skill Compiler (NSC) - Workspace Configuration
+# 
+# This is the root Cargo.toml that defines the workspace structure
+# for the Nexa Skill Compiler project.
+#
+# Project: Industrial-grade Agent Skill Compiler
+# License: MIT
+
+[workspace]
+resolver = "2"
+members = [
+    "nexa-skill-cli",
+    "nexa-skill-core",
+    "nexa-skill-templates",
+]
+
+# ============================================================================
+# Workspace Package Metadata (inherited by all crates)
+# ============================================================================
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+authors = ["Nexa Dev Team <dev@nexa.ai>"]
+license = "MIT"
+repository = "https://github.com/nexa-org/nexa-skill-compiler"
+homepage = "https://nexa.ai"
+description = "Industrial-grade Agent Skill Compiler for transforming SKILL.md to platform-native formats"
+keywords = ["agent", "skill", "compiler", "llm", "markdown", "ai", "sop"]
+categories = ["compilers", "development-tools", "text-processing", "command-line-utilities"]
+
+# ============================================================================
+# Workspace Dependencies (Shared across all crates)
+# ============================================================================
+
+[workspace.dependencies]
+
+# === Serialization ===
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# === Markdown Parsing ===
+pulldown-cmark = "0.10"
+
+# === Error Handling ===
+thiserror = "1.0"
+miette = { version = "7.0", features = ["fancy"] }
+
+# === CLI ===
+clap = { version = "4.5", features = ["derive", "env", "color", "suggestions"] }
+
+# === Template Engine ===
+askama = "0.12"
+
+# === Async Runtime ===
+tokio = { version = "1.0", features = ["full"] }
+async-trait = "0.1"
+
+# === Logging & Tracing ===
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json", "registry"] }
+
+# === Configuration ===
+config = "0.14"
+dotenvy = "0.15"
+
+# === HTTP Client (for LLM semantic check) ===
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+
+# === Crypto (for source hash) ===
+sha2 = "0.10"
+
+# === Time ===
+chrono = { version = "0.4", features = ["serde"] }
+
+# === Regex ===
+regex = "1.10"
+
+# === Parallel Processing ===
+rayon = "1.10"
+
+# === Smart Pointers ===
+arc-swap = "1.7"
+
+# === Testing (dev-dependencies) ===
+tempfile = "3.10"
+pretty_assertions = "1.4"
+serial_test = "3.0"
+tokio-test = "0.4"
+criterion = "0.5"
+
+# === Internal Crates ===
+nexa-skill-core = { path = "nexa-skill-core" }
+nexa-skill-templates = { path = "nexa-skill-templates" }
+
+# ============================================================================
+# Workspace Lint Configuration
+# ============================================================================
+
+[workspace.lints.rust]
+unsafe_code = "warn"
+missing_docs = "warn"
+rust_2018_idioms = "warn"
+unused_qualifications = "warn"
+
+[workspace.lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+cargo = "warn"
+
+# Allow some common patterns that are too noisy
+enum_glob_use = "allow"
+module_name_repetitions = "allow"
+too_many_arguments = "allow"
+type_complexity = "allow"
+similar_names = "allow"
+doc_markdown = "allow"
