@@ -20,3 +20,30 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+.venv/
+
+# Experiment data (generated)
+experiments/results/
+experiments/logs/
+experiments/analysis/
+experiments/tasks/input/
+experiments/tasks/output/
+
+# Test results (generated)
+test_results/compiled/
+test_results/reports/
+
+# Data files
+data/*.db
+data/*.db-shm
+data/*.db-wal
+
+# Large generated files
+*.json.bak
