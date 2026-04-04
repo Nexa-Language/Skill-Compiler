@@ -24,30 +24,32 @@
 
 ## 🔥 Key Features
 
-### 🚀 Multi-Target Compilation
-单一源文件编译到多个平台：
+### 🔍 Frontend: Parsing & Validation
+前端解析与静态分析：
+- **YAML Frontmatter Parser** - 高性能事件流解析
+- **Type Validation** - 字段类型检查与必填项验证
+- **Permission Auditor** - 权限静态分析与安全审计
+- **MCP Dependency Checker** - 依赖关系分析与验证
+
+### 🧠 Mid-end: IR & Optimization
+中端优化与安全增强：
+- **SkillIR** - 统一中间表示，平台无关的抽象
+- **Anti-Skill Injection** - 反向模式注入，自动防御危险行为
+- **Security Level Analyzer** - 四级安全模型验证
+- **HITL Triggers** - 高风险操作自动触发人机交互确认
+
+### 🚀 Backend: Multi-Target Emission
+后端多平台代码生成：
 - **Claude Target** - 生成 Claude Code 兼容的 SKILL.md
 - **Codex Target** - 生成 OpenAI Codex/GPT 格式
 - **Gemini Target** - 生成 Google Gemini 系统指令
-
-### 🔒 Security-First Design
-安全优先的架构设计：
-- **Permission Auditor** - 权限静态分析与审计
-- **HITL Triggers** - 高风险操作触发人机交互确认
-- **Anti-Skill Injection** - 反向模式注入防止危险行为
-
-### 📊 Semantic Validation
-100+ 验证规则，提供可操作的诊断信息：
-- YAML Frontmatter 结构验证
-- 必填字段检查
-- 安全等级验证
-- MCP 依赖分析
+- **Parallel Emission** - 并行多目标生成，提升编译效率
 
 ### ⚡ High Performance
 实验验证的执行效率提升：
 - **16.9% faster** - 编译后的技能执行速度提升（大规模对比实验验证）
 - **Rust Native** - 高性能原生编译器实现
-- **Parallel Emission** - 并行多目标生成
+- **Zero-Copy Parsing** - 零拷贝解析，内存高效
 
 ---
 

@@ -1,0 +1,47 @@
+{
+  "name": "nexa-skill-compiler",
+  "version": "1.0.0",
+  "description": "Industrial-grade multi-target compiler for AI Agent Skills - Write Once, Run Anywhere",
+  "main": "index.js",
+  "bin": {
+    "nsc": "./bin/nsc.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/install.js",
+    "test": "node test/test.js"
+  },
+  "keywords": [
+    "skill",
+    "compiler",
+    "ai",
+    "agent",
+    "claude",
+    "gpt",
+    "gemini",
+    "mcp",
+    "llm",
+    "nexa"
+  ],
+  "author": "Nexa Language Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ouyangyipeng/Skill-Compiler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ouyangyipeng/Skill-Compiler/issues"
+  },
+  "homepage": "https://github.com/ouyangyipeng/Skill-Compiler#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

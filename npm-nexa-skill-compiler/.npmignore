@@ -1,0 +1,21 @@
+# Test files
+test/
+*.test.js
+
+# Development files
+.git/
+.github/
+.gitignore
+
+# Source maps
+*.map
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
