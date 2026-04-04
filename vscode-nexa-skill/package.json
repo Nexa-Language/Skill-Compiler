@@ -3,7 +3,7 @@
   "displayName": "Nexa Skill Compiler",
   "description": "VS Code extension for Nexa Skill Compiler - Multi-target skill compilation for AI agents",
   "version": "1.0.0",
-  "publisher": "ouyangyipeng",
+  "publisher": "Nexa-Language",
   "license": "MIT",
   "icon": "images/icon.png",
   "engines": {
