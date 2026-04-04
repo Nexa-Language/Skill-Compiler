@@ -16,6 +16,49 @@
 
 ---
 
+## 📦 Installation
+
+```bash
+# Via npm (recommended for Node.js users)
+npm install -g nexa-skill-compiler
+
+# Via cargo (recommended for Rust users)
+cargo install nexa-skill-cli
+
+# From source
+git clone https://github.com/ouyangyipeng/Skill-Compiler.git
+cd Skill-Compiler
+cargo install --path nexa-skill-cli
+```
+
+### VS Code Extension
+
+Search "Nexa Skill Compiler" in VS Code Marketplace, or install manually:
+
+```bash
+code --install-extension nexa-skill-compiler-1.0.0.vsix
+```
+
+---
+
+## 🚀 Quick Start
+
+```bash
+# Compile a skill for all platforms
+nsc build skill.md
+
+# Compile for specific target
+nsc build skill.md --target claude
+
+# Validate a skill file
+nsc validate skill.md
+
+# Initialize a new skill from template
+nsc init my-skill
+```
+
+---
+
 ## ⚡ What is NSC?
 
 **Nexa Skill Compiler (NSC)** 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。它实现了 AI Agent 技能的 **"一次编写，到处运行"**——支持 Claude Code、OpenAI Codex/GPT 和 Google Gemini 等多个平台。

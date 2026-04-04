@@ -1,6 +1,6 @@
 # Nexa Skill Compiler (NSC) - 用户使用手册
 
-**版本:** 0.1.0  
+**版本:** 1.0.0
 **最后更新:** 2026-04-04
 
 ---
@@ -26,18 +26,19 @@
 
 ### 1.1 什么是Nexa Skill Compiler?
 
-Nexa Skill Compiler (NSC) 是一个多目标技能编译框架，用于将标准化的skill定义转换为不同AI agent平台可用的格式。它支持：
+Nexa Skill Compiler (NSC) 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。采用三段式编译架构：
 
-- **Claude** (Anthropic) - Markdown格式
-- **GPT/Codex** (OpenAI) - JSON格式
-- **Gemini** (Google) - 自定义格式
+- **Frontend (前端)**: YAML解析、类型验证、权限审计、MCP依赖检查
+- **Mid-end (中端)**: SkillIR中间表示、Anti-Skill注入优化、安全等级分析
+- **Backend (后端)**: 多平台代码生成 (Claude/Codex/Gemini)
 
 ### 1.2 核心特性
 
 | 特性 | 描述 |
 |------|------|
+| 三段式编译架构 | Frontend → Mid-end → Backend |
 | 多目标编译 | 一次编写，多平台使用 |
-| 安全验证 | 内置权限和安全级别检查 |
+| 安全验证 | 内置权限审计和Anti-Skill注入 |
 | 语义保持 | 编译后保持原始skill语义 |
 | 错误诊断 | 详细的错误报告和修复建议 |
 | 性能优化 | 编译后skill执行速度提升16.9% |
@@ -48,6 +49,7 @@ Nexa Skill Compiler (NSC) 是一个多目标技能编译框架，用于将标准
 |------|------|
 | 操作系统 | Linux / macOS / Windows (WSL2) |
 | Rust | 1.75+ (Edition 2024) |
+| Node.js | 14+ (可选，用于npm安装) |
 | 内存 | 最低 512MB |
 | 磁盘 | 最低 50MB |
 
@@ -55,7 +57,24 @@ Nexa Skill Compiler (NSC) 是一个多目标技能编译框架，用于将标准
 
 ## 2. 安装指南
 
-### 2.1 从源码安装
+### 2.1 通过 npm 安装 (推荐 Node.js 用户)
+
+```bash
+# 全局安装
+npm install -g nexa-skill-compiler
+
+# 安装 Rust 二进制 (必需)
+cargo install nexa-skill-cli
+```
+
+### 2.2 通过 Cargo 安装 (推荐 Rust 用户)
+
+```bash
+# 从 crates.io 安装
+cargo install nexa-skill-cli
+```
+
+### 2.3 从源码安装
 
 ```bash
 # 克隆仓库
@@ -69,14 +88,18 @@ cargo build --release
 cargo install --path nexa-skill-cli
 ```
 
-### 2.2 验证安装
+### 2.4 VS Code 扩展
+
+在 VS Code 扩展市场搜索 "Nexa Skill Compiler" 安装。
+
+### 2.5 验证安装
 
 ```bash
 # 检查版本
-nexa-skill --version
+nsc --version
 
 # 查看帮助
-nexa-skill --help
+nsc --help
 ```
 
 ### 2.3 开发环境设置
