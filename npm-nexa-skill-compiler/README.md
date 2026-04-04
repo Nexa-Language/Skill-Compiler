@@ -18,7 +18,7 @@
 # Install via npm
 npm install -g nexa-skill-compiler
 
-# Or install the Rust binary directly (recommended)
+# Install the Rust binary (required)
 cargo install nexa-skill-cli
 ```
 
