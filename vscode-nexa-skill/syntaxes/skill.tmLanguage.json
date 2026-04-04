@@ -1,0 +1,153 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Skill",
+  "scopeName": "source.skill",
+  "patterns": [
+    {
+      "include": "#frontmatter"
+    },
+    {
+      "include": "#markdown"
+    }
+  ],
+  "repository": {
+    "frontmatter": {
+      "begin": "^---$",
+      "end": "^---$",
+      "name": "meta.frontmatter.skill",
+      "patterns": [
+        {
+          "include": "#yaml"
+        }
+      ]
+    },
+    "yaml": {
+      "patterns": [
+        {
+          "match": "^(name|description|version|author|compatibility|security_level|hitl_required|mcp_servers|permissions|input_schema|pre_conditions|post_conditions|fallbacks|metadata):",
+          "name": "entity.name.tag.skill"
+        },
+        {
+          "match": ":\\s*(true|false)\\s*$",
+          "captures": {
+            "1": {
+              "name": "constant.language.boolean.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*(low|medium|high|critical)\\s*$",
+          "captures": {
+            "1": {
+              "name": "constant.language.security-level.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*(claude|codex|gemini)\\s*$",
+          "captures": {
+            "1": {
+              "name": "constant.language.platform.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*\\[([^\\]]*)\\]",
+          "captures": {
+            "1": {
+              "name": "string.unquoted.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*\"([^\"]*)\"",
+          "captures": {
+            "1": {
+              "name": "string.quoted.double.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*'([^']*)'",
+          "captures": {
+            "1": {
+              "name": "string.quoted.single.skill"
+            }
+          }
+        },
+        {
+          "match": ":\\s*([\\w.-]+)\\s*$",
+          "captures": {
+            "1": {
+              "name": "string.unquoted.skill"
+            }
+          }
+        },
+        {
+          "begin": ":\\s*\\|",
+          "end": "^(?=\\S)",
+          "name": "string.unquoted.block.skill"
+        },
+        {
+          "match": "^\\s+-\\s+",
+          "name": "punctuation.definition.list.begin.skill"
+        },
+        {
+          "match": "#.*$",
+          "name": "comment.line.number-sign.skill"
+        }
+      ]
+    },
+    "markdown": {
+      "patterns": [
+        {
+          "match": "^#{1,6}\\s+.*$",
+          "name": "markup.heading.skill"
+        },
+        {
+          "match": "^(ALWAYS|NEVER|REQUIRE)\\b",
+          "name": "keyword.control.constraint.skill"
+        },
+        {
+          "match": "^\\s*-\\s+",
+          "name": "markup.list.unnumbered.skill"
+        },
+        {
+          "match": "^\\s*\\d+\\.\\s+",
+          "name": "markup.list.numbered.skill"
+        },
+        {
+          "begin": "```",
+          "end": "```",
+          "name": "markup.code.block.skill",
+          "patterns": [
+            {
+              "match": ".*",
+              "name": "source.embedded"
+            }
+          ]
+        },
+        {
+          "match": "`[^`]+`",
+          "name": "markup.code.inline.skill"
+        },
+        {
+          "match": "\\*\\*([^*]+)\\*\\*",
+          "name": "markup.bold.skill"
+        },
+        {
+          "match": "\\*([^*]+)\\*",
+          "name": "markup.italic.skill"
+        },
+        {
+          "match": "\\[([^\\]]+)\\]\\(([^)]+)\\)",
+          "name": "markup.link.skill"
+        },
+        {
+          "match": "^>\\s+.*$",
+          "name": "markup.quote.skill"
+        }
+      ]
+    }
+  }
+}

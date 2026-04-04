@@ -1,0 +1,209 @@
+{
+  "Skill Frontmatter": {
+    "prefix": "skill",
+    "scope": "skill",
+    "body": [
+      "---",
+      "name: ${1:skill-name}",
+      "description: ${2:Skill description}",
+      "version: 1.0.0",
+      "author: ${3:Author Name}",
+      "compatibility:",
+      "  - claude",
+      "  - codex",
+      "  - gemini",
+      "security_level: ${4|low,medium,high,critical|}",
+      "hitl_required: ${5:false}",
+      "---",
+      "",
+      "# ${6:Skill Title}",
+      "",
+      "${7:Detailed description of the skill.}",
+      "",
+      "## Triggers",
+      "",
+      "- ${8:When to use this skill}",
+      "",
+      "## Procedures",
+      "",
+      "### 1. Context Gathering",
+      "",
+      "- ${9:Gather necessary context}",
+      "",
+      "### 2. Execution",
+      "",
+      "- ${10:Execute the main task}",
+      "",
+      "### 3. Verification",
+      "",
+      "- ${11:Verify the results}",
+      "",
+      "## Examples",
+      "",
+      "### Example 1: Basic Usage",
+      "",
+      "\\`\\`\\`",
+      "${12:Example usage}",
+      "\\`\\`\\`",
+      "",
+      "## Constraints",
+      "",
+      "- ALWAYS ${13:Follow best practices}",
+      "- NEVER ${14:Skip verification}",
+      "- REQUIRE ${15:User confirmation for destructive actions}",
+      "",
+      "## Fallbacks",
+      "",
+      "- ${16:Error handling strategy}",
+      ""
+    ],
+    "description": "Create a complete skill file with frontmatter and body"
+  },
+  "Frontmatter Only": {
+    "prefix": "frontmatter",
+    "scope": "skill",
+    "body": [
+      "---",
+      "name: ${1:skill-name}",
+      "description: ${2:Skill description}",
+      "version: ${3:1.0.0}",
+      "author: ${4:Author Name}",
+      "compatibility:",
+      "  - ${5:claude}",
+      "security_level: ${6|low,medium,high,critical|}",
+      "hitl_required: ${7:false}",
+      "---"
+    ],
+    "description": "Insert YAML frontmatter"
+  },
+  "Procedures Section": {
+    "prefix": "procedures",
+    "scope": "skill",
+    "body": [
+      "## Procedures",
+      "",
+      "### 1. ${1:Step Name}",
+      "",
+      "- ${2:Description}",
+      "",
+      "### 2. ${3:Step Name}",
+      "",
+      "- ${4:Description}",
+      "",
+      "### 3. ${5:Step Name}",
+      "",
+      "- ${6:Description}",
+      ""
+    ],
+    "description": "Insert procedures section"
+  },
+  "Examples Section": {
+    "prefix": "examples",
+    "scope": "skill",
+    "body": [
+      "## Examples",
+      "",
+      "### Example 1: ${1:Title}",
+      "",
+      "\\`\\`\\`${2:language}",
+      "${3:Example code}",
+      "\\`\\`\\`",
+      "",
+      "### Example 2: ${4:Title}",
+      "",
+      "\\`\\`\\`${5:language}",
+      "${6:Example code}",
+      "\\`\\`\\`",
+      ""
+    ],
+    "description": "Insert examples section"
+  },
+  "Constraints Section": {
+    "prefix": "constraints",
+    "scope": "skill",
+    "body": [
+      "## Constraints",
+      "",
+      "- ALWAYS ${1:Action that must always be performed}",
+      "- NEVER ${2:Action that must never be performed}",
+      "- REQUIRE ${3:Condition that must be met}",
+      ""
+    ],
+    "description": "Insert constraints section"
+  },
+  "Fallbacks Section": {
+    "prefix": "fallbacks",
+    "scope": "skill",
+    "body": [
+      "## Fallbacks",
+      "",
+      "- If ${1:condition fails}:",
+      "  - ${2:Fallback action}",
+      "- On error:",
+      "  - ${3:Error handling}",
+      ""
+    ],
+    "description": "Insert fallbacks section"
+  },
+  "Permission Declaration": {
+    "prefix": "permission",
+    "scope": "skill",
+    "body": [
+      "permissions:",
+      "  - kind: ${1|database,filesystem,network,api,execution|}",
+      "    scope: ${2:scope definition}",
+      ""
+    ],
+    "description": "Insert permission declaration"
+  },
+  "MCP Server Declaration": {
+    "prefix": "mcp",
+    "scope": "skill",
+    "body": [
+      "mcp_servers:",
+      "  - ${1:server-name}",
+      ""
+    ],
+    "description": "Insert MCP server declaration"
+  },
+  "Input Schema": {
+    "prefix": "input_schema",
+    "scope": "skill",
+    "body": [
+      "input_schema:",
+      "  type: object",
+      "  properties:",
+      "    ${1:property_name}:",
+      "      type: ${2|string,number,boolean,array,object|}",
+      "      description: ${3:Property description}",
+      "  required:",
+      "    - ${1:property_name}",
+      ""
+    ],
+    "description": "Insert input schema declaration"
+  },
+  "ALWAYS Constraint": {
+    "prefix": "always",
+    "scope": "skill",
+    "body": [
+      "- ALWAYS ${1:action}"
+    ],
+    "description": "Insert ALWAYS constraint"
+  },
+  "NEVER Constraint": {
+    "prefix": "never",
+    "scope": "skill",
+    "body": [
+      "- NEVER ${1:action}"
+    ],
+    "description": "Insert NEVER constraint"
+  },
+  "REQUIRE Constraint": {
+    "prefix": "require",
+    "scope": "skill",
+    "body": [
+      "- REQUIRE ${1:condition}"
+    ],
+    "description": "Insert REQUIRE constraint"
+  }
+}

@@ -1,0 +1,248 @@
+{
+  "name": "nexa-skill-compiler",
+  "displayName": "Nexa Skill Compiler",
+  "description": "VS Code extension for Nexa Skill Compiler - Multi-target skill compilation for AI agents",
+  "version": "1.0.0",
+  "publisher": "ouyangyipeng",
+  "license": "MIT",
+  "icon": "images/icon.png",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "skill",
+    "compiler",
+    "ai",
+    "agent",
+    "claude",
+    "gpt",
+    "gemini",
+    "mcp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ouyangyipeng/Skill-Compiler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ouyangyipeng/Skill-Compiler/issues"
+  },
+  "homepage": "https://github.com/ouyangyipeng/Skill-Compiler#readme",
+  "activationEvents": [
+    "onLanguage:skill",
+    "onCommand:nsc.compile",
+    "onCommand:nsc.validate",
+    "onCommand:nsc.check",
+    "workspaceContains:**/SKILL.md"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "skill",
+        "aliases": [
+          "Skill",
+          "skill"
+        ],
+        "extensions": [
+          ".skill.md",
+          ".skill"
+        ],
+        "filenames": [
+          "SKILL.md"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "skill",
+        "scopeName": "source.skill",
+        "path": "./syntaxes/skill.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "nsc.compile",
+        "title": "NSC: Compile Skill",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "nsc.compileAll",
+        "title": "NSC: Compile All Skills in Workspace",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "nsc.validate",
+        "title": "NSC: Validate Skill",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(check)"
+      },
+      {
+        "command": "nsc.check",
+        "title": "NSC: Check Skill",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(search)"
+      },
+      {
+        "command": "nsc.init",
+        "title": "NSC: Initialize New Skill",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(add)"
+      },
+      {
+        "command": "nsc.showPreview",
+        "title": "NSC: Show Compiled Preview",
+        "category": "Nexa Skill Compiler",
+        "icon": "$(eye)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "when": "resourceFilename == SKILL.md || resourceExtname == .skill",
+          "command": "nsc.compile",
+          "group": "nsc@1"
+        },
+        {
+          "when": "resourceFilename == SKILL.md || resourceExtname == .skill",
+          "command": "nsc.validate",
+          "group": "nsc@2"
+        }
+      ],
+      "editor/title": [
+        {
+          "when": "resourceFilename == SKILL.md || resourceExtname == .skill",
+          "command": "nsc.showPreview",
+          "group": "navigation"
+        }
+      ],
+      "explorer/context": [
+        {
+          "when": "resourceFilename == SKILL.md || resourceExtname == .skill",
+          "command": "nsc.compile",
+          "group": "nsc@1"
+        },
+        {
+          "when": "explorerResourceIsFolder",
+          "command": "nsc.init",
+          "group": "nsc@2"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Nexa Skill Compiler",
+      "properties": {
+        "nsc.compilerPath": {
+          "type": "string",
+          "default": "nsc",
+          "description": "Path to the Nexa Skill Compiler binary"
+        },
+        "nsc.defaultTarget": {
+          "type": "string",
+          "enum": [
+            "claude",
+            "codex",
+            "gemini",
+            "all"
+          ],
+          "default": "all",
+          "description": "Default target platform for compilation"
+        },
+        "nsc.outputDirectory": {
+          "type": "string",
+          "default": "dist",
+          "description": "Output directory for compiled skills"
+        },
+        "nsc.enableDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable real-time diagnostics for skill files"
+        },
+        "nsc.enableAutoCompile": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically compile on save"
+        },
+        "nsc.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show NSC status bar item"
+        }
+      }
+    },
+    "taskDefinitions": [
+      {
+        "type": "nsc",
+        "required": [
+          "task"
+        ],
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "The NSC task to run"
+          },
+          "file": {
+            "type": "string",
+            "description": "The skill file to process"
+          },
+          "target": {
+            "type": "string",
+            "description": "Target platform"
+          }
+        }
+      }
+    ],
+    "problemMatchers": [
+      {
+        "name": "nsc",
+        "owner": "nsc",
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
+        "pattern": {
+          "regexp": "^(.+):(\\d+):(\\d+)\\s+-\\s+(.+)$",
+          "file": 1,
+          "line": 2,
+          "column": 3,
+          "message": 4
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "skill",
+        "path": "./snippets/skill.code-snippets.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "typescript": "^5.3.2",
+    "@vscode/vsce": "^2.22.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  }
+}
