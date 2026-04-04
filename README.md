@@ -1,18 +1,67 @@
-# Nexa Skill Compiler (NSC)
-
 <div align="center">
-
-[![Crates.io](https://img.shields.io/crates/v/nexa-skill-compiler?style=flat-square&logo=rust)](https://crates.io/crates/nexa-skill-compiler)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/ouyangyipeng/Skill-Compiler/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/ouyangyipeng/Skill-Compiler/actions)
-[![Docs](https://img.shields.io/badge/docs-latest-green?style=flat-square&logo=gitbook)](docs/)
-[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange?style=flat-square&logo=rust)](https://www.rust-lang.org/)
-
-**A Multi-Target Skill Compiler for AI Agent Platforms**
-
-[English](#overview) · [中文文档](docs/USER_GUIDE.md) · [Documentation](docs/) · [API Reference](docs/API_REFERENCE.md)
-
+  <img src="docs/img/nsc-logo.png" alt="NSC Logo" width="100" />
+  <h1>Nexa Skill Compiler</h1>
+  <p><b><i>Write Once, Run Anywhere for AI Agent Skills</i></b></p>
+  <p>
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"/>
+    <img src="https://img.shields.io/badge/Version-v1.0-brightgreen.svg?style=for-the-badge" alt="Version"/>
+    <img src="https://img.shields.io/badge/Rust-1.75%2B-orange.svg?style=for-the-badge" alt="Rust"/>
+    <img src="https://img.shields.io/badge/Status-Stable-green.svg?style=for-the-badge" alt="Status"/>
+  </p>
+  
+  **中文版** | **[English](#overview)**
+  
+  📚 **文档**: [中文](docs/USER_GUIDE.md) | [API Reference](docs/API_REFERENCE.md)
 </div>
+
+---
+
+## ⚡ What is NSC?
+
+**Nexa Skill Compiler (NSC)** 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。它实现了 AI Agent 技能的 **"一次编写，到处运行"**——支持 Claude Code、OpenAI Codex/GPT 和 Google Gemini 等多个平台。
+
+---
+
+## 🔥 Key Features
+
+### 🚀 Multi-Target Compilation
+单一源文件编译到多个平台：
+- **Claude Target** - 生成 Claude Code 兼容的 SKILL.md
+- **Codex Target** - 生成 OpenAI Codex/GPT 格式
+- **Gemini Target** - 生成 Google Gemini 系统指令
+
+### 🔒 Security-First Design
+安全优先的架构设计：
+- **Permission Auditor** - 权限静态分析与审计
+- **HITL Triggers** - 高风险操作触发人机交互确认
+- **Anti-Skill Injection** - 反向模式注入防止危险行为
+
+### 📊 Semantic Validation
+100+ 验证规则，提供可操作的诊断信息：
+- YAML Frontmatter 结构验证
+- 必填字段检查
+- 安全等级验证
+- MCP 依赖分析
+
+### ⚡ High Performance
+实验验证的执行效率提升：
+- **16.9% faster** - 编译后的技能执行速度提升（大规模对比实验验证）
+- **Rust Native** - 高性能原生编译器实现
+- **Parallel Emission** - 并行多目标生成
+
+---
+
+## 📈 Performance Highlights
+
+基于 25 个真实任务的大规模对比实验结果：
+
+| Metric | Original Skills | Compiled Skills | Improvement |
+|--------|-----------------|-----------------|-------------|
+| Avg Duration | 45.2s | 37.6s | **16.9% faster** |
+| Success Rate | 96% | 100% | +4% |
+| Quality Score | 0.92 | 0.94 | +2.2% |
+
+详见 [Large-Scale Experiment Report](experiments/LARGE_SCALE_EXPERIMENT_REPORT.md)
 
 ---
 
