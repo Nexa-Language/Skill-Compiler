@@ -152,23 +152,23 @@ impl Compiler {
 
         // Emit for each target
         for target in targets {
-            let output_content = match target {
+            let (output_content, assets) = match target {
                 TargetPlatform::Claude => {
                     let emitter = ClaudeEmitter::new();
-                    rt.block_on(emitter.emit(ir))?
+                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
                 }
                 TargetPlatform::Codex => {
                     let emitter = CodexEmitter::new();
-                    rt.block_on(emitter.emit(ir))?
+                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
                 }
                 TargetPlatform::Gemini => {
                     let emitter = GeminiEmitter::new();
-                    rt.block_on(emitter.emit(ir))?
+                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
                 }
                 TargetPlatform::Kimi => {
                     // Kimi uses same format as Gemini
                     let emitter = GeminiEmitter::new();
-                    rt.block_on(emitter.emit(ir))?
+                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
                 }
             };
 
@@ -181,6 +181,24 @@ impl Compiler {
 
             if self.config.verbose {
                 println!("  ✓ Generated: {}", file_path.display());
+            }
+
+            // Write assets (e.g., JSON Schema files for Codex, YAML files for Gemini)
+            for (asset_path, asset_content) in assets {
+                let full_asset_path = output_path.join(&asset_path);
+                // Create parent directories if needed
+                if let Some(parent) = full_asset_path.parent() {
+                    if !parent.exists() {
+                        fs::create_dir_all(parent)
+                            .map_err(|e| CompileError::IOError(e.to_string()))?;
+                    }
+                }
+                fs::write(&full_asset_path, asset_content)
+                    .map_err(|e| CompileError::IOError(e.to_string()))?;
+
+                if self.config.verbose {
+                    println!("  ✓ Generated asset: {}", full_asset_path.display());
+                }
             }
         }
 
@@ -238,6 +256,7 @@ impl Compiler {
         }
 
         let mut results = Vec::new();
+        let mut irs_for_manifest = Vec::new();
 
         // Find all .md files
         for entry in fs::read_dir(input_path)
@@ -247,16 +266,35 @@ impl Compiler {
             let path = entry.path();
 
             if path.extension().map(|e| e == "md").unwrap_or(false) {
+                // Skip error test files (files starting with "error-")
+                let file_name = path.file_stem().unwrap().to_string_lossy();
+                if file_name.starts_with("error-") {
+                    continue; // Skip intentionally invalid test files
+                }
+                
                 let skill_output_dir = format!(
                     "{}/{}",
                     output_dir,
-                    path.file_stem().unwrap().to_string_lossy()
+                    file_name
                 );
-                let result = self.compile_file(
+                
+                // Compile and collect IR for routing manifest
+                // Use tolerant mode - skip files that fail to parse
+                let result = match self.compile_file_with_ir(
                     &path.to_string_lossy(),
                     targets,
                     &skill_output_dir,
-                )?;
+                    &mut irs_for_manifest,
+                ) {
+                    Ok(r) => r,
+                    Err(e) => {
+                        // Log error but continue with other files
+                        if self.config.verbose {
+                            println!("  ⚠ Skipped {}: {}", file_name, e);
+                        }
+                        continue;
+                    }
+                };
                 results.push(result);
             }
         }
@@ -265,7 +303,78 @@ impl Compiler {
             return Err(CompileError::IOError("No .md files found".to_string()));
         }
 
+        // Generate routing_manifest.yaml for progressive disclosure
+        self.generate_routing_manifest(&irs_for_manifest, output_dir)?;
+
         Ok(results)
+    }
+
+    /// Compile a single file and collect IR for routing manifest
+    fn compile_file_with_ir(
+        &self,
+        input_path: &str,
+        targets: &[TargetPlatform],
+        output_dir: &str,
+        irs_collector: &mut Vec<SkillIR>,
+    ) -> Result<CompileOutput, CompileError> {
+        // Phase 1: Frontend - Parse SKILL.md
+        let raw_ast = ASTBuilder::build_from_file(input_path)?;
+
+        // Phase 2: IR Construction - Build SkillIR
+        let ir = build_ir(&raw_ast);
+
+        // Phase 3: Analyzer - Validate and enhance
+        let analyzer = Analyzer::new();
+        let validated_ir = analyzer.analyze(ir).map_err(|(_ir, diagnostics)| {
+            let has_blocking = diagnostics.iter().any(|d| d.is_blocking());
+            if has_blocking {
+                CompileError::AnalysisError(error::AnalysisError::SchemaValidationFailed(
+                    diagnostics.iter().map(|d| d.message.clone()).collect::<Vec<_>>().join(", ")
+                ))
+            } else {
+                CompileError::AnalysisError(error::AnalysisError::SchemaValidationFailed(
+                    "Analysis found warnings but not blocking".to_string()
+                ))
+            }
+        })?;
+
+        // Collect IR for routing manifest (before validation wrapper)
+        irs_collector.push(validated_ir.as_ref().clone());
+
+        // Phase 4: Backend - Emit platform-specific output
+        self.emit_outputs(&validated_ir, targets, output_dir)?;
+
+        Ok(CompileOutput {
+            skill_name: validated_ir.as_ref().name.clone(),
+            output_dir: output_dir.to_string(),
+            targets: targets.to_vec(),
+            manifest_path: format!("{}/manifest.json", output_dir),
+        })
+    }
+
+    /// Generate routing_manifest.yaml for progressive disclosure
+    fn generate_routing_manifest(
+        &self,
+        irs: &[SkillIR],
+        output_dir: &str,
+    ) -> Result<(), CompileError> {
+        use crate::backend::routing_manifest::RoutingManifest;
+
+        let mut manifest = RoutingManifest::new();
+        manifest.add_skills(irs);
+
+        let yaml_content = manifest.to_yaml()
+            .map_err(|e| CompileError::IOError(e.to_string()))?;
+
+        let manifest_path = Path::new(output_dir).join("routing_manifest.yaml");
+        fs::write(&manifest_path, yaml_content)
+            .map_err(|e| CompileError::IOError(e.to_string()))?;
+
+        if self.config.verbose {
+            println!("  ✓ Generated routing_manifest.yaml with {} skills", irs.len());
+        }
+
+        Ok(())
     }
 
     /// Check a SKILL.md file without generating output

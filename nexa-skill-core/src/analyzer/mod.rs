@@ -12,7 +12,7 @@ pub use mcp::MCPDependencyChecker;
 pub use permission::PermissionAuditor;
 pub use schema::SchemaValidator;
 
-use crate::error::{AnalysisError, Diagnostic};
+use crate::error::Diagnostic;
 use crate::ir::SkillIR;
 
 /// Validated SkillIR wrapper

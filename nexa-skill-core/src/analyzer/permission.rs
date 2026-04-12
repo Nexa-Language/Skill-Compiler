@@ -19,6 +19,7 @@ struct DangerousKeyword {
 }
 
 #[derive(Debug, Clone, Copy)]
+#[allow(dead_code)]
 enum KeywordSeverity {
     Warning,
     Error,

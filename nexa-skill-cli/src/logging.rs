@@ -31,8 +31,9 @@ use tracing_subscriber::{
     util::SubscriberInitExt,
 };
 
-/// Log output format
+/// Log output format (reserved for future advanced logging features)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)]
 pub enum LogFormat {
     /// Pretty format with colors (default for terminal)
     Pretty,
@@ -173,6 +174,7 @@ pub fn init_logging(
 /// ```ignore
 /// init_logging_with_format("debug", LogFormat::Json)?;
 /// ```
+#[allow(dead_code)]
 pub fn init_logging_with_format(log_level: &str, format: LogFormat) -> miette::Result<()> {
     let env_filter = EnvFilter::try_new(log_level)
         .map_err(|e| miette::miette!("Invalid log level '{}': {}", log_level, e))?;
@@ -229,10 +231,11 @@ pub fn init_logging_with_format(log_level: &str, format: LogFormat) -> miette::R
     Ok(())
 }
 
-/// Shutdown the logging system
+/// Shutdown the logging system (reserved for future use)
 ///
 /// This function flushes any remaining log events and shuts down
 /// the tracing subscriber. Should be called before application exit.
+#[allow(dead_code)]
 pub fn shutdown_logging() {
     tracing::info!("Shutting down logging system");
     // tracing-subscriber doesn't require explicit shutdown

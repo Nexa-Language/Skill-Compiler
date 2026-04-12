@@ -30,9 +30,10 @@
 use serde::Deserialize;
 use std::path::PathBuf;
 
-/// Compilation target platform
+/// Compilation target platform (reserved for future config file usage)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize)]
 #[serde(rename_all = "lowercase")]
+#[allow(dead_code)]
 pub enum TargetPlatform {
     /// Claude XML format
     Claude,
@@ -62,7 +63,9 @@ impl std::fmt::Display for TargetPlatform {
 ///
 /// This struct holds all configuration options for the Nexa Skill Compiler.
 /// It can be loaded from environment variables, configuration files, or defaults.
+/// Note: Some fields are reserved for future features and may not be used currently.
 #[derive(Debug, Clone, Deserialize)]
+#[allow(dead_code)]
 pub struct Config {
     // === API Configuration ===
     /// OpenAI API key for LLM semantic check
@@ -188,6 +191,7 @@ impl Default for Config {
     }
 }
 
+#[allow(dead_code)]
 impl Config {
     /// Load configuration from environment variables
     ///

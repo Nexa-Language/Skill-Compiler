@@ -16,6 +16,7 @@ Cargo.lock
 # Build artifacts
 build/
 dist/
+build_outputs/
 
 # OS
 .DS_Store

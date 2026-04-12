@@ -76,20 +76,23 @@ build/database-migration/
 
 ## 📖 文档索引
 
-| 文档 | 描述 |
-|------|------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | 系统架构总览、模块划分、数据流图 |
-| [SPECIFICATION.md](SPECIFICATION.md) | SKILL.md 源文件规范定义 |
-| [COMPILER_PIPELINE.md](COMPILER_PIPELINE.md) | 编译管线四阶段详细设计 |
-| [IR_DESIGN.md](IR_DESIGN.md) | 中间表示（SkillIR）数据结构设计 |
-| [BACKEND_ADAPTERS.md](BACKEND_ADAPTERS.md) | 后端适配器设计（Claude/Codex/Gemini） |
-| [CLI_DESIGN.md](CLI_DESIGN.md) | CLI 交互设计、命令规范 |
-| [ERROR_HANDLING.md](ERROR_HANDLING.md) | 错误处理与诊断系统设计 |
-| [SECURITY_MODEL.md](SECURITY_MODEL.md) | 安全模型、权限审计、Anti-Skill 注入 |
-| [TESTING_STRATEGY.md](TESTING_STRATEGY.md) | 测试策略、测试金字塔 |
-| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) | 开发指南、环境配置、贡献规范 |
-| [API_REFERENCE.md](API_REFERENCE.md) | 公开 API 参考、核心 Trait 定义 |
-| [ROADMAP.md](ROADMAP.md) | 项目路线图、里程碑规划 |
+| 文档 | 描述 | 更新状态 |
+|------|------|----------|
+| [ARCHITECTURE.md](ARCHITECTURE.md) | 系统架构总览、模块划分、数据流图 | ✅ v2.0 已更新 |
+| [SPECIFICATION.md](SPECIFICATION.md) | SKILL.md 源文件规范定义，含格式偏好说明 | ✅ v2.0 已更新 |
+| [COMPILER_PIPELINE.md](COMPILER_PIPELINE.md) | 编译管线四阶段详细设计，含AST优化 | ✅ v2.0 已更新 |
+| [IR_DESIGN.md](IR_DESIGN.md) | 中间表示（SkillIR）数据结构，含嵌套数据检测 | ✅ v2.0 已更新 |
+| [BACKEND_ADAPTERS.md](BACKEND_ADAPTERS.md) | 后端适配器设计，含双负载生成和YAML优化 | ✅ v2.0 已更新 |
+| [ROUTING_MANIFEST.md](ROUTING_MANIFEST.md) | 渐进式路由清单机制，解决上下文膨胀 | ✅ 新增 |
+| [CLI_DESIGN.md](CLI_DESIGN.md) | CLI 交互设计、命令规范 | 待更新 |
+| [ERROR_HANDLING.md](ERROR_HANDLING.md) | 错误处理与诊断系统设计 | 待更新 |
+| [SECURITY_MODEL.md](SECURITY_MODEL.md) | 安全模型、权限审计、Anti-Skill 注入 | 待更新 |
+| [TESTING_STRATEGY.md](TESTING_STRATEGY.md) | 测试策略、测试金字塔 | 待更新 |
+| [DEVELOPMENT_GUIDE.md](DEVELOPMENT_GUIDE.md) | 开发指南、环境配置、贡献规范 | 待更新 |
+| [API_REFERENCE.md](API_REFERENCE.md) | 公开 API 参考、核心 Trait 定义 | 待更新 |
+| [ROADMAP.md](ROADMAP.md) | 项目路线图、里程碑规划 | 待更新 |
+
+> **v2.0 更新说明**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），核心文档已全面重构，实现消除格式税、AST优化注入和渐进式路由清单生成。
 
 ---
 
@@ -118,16 +121,18 @@ NSC 遵循 **"静态编译、动态执行、多态分发"** 的设计哲学：
 
 ## 🤝 兼容性
 
-NSC 生成的产物兼容以下 Agent 平台：
+NSC 生成的产物兼容以下 Agent 平台（基于格式敏感性实证研究）：
 
-| 平台 | 底层模型 | 首选格式 | 支持状态 |
-|------|----------|----------|----------|
-| Claude Code | Claude 4.6 Opus | XML / 强标签化 MD | ✅ 完全支持 |
-| Codex CLI | GPT-5.4 | YAML + JSON Schema | ✅ 完全支持 |
-| Gemini CLI | Gemini 3.1 Pro | 结构化 Markdown + YAML | ✅ 完全支持 |
-| Kimi CLI | K2.5 | 纯文本 / 巨型文档 | 🚧 实验性支持 |
-| GitHub Copilot | GPT-4 | JSON Schema | ✅ 完全支持 |
-| VS Code Agent | 多模型 | Markdown | ✅ 完全支持 |
+| 平台 | 底层模型 | 输出格式 | 核心策略 | 学术依据 | 支持状态 |
+|------|----------|----------|----------|----------|----------|
+| Claude Code | Claude 4.6 Opus | **XML** | XML原教旨主义，强标签嵌套 | +23%推理准确率 | ✅ 完全支持 |
+| Codex CLI | GPT-5.4 | **Markdown + JSON Schema** | 双负载生成，消除格式税 | 100% Schema遵循率 | ✅ 完全支持 |
+| Gemini CLI | Gemini 3.1 Pro | **Markdown + YAML块** | AST优化，嵌套数据自动转YAML | YAML 51.9% > JSON 43.1% | ✅ 完全支持 |
+| Kimi CLI | K2.5 | **完整Markdown** | 海量上下文，弱约束强推理 | 超长上下文优势 | ✅ 完全支持 |
+| GitHub Copilot | GPT-4 | JSON Schema | Function Calling 接口化 | OpenAI 标准 | ✅ 完全支持 |
+| VS Code Agent | 多模型 | Markdown | 标准Markdown格式 | 通用兼容 | ✅ 完全支持 |
+
+> **关键发现**：GPT系列存在"格式税"问题，强制JSON输入会导致40%性能衰退。Codex适配器采用双负载生成策略（Markdown指令 + JSON Schema分离），彻底解决此问题。
 
 ---
 

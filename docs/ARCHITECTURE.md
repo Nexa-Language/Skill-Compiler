@@ -1,6 +1,8 @@
 # 系统架构总览
 
 > **Nexa Skill Compiler (NSC) 的整体架构设计、模块划分与数据流**
+>
+> **架构版本**：v2.0（基于《高级提示词工程格式与智能体技能架构》调研报告重构）
 
 ---
 
@@ -8,10 +10,25 @@
 
 NSC 采用经典编译器的**四阶段管线架构**，将人类可读的 `SKILL.md` 源文件转化为 AI Agent 可执行的结构化产物。整体设计遵循以下原则：
 
-- **关注点分离 (Separation of Concerns)**：每个阶段职责明确，边界清晰
-- **强类型中间表示 (Strongly-typed IR)**：所有阶段通过 `SkillIR` 进行数据交换
-- **零拷贝优化 (Zero-copy Optimization)**：利用 Rust 生命周期实现高效字符串处理
-- **可扩展后端 (Extensible Backend)**：通过 `Emitter` Trait 支持新平台适配
+### 1.1 核心设计原则
+
+| 原则 | 描述 | 学术依据 |
+|------|------|----------|
+| **消除格式税** | 避免强制模型解析复杂JSON输入，防止高达40%的性能衰退 | Format Tax 研究 (2025) |
+| **解耦推理与格式化** | 输入端使用Markdown进行自由态推理，输出端通过API强制约束 | OpenAI Structured Outputs 最佳实践 |
+| **AST优化注入** | 编译期检测嵌套数据结构，自动选择最优格式 | Gemini 嵌套数据准确率测试 |
+| **渐进式披露** | 仅提取name和description生成路由清单，解决上下文膨胀 | Agent Skills 开放标准 |
+| **关注点分离** | 每个阶段职责明确，边界清晰 | 编译器设计经典原则 |
+| **强类型中间表示** | 所有阶段通过 `SkillIR` 进行数据交换 | Rust 类型系统优势 |
+| **零拷贝优化** | 利用 Rust 生命周期实现高效字符串处理 | Rust 性能特性 |
+| **可扩展后端** | 通过 `Emitter` Trait 支持新平台适配 | Trait 抽象设计 |
+
+### 1.2 架构演进历史
+
+| 版本 | 主要变更 | 学术依据 |
+|------|----------|----------|
+| v1.0 | 初始四阶段管线设计 | 编译器经典理论 |
+| v2.0 | 消除格式税、AST优化、渐进式路由 | 2026年格式敏感性调研报告 |
 
 ---
 
@@ -34,6 +51,7 @@ graph TB
     subgraph "Phase 2: IR Construction"
         G[SkillIR Builder]
         H[Type Mapping]
+        N[Nested Data Detector<br/>AST优化标记]
     end
     
     subgraph "Phase 3: Analyzer"
@@ -44,17 +62,20 @@ graph TB
     end
     
     subgraph "Phase 4: Backend"
-        M[Claude Emitter<br/>askama XML]
-        N[Codex Emitter<br/>JSON Schema]
-        O[Gemini Emitter<br/>Structured MD]
+        M[Claude Emitter<br/>XML原教旨主义]
+        O[Codex Emitter<br/>双负载生成]
+        P[Gemini Emitter<br/>YAML优化注入]
+        Q[Kimi Emitter<br/>完整Markdown]
     end
     
     subgraph Output
-        P[manifest.json]
-        Q[claude.xml]
-        R[codex_schema.json]
-        S[gemini.md]
-        T[signature.sha256]
+        R[manifest.json]
+        S[routing_manifest.yaml<br/>渐进式路由清单]
+        T[claude.xml]
+        U[codex.md + codex_schema.json]
+        V[gemini.md<br/>含YAML块]
+        W[kimi.md]
+        X[signature.sha256]
     end
     
     A --> D
@@ -65,18 +86,22 @@ graph TB
     E --> F
     F --> G
     G --> H
-    H --> I
+    H --> N
+    N --> I
     I --> J
     J --> K
     K --> L
     L --> M
-    L --> N
     L --> O
-    M --> Q
-    N --> R
-    O --> S
-    G --> P
-    P --> T
+    L --> P
+    L --> Q
+    M --> T
+    O --> U
+    P --> V
+    Q --> W
+    G --> R
+    G --> S
+    R --> X
 ```
 
 ---
@@ -96,6 +121,7 @@ nexa-skill-compiler/
 │   │   │   ├── build.rs      # build 命令
 │   │   │   ├── check.rs      # check 命令
 │   │   │   └── validate.rs   # validate 命令
+│   │   │   └── index.rs      # index 命令（生成路由清单）
 │   │   └── config.rs         # 配置管理
 │   └── Cargo.toml
 │
@@ -111,19 +137,23 @@ nexa-skill-compiler/
 │   │   │   ├── mod.rs
 │   │   │   ├── skill_ir.rs
 │   │   │   ├── procedure.rs
-│   │   │   └── constraint.rs
+│   │   │   ├── constraint.rs
+│   │   │   └── nested_data.rs  # 嵌套数据检测（新增）
 │   │   ├── analyzer/         # Phase 3: 语义分析
 │   │   │   ├── mod.rs
 │   │   │   ├── schema.rs
 │   │   │   ├── mcp.rs
 │   │   │   ├── permission.rs
-│   │   │   └── anti_skill.rs
+│   │   │   ├── anti_skill.rs
+│   │   │   └── nested_data.rs  # AST优化检测器（新增）
 │   │   ├── backend/          # Phase 4: 后端生成
 │   │   │   ├── mod.rs
 │   │   │   ├── emitter.rs    # Emitter Trait
-│   │   │   ├── claude.rs
-│   │   │   ├── codex.rs
-│   │   │   └── gemini.rs
+│   │   │   ├── claude.rs     # XML发射器
+│   │   │   ├── codex.rs      # 双负载发射器（重构）
+│   │   │   ├── gemini.rs     # YAML优化发射器（重构）
+│   │   │   ├── kimi.rs       # 完整Markdown发射器
+│   │   │   └── routing.rs    # 路由清单生成器（新增）
 │   │   └── error/            # 错误处理
 │   │       ├── mod.rs
 │   │       ├── diagnostic.rs
@@ -133,7 +163,8 @@ nexa-skill-compiler/
 ├── nexa-skill-templates/     # Askama 模板
 │   ├── templates/
 │   │   ├── claude_xml.html
-│   │   └── gemini_md.html
+│   │   ├── gemini_md.html    # 支持YAML优化
+│   │   └── routing_manifest.yaml  # 路由清单模板（新增）
 │   └── Cargo.toml
 │
 ├── nexa-skill-wasm/          # WASM 绑定 (可选)
@@ -143,7 +174,7 @@ nexa-skill-compiler/
 │
 └── tests/                    # 集成测试
     ├── fixtures/             # 测试用 SKILL.md
-    └── integration/
+    └ integration/
 ```
 
 ### 3.2 模块依赖关系
@@ -163,6 +194,7 @@ graph LR
     E --> |serde_json| B
     E --> |askama| C
     E --> |wasm-bindgen| D
+    E --> |rayon| B
 ```
 
 ---
@@ -202,11 +234,11 @@ SKILL.md
 
 ### 4.2 Phase 2: IR Construction (中间表示构建)
 
-**职责**：将 `RawAST` 映射为强类型的 `SkillIR`。
+**职责**：将 `RawAST` 映射为强类型的 `SkillIR`，并进行嵌套数据检测。
 
 **输入**：`RawAST`
 
-**输出**：`SkillIR`（核心中间表示）
+**输出**：`SkillIR`（核心中间表示，含AST优化标记）
 
 **关键转换**：
 
@@ -227,6 +259,8 @@ impl From<RawAST> for SkillIR {
             context_gathering: extract_context_gathering(&raw.body),
             procedures: extract_procedures(&raw.body),
             few_shot_examples: extract_examples(&raw.body),
+            // 新增：嵌套数据检测标记
+            requires_yaml_optimization: NestedDataDetector::detect(&raw.frontmatter),
         }
     }
 }
@@ -264,11 +298,11 @@ graph LR
 
 ### 4.4 Phase 4: Backend (后端生成)
 
-**职责**：将 `ValidatedSkillIR` 序列化为特定平台的原生表示。
+**职责**：将 `ValidatedSkillIR` 序列化为特定平台的原生表示，并生成渐进式路由清单。
 
 **输入**：`ValidatedSkillIR` + Target Flag
 
-**输出**：平台特定产物文件
+**输出**：平台特定产物文件 + 路由清单
 
 **Emitter Trait 定义**：
 
@@ -283,10 +317,27 @@ pub trait Emitter {
     /// 发射产物文件扩展名
     fn file_extension(&self) -> &'static str;
     
+    /// 是否支持双负载生成（Codex专用）
+    fn supports_dual_payload(&self) -> bool { false }
+    
+    /// 发射JSON Schema负载（用于API工具调用层）
+    fn emit_schema_payload(&self, ir: &ValidatedSkillIR) -> Result<Option<String>, EmitError> {
+        Ok(None)
+    }
+    
     /// 是否需要生成 manifest.json
     fn requires_manifest(&self) -> bool { true }
 }
 ```
+
+**后端发射策略（基于实证研究）**：
+
+| 平台 | 发射策略 | 学术依据 |
+|------|----------|----------|
+| Claude | XML原教旨主义，强标签嵌套 | Anthropic官方指南 + 23%推理准确率提升 |
+| Codex | **双负载生成**：Markdown指令 + JSON Schema分离 | Format Tax消除 + 100% Schema遵循率 |
+| Gemini | **AST优化**：嵌套数据自动转YAML | YAML 51.9% > MD 48.2% > JSON 43.1% |
+| Kimi | 完整Markdown，保留所有细节 | 超长上下文优势 |
 
 ---
 
@@ -305,7 +356,7 @@ pub struct SkillIR {
     pub name: String,
     /// 版本号 (语义化版本)
     pub version: String,
-    /// 触发条件与功能描述
+    /// 触发条件与功能描述（用于渐进式路由）
     pub description: String,
     
     // ===== 接口与 MCP =====
@@ -327,6 +378,8 @@ pub struct SkillIR {
     pub fallbacks: Vec<String>,
     /// 权限声明列表
     pub permissions: Vec<Permission>,
+    /// 安全等级
+    pub security_level: SecurityLevel,
     
     // ===== 执行逻辑 =====
     /// 上下文收集步骤
@@ -339,6 +392,12 @@ pub struct SkillIR {
     // ===== 编译期注入 =====
     /// Anti-Skill 约束 (由 Analyzer 注入)
     pub anti_skill_constraints: Vec<Constraint>,
+    
+    // ===== AST优化标记（新增）=====
+    /// 是否需要YAML优化（嵌套数据深度>=3）
+    pub requires_yaml_optimization: bool,
+    /// 嵌套数据深度检测结果
+    pub nested_data_depth: Option<usize>,
 }
 
 /// 执行步骤定义
@@ -396,6 +455,41 @@ pub struct Manifest {
     /// 依赖的 MCP 服务器
     pub mcp_servers: Vec<String>,
     /// 安全等级
+    pub security_level: SecurityLevel,
+    /// 是否启用YAML优化
+    pub yaml_optimized: bool,
+}
+```
+
+### 5.3 渐进式路由清单（新增）
+
+```rust
+/// 渐进式路由清单
+/// 
+/// 仅提取name和description，用于Agent初始化阶段的轻量级路由
+/// 解决"上下文膨胀"问题
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RoutingManifest {
+    /// 生成时间戳
+    pub generated_at: DateTime<Utc>,
+    /// 技能总数
+    pub total_skills: usize,
+    /// 技能路由条目列表
+    pub skills: Vec<RoutingEntry>,
+}
+
+/// 路由条目
+/// 
+/// 极简结构，仅包含触发路由所需的最小信息
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RoutingEntry {
+    /// 技能名称（用于显式调用 @skill-name）
+    pub name: String,
+    /// 功能描述（用于隐式语义路由匹配）
+    pub description: String,
+    /// 技能目录路径
+    pub path: String,
+    /// 安全等级（用于HITL决策）
     pub security_level: SecurityLevel,
 }
 ```
@@ -471,6 +565,7 @@ graph LR
 - ✅ IR 构建
 - ✅ Analyzer 校验
 - ✅ Backend 生成（部分）
+- ✅ 路由清单生成
 - ❌ 文件系统操作（需通过 JS Bridge）
 
 ---
@@ -506,7 +601,16 @@ fn emit_parallel(ir: &ValidatedSkillIR, targets: &[TargetPlatform]) -> Vec<EmitR
 }
 ```
 
-### 8.3 内存预算
+### 8.3 词元效率优化
+
+| 格式 | 词元消耗 | 相对效率 | 适用场景 |
+|------|----------|----------|----------|
+| **Markdown** | 基准 | 100% | Codex主负载、Gemini主框架 |
+| **YAML** | +10% | 90% | Gemini嵌套数据优化 |
+| **JSON** | +34%~38% | 62%~66% | 仅Codex Schema负载 |
+| **XML** | 中等 | 85% | Claude专用 |
+
+### 8.4 内存预算
 
 | 阶段 | 预估内存占用 | 优化策略 |
 |------|-------------|----------|
@@ -514,6 +618,7 @@ fn emit_parallel(ir: &ValidatedSkillIR, targets: &[TargetPlatform]) -> Vec<EmitR
 | IR | ~500KB per skill | Arc 共享字符串 |
 | Analyzer | ~100KB | 无额外分配 |
 | Backend | ~1MB per target | 模板预编译 |
+| RoutingManifest | ~50KB for 100 skills | 极简条目结构 |
 
 ---
 
@@ -581,10 +686,81 @@ impl Analyzer for NamingConventionAnalyzer {
 
 ---
 
-## 10. 相关文档
+## 10. 渐进式披露机制
+
+### 10.1 问题背景
+
+Agent Skills 开放标准之前，传统做法是将所有指令打包放入全局配置文件（如 `agents.md`），导致"上下文膨胀"：模型在处理每一个简单请求时都需要重新阅读数以万计的无关背景信息。
+
+### 10.2 NSC解决方案
+
+NSC 在编译期生成**渐进式路由清单**（`routing_manifest.yaml`），仅提取所有技能的 `name` 和 `description`：
+
+```yaml
+# routing_manifest.yaml
+generated_at: "2026-04-12T10:00:00Z"
+total_skills: 15
+skills:
+  - name: "database-migration"
+    description: "执行 PostgreSQL 数据库表结构修改、数据迁移或复杂 SQL DDL 操作。当用户要求修改数据库表结构时使用此技能。"
+    path: "build/database-migration"
+    security_level: "high"
+    
+  - name: "api-client"
+    description: "调用外部 REST API 并处理响应数据。当用户需要与第三方 API 交互时使用。"
+    path: "build/api-client"
+    security_level: "medium"
+    
+  - name: "file-organizer"
+    description: "整理和归档项目文件。当用户要求清理文件目录时使用。"
+    path: "build/file-organizer"
+    security_level: "low"
+```
+
+### 10.3 加载机制
+
+```mermaid
+graph TB
+    A[Agent启动] --> B[扫描技能目录]
+    B --> C[仅读取routing_manifest.yaml]
+    C --> D[注入name+description到系统提示词]
+    D --> E[常驻词元极小<br/>~50KB for 100 skills]
+    
+    F[用户请求] --> G[语义路由匹配]
+    G --> H[触发activate_skill]
+    H --> I[动态拉取完整SKILL.md]
+    I --> J[注入到当前对话上下文]
+```
+
+---
+
+## 11. 学术依据总结
+
+### 11.1 格式敏感性实证数据
+
+| 发现 | 数据 | 影响 |
+|------|------|------|
+| Format Tax | 强制JSON输入导致40%性能衰退 | Codex采用双负载生成 |
+| XML优势 | Claude XML比JSON高23%推理准确率 | Claude Emitter保持XML原教旨主义 |
+| YAML嵌套优势 | YAML 51.9% > MD 48.2% > JSON 43.1% | Gemini实现AST优化注入 |
+| 词元效率 | Markdown比JSON节省34%-38%词元 | Codex主负载采用Markdown |
+
+### 11.2 架构设计决策
+
+| 决策 | 原因 | 效果 |
+|------|------|------|
+| 四阶段管线 | 编译器经典理论 | 关注点分离，易于扩展 |
+| 双负载生成 | 消除格式税 | 节省34%-38%词元，避免推理衰退 |
+| YAML优化 | 套数据准确率 | +8.8%解析准确率 |
+| 渐进式路由 | 解决上下文膨胀 | 常驻词元极小化 |
+
+---
+
+## 12. 相关文档
 
 - [COMPILER_PIPELINE.md](COMPILER_PIPELINE.md) - 编译管线各阶段详细实现
 - [IR_DESIGN.md](IR_DESIGN.md) - SkillIR 数据结构完整定义
 - [BACKEND_ADAPTERS.md](BACKEND_ADAPTERS.md) - 各平台 Emitter 实现细节
+- [ROUTING_MANIFEST.md](ROUTING_MANIFEST.md) - 渐进式路由清单机制
 - [ERROR_HANDLING.md](ERROR_HANDLING.md) - 错误处理与诊断系统
 - [API_REFERENCE.md](API_REFERENCE.md) - 公开 Trait 和接口定义

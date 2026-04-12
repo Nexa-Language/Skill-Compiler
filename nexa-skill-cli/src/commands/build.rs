@@ -58,16 +58,33 @@ pub fn execute(args: BuildArgs) -> Result<()> {
         );
     }
 
-    // Create compiler and compile
+    // Create compiler
     let compiler = nexa_skill_core::Compiler::new();
-    let result = compiler.compile_file(&args.input, &targets, &args.out_dir)
-        .map_err(|e| miette::miette!("Compilation failed: {}", e))?;
+    
+    // Check if input is a directory or file
+    let input_path = std::path::Path::new(&args.input);
+    
+    if input_path.is_dir() {
+        // Directory compilation - generates routing_manifest.yaml
+        let results = compiler.compile_dir(&args.input, &targets, &args.out_dir)
+            .map_err(|e| miette::miette!("Compilation failed: {}", e))?;
+        
+        println!("✅ Build completed successfully");
+        println!("   Skills compiled: {}", results.len());
+        println!("   Output: {}", args.out_dir);
+        println!("   Targets: {:?}", targets.iter().map(|t| t.slug()).collect::<Vec<_>>());
+        println!("   Routing manifest: {}/routing_manifest.yaml", args.out_dir);
+    } else {
+        // Single file compilation
+        let result = compiler.compile_file(&args.input, &targets, &args.out_dir)
+            .map_err(|e| miette::miette!("Compilation failed: {}", e))?;
 
-    println!("✅ Build completed successfully");
-    println!("   Skill: {}", result.skill_name);
-    println!("   Output: {}", result.output_dir);
-    println!("   Targets: {:?}", result.targets.iter().map(|t| t.slug()).collect::<Vec<_>>());
-    println!("   Manifest: {}", result.manifest_path);
+        println!("✅ Build completed successfully");
+        println!("   Skill: {}", result.skill_name);
+        println!("   Output: {}", result.output_dir);
+        println!("   Targets: {:?}", result.targets.iter().map(|t| t.slug()).collect::<Vec<_>>());
+        println!("   Manifest: {}", result.manifest_path);
+    }
 
     Ok(())
 }

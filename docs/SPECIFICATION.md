@@ -1,6 +1,8 @@
 # SKILL.md 规范定义
 
 > **Nexa Skill Compiler 源文件的完整语法规范与元数据定义**
+>
+> **重要更新**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），本规范已更新格式偏好说明，确保源文件设计符合各Agent平台的最佳实践。
 
 ---
 
@@ -10,12 +12,13 @@
 
 ### 1.1 设计原则
 
-| 原则 | 描述 |
-|------|------|
-| **人类优先** | 文件首先服务于人类阅读和编写，其次服务于机器解析 |
-| **渐进式披露** | 元数据精简，详细内容按需加载 |
-| **强类型约束** | 关键字段有严格的格式校验，编译期报错 |
-| **平台无关** | 源文件不包含任何平台特定语法，由编译器适配 |
+| 原则 | 描述 | 学术依据 |
+|------|------|----------|
+| **人类优先** | 文件首先服务于人类阅读和编写，其次服务于机器解析 | Agent Skills 开放标准 |
+| **渐进式披露** | 元数据精简，详细内容按需加载，解决上下文膨胀 | Progressive Disclosure 机制 |
+| **强类型约束** | 关键字段有严格的格式校验，编译期报错 | Rust 类型系统 |
+| **平台无关** | 源文件不包含任何平台特定语法，由编译器适配 | 编译器理论 |
+| **格式敏感性** | 源文件使用Markdown+YAML，编译器根据目标平台优化输出 | 格式税研究 |
 
 ### 1.2 文件位置约定
 
@@ -94,10 +97,14 @@ name: 数据库迁移           # 包含非 ASCII 字符
 
 #### 3.1.2 `description` 字段规范
 
+> **学术依据**：Agent Skills 开放标准明确指出，`description` 字段是模型语义路由的依据。Agent 在初始化阶段仅读取 `name` 和 `description`，实现渐进式披露。
+
 **内容要求**：
 - 必须描述"能做什么"和"何时触发"
 - 应包含有助于 Agent 路由的关键词
 - 建议明确"不该何时触发"的边界条件
+- **长度必须控制在 1024 字符以内**
+- **严禁使用 XML 标签（如 `<` 或 `>`）**
 
 **良好示例**：
 ```yaml
@@ -110,7 +117,18 @@ description: >-
 **不良示例**：
 ```yaml
 description: 帮助处理数据库。  # 过于模糊，缺乏触发条件
+description: <database>执行数据库操作</database>  # 包含XML标签，违反规范
+description: 这是一个非常长的描述...（超过1024字符）  # 超出长度限制
 ```
+
+**路由匹配机制**：
+
+| 匹配方式 | 描述 | 示例 |
+|----------|------|------|
+| **隐式调用** | Agent 根据语义相似度自动匹配 | 用户说"帮我迁移数据库表结构" → 匹配 `database-migration` |
+| **显式调用** | 用户在指令中@技能名称 | 用户说"@database-migration 执行迁移" → 直接匹配 |
+
+> **关键发现**：`description` 字段的质量直接影响路由准确率。模糊的描述会导致 Agent 无法正确匹配技能，或错误触发不相关的技能。
 
 ### 3.2 可选字段
 
@@ -716,9 +734,91 @@ NSC 支持的 SKILL.md 规范版本：
 
 ---
 
-## 8. 相关文档
+## 8. 格式偏好与编译器适配（新增）
+
+### 8.1 学术依据
+
+根据《高级提示词工程格式与智能体技能架构》调研报告，大语言模型对提示词格式具有极高的敏感性：
+
+| 模型 | 最佳输入格式 | 准确率提升 | 词元效率 | 学术来源 |
+|------|--------------|------------|----------|----------|
+| **Claude** | XML标签分层 | +23% (vs JSON) | 中等 | Anthropic官方指南 |
+| **GPT** | Markdown | +40% (vs JSON) | **最优** | Format Tax研究 |
+| **Gemini** | Markdown + YAML嵌套数据 | YAML 51.9% > JSON 43.1% | 高 | 嵌套数据压力测试 |
+
+### 8.2 源文件格式选择
+
+NSC 源文件采用 **YAML Frontmatter + Markdown Body** 的组合格式，原因如下：
+
+| 格式组件 | 选择原因 | 学术依据 |
+|----------|----------|----------|
+| **YAML Frontmatter** | 人类可读性高，Agent Skills 标准要求 | Agent Skills 开放标准 |
+| **Markdown Body** | 词元效率最优，GPT/Gemini 天然亲和 | 词元效率研究 |
+| **不使用 JSON** | 避免"格式税"，防止40%性能衰退 | Format Tax 研究 |
+| **不使用 XML Body** | 仅Claude偏好，其他平台解析效率低 | 格式敏感性测试 |
+
+### 8.3 编译器格式适配策略
+
+NSC 编译器根据目标平台自动优化输出格式：
+
+```mermaid
+graph TB
+    A[SKILL.md<br/>YAML + Markdown] --> B[NSC Compiler]
+    
+    B --> C[Claude Emitter]
+    B --> D[Codex Emitter]
+    B --> E[Gemini Emitter]
+    
+    C --> F[claude.xml<br/>XML原教旨主义]
+    D --> G[codex.md + codex_schema.json<br/>双负载生成]
+    E --> H[gemini.md<br/>含YAML优化块]
+    
+    I[嵌套数据检测] --> J{深度 >= 3?}
+    J -->|是| K[启用YAML优化]
+    J -->|否| L[保持Markdown格式]
+    K --> H
+    L --> H
+```
+
+### 8.4 各平台输出格式说明
+
+| 目标平台 | 输出格式 | 核心策略 | 词元效率 |
+|----------|----------|----------|----------|
+| **Claude** | XML | XML原教旨主义，强标签嵌套降低认知负载 | 中等 |
+| **Codex** | Markdown + JSON Schema | 双负载生成：指令Markdown + Schema分离 | **最优** |
+| **Gemini** | Markdown + YAML块 | AST优化：嵌套数据自动转YAML | 高 |
+| **Kimi** | 完整Markdown | 保留所有细节，弱约束强推理 | 中等 |
+
+### 8.5 嵌套数据深度阈值
+
+当 `input_schema` 或 `output_schema` 的嵌套深度达到阈值时，Gemini Emitter 自动启用 YAML 优化：
+
+| 嵌套深度 | Gemini输出格式 | 准确率 | 词元成本 |
+|----------|----------------|--------|----------|
+| 1-2层 | Markdown JSON块 | 48.2% | 基准 |
+| **≥3层** | **YAML代码块** | **51.9%** | +10% |
+
+> **决策依据**：3层嵌套已足以让JSON的语法噪音干扰模型注意力，YAML的准确率优势开始显著体现。
+
+### 8.6 源文件编写建议
+
+基于格式敏感性研究，建议 SKILL.md 编写者遵循以下原则：
+
+| 建议 | 原因 | 影响 |
+|------|------|------|
+| **Procedures使用有序列表** | Markdown有序列表对所有平台友好 | 提高解析准确率 |
+| **避免在Body中嵌入复杂JSON** | JSON会导致格式税 | 防止推理性能衰退 |
+| **嵌套数据放在input_schema中** | 编译器自动优化为YAML | 提高Gemini准确率 |
+| **使用Markdown标题划分章节** | 标题层级对所有平台有效 | 降低认知负载 |
+| **Claude目标可使用XML标签注释** | 编译器保留并转换为XML | 提高Claude遵循度 |
+
+---
+
+## 9. 相关文档
 
 - [COMPILER_PIPELINE.md](COMPILER_PIPELINE.md) - Frontend 解析实现
-- [IR_DESIGN.md](IR_DESIGN.md) - SkillIR 数据结构映射
+- [IR_DESIGN.md](IR_DESIGN.md) - SkillIR 数据结构映射，含嵌套数据检测
+- [BACKEND_ADAPTERS.md](BACKEND_ADAPTERS.md) - 各平台格式适配策略
+- [ROUTING_MANIFEST.md](ROUTING_MANIFEST.md) - 渐进式路由清单机制
 - [SECURITY_MODEL.md](SECURITY_MODEL.md) - 权限审计与安全等级
 - [API_REFERENCE.md](API_REFERENCE.md) - 校验 API 定义
