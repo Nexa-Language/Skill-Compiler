@@ -59,6 +59,16 @@
 {% endfor %}
 
 {% endif %}
+{% if !approaches.is_empty() %}
+## Approaches ({{ skill_mode }})
+
+{% for approach in approaches %}
+### {{ approach.name }}
+{{ approach.description }}
+
+{{ approach.instructions }}
+{% endfor %}
+{% endif %}
 {% if !anti_skill_constraints.is_empty() %}
 ## Safety Constraints
 
@@ -103,6 +113,15 @@
 
 **Agent**:
 {{ example.agent_response }}
+
+{% endfor %}
+{% endif %}
+{% if !extra_sections.is_empty() %}
+## Additional Context
+
+{% for section in extra_sections %}
+### {{ section.title }}
+{{ section.content }}
 
 {% endfor %}
 {% endif %}

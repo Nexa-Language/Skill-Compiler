@@ -119,6 +119,11 @@ impl Compiler {
             }
         })?;
 
+        // Log non-blocking warnings
+        for warning in validated_ir.warnings() {
+            tracing::warn!("[{}] {}", warning.code, warning.message);
+        }
+
         // Phase 4: Backend - Emit platform-specific output
         self.emit_outputs(&validated_ir, targets, output_dir)?;
 
@@ -127,6 +132,7 @@ impl Compiler {
             output_dir: output_dir.to_string(),
             targets: targets.to_vec(),
             manifest_path: format!("{}/manifest.json", output_dir),
+            warnings: validated_ir.warnings().to_vec(),
         })
     }
 
@@ -322,6 +328,11 @@ impl Compiler {
             }
         })?;
 
+        // Log non-blocking warnings
+        for warning in validated_ir.warnings() {
+            tracing::warn!("[{}] {}", warning.code, warning.message);
+        }
+
         // Collect IR for routing manifest (before validation wrapper)
         irs_collector.push(validated_ir.as_ref().clone());
 
@@ -333,6 +344,7 @@ impl Compiler {
             output_dir: output_dir.to_string(),
             targets: targets.to_vec(),
             manifest_path: format!("{}/manifest.json", output_dir),
+            warnings: validated_ir.warnings().to_vec(),
         })
     }
 
@@ -378,7 +390,7 @@ impl Compiler {
         let result = analyzer.analyze(ir);
 
         match result {
-            Ok(_) => Ok(vec![]),
+            Ok(validated) => Ok(validated.warnings().to_vec()),
             Err((_ir, diagnostics)) => Ok(diagnostics),
         }
     }
@@ -420,6 +432,8 @@ pub struct CompileOutput {
     pub targets: Vec<TargetPlatform>,
     /// Path to the manifest file
     pub manifest_path: String,
+    /// Non-blocking diagnostic warnings collected during compilation
+    pub warnings: Vec<Diagnostic>,
 }
 
 /// Result of validation

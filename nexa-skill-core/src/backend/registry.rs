@@ -158,7 +158,7 @@ mod tests {
 
         let emitter = registry.get(&TargetPlatform::Claude).unwrap();
         // Verify it's our mock by checking emit output
-        let ir = ValidatedSkillIR::new(SkillIR::default());
+        let ir = ValidatedSkillIR::new(SkillIR::default(), vec![]);
         let output = emitter.emit(&ir).unwrap();
         assert!(output.contains("mock-output"));
     }
@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn emit_for_target() {
         let registry = EmitterRegistry::new();
-        let ir = ValidatedSkillIR::new(SkillIR::default());
+        let ir = ValidatedSkillIR::new(SkillIR::default(), vec![]);
         let result = registry.emit_for_target(&TargetPlatform::Claude, &ir);
         assert!(result.is_ok());
         // Claude emitter produces XML output
@@ -189,7 +189,7 @@ mod tests {
         let mut registry = EmitterRegistry::new();
 
         // First emit with default Claude emitter
-        let ir = ValidatedSkillIR::new(SkillIR::default());
+        let ir = ValidatedSkillIR::new(SkillIR::default(), vec![]);
         let original_output = registry
             .emit_for_target(&TargetPlatform::Claude, &ir)
             .unwrap();

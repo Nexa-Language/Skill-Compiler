@@ -46,6 +46,14 @@
   </execution_steps>
 
 {% endif %}
+{% if !approaches.is_empty() %}
+  <execution_approaches mode="{{ skill_mode }}">
+{% for approach in approaches %}
+    <approach name="{{ approach.name }}">{{ approach.description }}</approach>
+{% endfor %}
+  </execution_approaches>
+
+{% endif %}
 {% if !anti_skill_constraints.is_empty() %}
   <strict_constraints>
 {% for constraint in anti_skill_constraints %}

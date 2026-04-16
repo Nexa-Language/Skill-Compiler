@@ -16,7 +16,7 @@
 use serde_json::json;
 
 use askama::Template;
-use nexa_skill_templates::{ConstraintContext, GeminiContext, StepContext};
+use nexa_skill_templates::{ApproachContext, ConstraintContext, ExampleContext, GeminiContext, PermissionContext, SectionContext, StepContext};
 
 use crate::analyzer::ValidatedSkillIR;
 use crate::error::EmitError;
@@ -120,6 +120,55 @@ impl GeminiEmitter {
                     },
                 })
                 .collect(),
+            context_gathering: if ir.context_gathering.is_empty() {
+                vec![
+                    "Verify all required dependencies are available".to_string(),
+                    "Check system state and prerequisites".to_string(),
+                ]
+            } else {
+                ir.context_gathering.clone()
+            },
+            pre_conditions: ir.pre_conditions.clone(),
+            post_conditions: ir.post_conditions.clone(),
+            permissions: ir
+                .permissions
+                .iter()
+                .map(|p| PermissionContext {
+                    kind_name: p.kind.display_name().to_string(),
+                    scope: p.scope.clone(),
+                    read_only: p.read_only,
+                    description: p.description.clone().unwrap_or_default(),
+                })
+                .collect(),
+            examples: ir
+                .few_shot_examples
+                .iter()
+                .map(|e| ExampleContext {
+                    title: e.title.clone().unwrap_or_default(),
+                    user_input: e.user_input.clone(),
+                    agent_response: e.agent_response.clone(),
+                })
+                .collect(),
+            fallbacks: ir.fallbacks.clone(),
+            extra_sections: ir
+                .extra_sections
+                .iter()
+                .map(|s| SectionContext {
+                    level: s.level,
+                    title: s.title.clone(),
+                    content: s.content.clone(),
+                })
+                .collect(),
+            approaches: ir
+                .approaches
+                .iter()
+                .map(|a| ApproachContext {
+                    name: a.name.to_string(),
+                    description: a.description.to_string(),
+                    instructions: a.instructions.to_string(),
+                })
+                .collect(),
+            skill_mode: ir.mode.to_string(),
         }
     }
 
@@ -207,7 +256,7 @@ mod tests {
     #[test]
     fn test_gemini_emitter_markdown_output() {
         let ir = make_test_ir();
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = GeminiEmitter::new();
         let result = emitter.emit(&validated).unwrap();
         assert!(result.contains("# test-skill"));
@@ -227,7 +276,7 @@ mod tests {
             procedures: vec![make_step(1, "Test")],
             ..Default::default()
         };
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = GeminiEmitter::new();
         let assets = emitter.generate_assets(&validated);
         assert!(!assets.is_empty());

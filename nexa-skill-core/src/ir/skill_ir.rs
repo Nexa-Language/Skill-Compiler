@@ -10,6 +10,48 @@ use serde::{Deserialize, Serialize};
 
 use super::{Constraint, Example, Permission, ProcedureStep, SectionInfo};
 
+/// An alternative execution approach for mode-selector skills
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Approach {
+    /// Approach name (e.g. "Basic Extraction", "Advanced Analysis")
+    pub name: Arc<str>,
+    /// One-line description of this approach
+    pub description: Arc<str>,
+    /// Full instructions for this approach
+    pub instructions: Arc<str>,
+}
+
+/// How the skill should be executed
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SkillMode {
+    /// Single sequential procedure (Explicit Steps / Workflow)
+    Sequential,
+    /// Multiple alternative approaches (Mode Selector)
+    Alternative,
+    /// Reference toolkit — pick relevant operations as needed
+    Toolkit,
+    /// Pure guidelines — no structured execution logic
+    Guideline,
+}
+
+impl Default for SkillMode {
+    fn default() -> Self {
+        Self::Sequential
+    }
+}
+
+impl std::fmt::Display for SkillMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            SkillMode::Sequential => write!(f, "sequential"),
+            SkillMode::Alternative => write!(f, "alternative"),
+            SkillMode::Toolkit => write!(f, "toolkit"),
+            SkillMode::Guideline => write!(f, "guideline"),
+        }
+    }
+}
+
 /// Nexa Skill Compiler Core Intermediate Representation
 ///
 /// This is the central data structure that all compilation stages
@@ -74,6 +116,14 @@ pub struct SkillIR {
     /// Standard operating procedure steps
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub procedures: Vec<ProcedureStep>,
+
+    /// Alternative execution approaches (for mode-selector skills)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub approaches: Vec<Approach>,
+
+    /// Skill execution mode (Sequential, Alternative, Toolkit, Guideline)
+    #[serde(default)]
+    pub mode: SkillMode,
 
     /// Few-shot examples
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
@@ -305,6 +355,8 @@ impl Default for SkillIR {
             security_level: SecurityLevel::default(),
             context_gathering: Vec::new(),
             procedures: Vec::new(),
+            approaches: Vec::new(),
+            mode: SkillMode::default(),
             few_shot_examples: Vec::new(),
             anti_skill_constraints: Vec::new(),
             extra_sections: Vec::new(),

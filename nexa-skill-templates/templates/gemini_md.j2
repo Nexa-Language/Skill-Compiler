@@ -33,15 +33,16 @@ Follow these boundaries strictly:
 
 {{ description }}
 
+{% if !context_gathering.is_empty() %}
 ## Context Gathering
 
 Before execution, gather the following information:
 
-{% if has_input_schema %}
-- Review input parameters from `assets/input.yaml`
+{% for item in context_gathering %}
+- {{ item }}
+{% endfor %}
+
 {% endif %}
-- Verify all required dependencies are available
-- Check system state and prerequisites
 
 {% if !procedures.is_empty() %}
 ## Execution Steps
@@ -50,6 +51,69 @@ Execute in exact sequence:
 
 {% for step in procedures %}
 {{ step.order }}. {{ step.instruction }}{% if step.is_critical %} ⚠️ **[CRITICAL]**{% endif %}
+{% endfor %}
+
+{% endif %}
+{% if !approaches.is_empty() %}
+## Approaches ({{ skill_mode }})
+
+{% for approach in approaches %}
+### {{ approach.name }}
+{{ approach.description }}
+
+{% endfor %}
+{% endif %}
+{% if !pre_conditions.is_empty() %}
+## Pre-Conditions
+
+{% for cond in pre_conditions %}
+- {{ cond }}
+{% endfor %}
+
+{% endif %}
+{% if !permissions.is_empty() %}
+## Permissions
+
+{% for perm in permissions %}
+- **{{ perm.kind_name }}**: {{ perm.scope }}{% if perm.read_only %} (read-only){% endif %} — {{ perm.description }}
+{% endfor %}
+
+{% endif %}
+{% if !examples.is_empty() %}
+## Examples
+
+{% for example in examples %}
+{% if !example.title.is_empty() %}
+### {{ example.title }}
+
+{% endif %}
+**User Input:**
+```
+{{ example.user_input }}
+```
+
+**Agent Response:**
+```
+{{ example.agent_response }}
+```
+
+{% endfor %}
+{% endif %}
+{% if !fallbacks.is_empty() %}
+## Fallbacks
+
+If primary approach fails:
+
+{% for fb in fallbacks %}
+- {{ fb }}
+{% endfor %}
+
+{% endif %}
+{% if !post_conditions.is_empty() %}
+## Post-Conditions
+
+{% for cond in post_conditions %}
+- {{ cond }}
 {% endfor %}
 
 {% endif %}
@@ -62,6 +126,15 @@ NEVER perform these actions:
 - {{ constraint.content }}{{ constraint.level_marker }}
 {% endfor %}
 
+{% endif %}
+{% if !extra_sections.is_empty() %}
+## Additional Context
+
+{% for section in extra_sections %}
+### {{ section.title }}
+{{ section.content }}
+
+{% endfor %}
 {% endif %}
 ## Output Format
 

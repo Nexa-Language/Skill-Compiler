@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use chrono::Utc;
 use crate::frontend::RawAST;
-use crate::ir::{Constraint, Example, Permission, PermissionKind, ProcedureStep, SectionInfo, SecurityLevel, SkillIR};
+use crate::ir::{Approach, Constraint, Example, Permission, PermissionKind, ProcedureStep, SectionInfo, SecurityLevel, SkillIR, SkillMode};
 use crate::security::SecurityBaseline;
 
 /// Build SkillIR from RawAST
@@ -150,6 +150,10 @@ pub fn build_ir(raw: &RawAST) -> SkillIR {
         })
         .unwrap_or(SecurityLevel::Medium);
 
+    // Infer SkillMode before moving procedures into SkillIR
+    let mut mode = SkillMode::default();
+    infer_skill_mode(&procedures, &body.approaches, &mut mode);
+
     SkillIR {
         name: Arc::from(fm.name.clone()),
         version: Arc::from(fm.version.clone().unwrap_or_else(|| "0.1.0".to_string())),
@@ -165,6 +169,12 @@ pub fn build_ir(raw: &RawAST) -> SkillIR {
         security_level,
         context_gathering,
         procedures,
+        approaches: body.approaches.iter().map(|a| Approach {
+            name: Arc::from(a.name.clone()),
+            description: Arc::from(a.description.clone()),
+            instructions: Arc::from(a.instructions.clone()),
+        }).collect(),
+        mode,
         few_shot_examples,
         anti_skill_constraints: constraints,
         extra_sections,
@@ -173,6 +183,38 @@ pub fn build_ir(raw: &RawAST) -> SkillIR {
         source_path: raw.source_path.clone(),
         source_hash: raw.source_hash.clone(),
         compiled_at: Some(Utc::now()),
+    }
+}
+
+/// Infer the SkillMode from the extracted procedures and approaches.
+///
+/// Classification logic:
+/// - Alternative: if approaches are present (mode-selector skills)
+/// - Guideline: if the only procedure is the fallback "Follow the skill instructions"
+/// - Toolkit: if procedures contain operation-like keywords
+/// - Sequential: if procedures exist without the above patterns
+fn infer_skill_mode(
+    procedures: &[ProcedureStep],
+    approaches: &[crate::frontend::RawApproach],
+    mode: &mut SkillMode,
+) {
+    if !approaches.is_empty() {
+        *mode = SkillMode::Alternative;
+    } else if procedures.len() == 1
+        && procedures[0].instruction.starts_with("Follow the skill instructions")
+    {
+        *mode = SkillMode::Guideline;
+    } else if !procedures.is_empty()
+        && procedures.iter().any(|p| {
+            let t = p.instruction.to_lowercase();
+            t.contains("operation") || t.contains("extract") || t.contains("merge")
+        })
+    {
+        *mode = SkillMode::Toolkit;
+    } else if !procedures.is_empty() {
+        *mode = SkillMode::Sequential;
+    } else {
+        *mode = SkillMode::Guideline;
     }
 }
 

@@ -17,15 +17,20 @@ pub use schema::SchemaValidator;
 use crate::error::Diagnostic;
 use crate::ir::SkillIR;
 
-/// Validated SkillIR wrapper
+/// Validated SkillIR wrapper with non-blocking diagnostics
 #[derive(Debug, Clone)]
-pub struct ValidatedSkillIR(SkillIR);
+pub struct ValidatedSkillIR(SkillIR, Vec<Diagnostic>);
 
 impl ValidatedSkillIR {
-    /// Create a new validated IR wrapper
+    /// Create a new validated IR wrapper with non-blocking diagnostics
+    ///
+    /// Only stores non-blocking (warning) diagnostics; blocking diagnostics
+    /// are returned via the `Err` path of `analyze()`.
     #[must_use]
-    pub fn new(ir: SkillIR) -> Self {
-        Self(ir)
+    pub fn new(ir: SkillIR, warnings: Vec<Diagnostic>) -> Self {
+        // Only store non-blocking diagnostics
+        let warnings = warnings.into_iter().filter(|d| !d.is_blocking()).collect();
+        Self(ir, warnings)
     }
 
     /// Get the inner IR
@@ -38,6 +43,12 @@ impl ValidatedSkillIR {
     #[must_use]
     pub fn into_inner(self) -> SkillIR {
         self.0
+    }
+
+    /// Get non-blocking diagnostics (warnings)
+    #[must_use]
+    pub fn warnings(&self) -> &[Diagnostic] {
+        &self.1
     }
 }
 
@@ -94,7 +105,7 @@ impl Analyzer {
             return Err((ir, diagnostics));
         }
 
-        Ok(ValidatedSkillIR::new(ir))
+        Ok(ValidatedSkillIR::new(ir, diagnostics))
     }
 }
 

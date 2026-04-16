@@ -14,4 +14,4 @@ mod markdown;
 
 pub use ast::{ASTBuilder, RawAST};
 pub use frontmatter::{FrontmatterMeta, extract_frontmatter};
-pub use markdown::{MarkdownBody, RawProcedureStep, parse_markdown_body};
+pub use markdown::{MarkdownBody, RawApproach, RawProcedureStep, SectionKind, classify_section, parse_markdown_body};

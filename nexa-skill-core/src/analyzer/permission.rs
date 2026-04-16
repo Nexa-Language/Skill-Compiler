@@ -6,6 +6,39 @@ use crate::error::Diagnostic;
 use crate::ir::{PermissionKind, SkillIR};
 use crate::security::SecurityBaseline;
 
+/// Check if a dangerous keyword appears in text with proper word boundary matching.
+///
+/// For single-word keywords (no spaces), requires word boundary matching to avoid
+/// false positives like "exec" matching "execution" or "executive".
+/// For multi-word keywords (with spaces, like "rm -rf"), uses simple substring matching
+/// since spaces serve as natural delimiters.
+fn matches_dangerous_keyword(text: &str, keyword: &str) -> bool {
+    if keyword.contains(' ') {
+        // Multi-word patterns: spaces are natural delimiters
+        return text.contains(keyword);
+    }
+    // Single-word: need word boundary check
+    // A word boundary means the keyword is preceded/followed by a non-alphanumeric
+    // character (or string boundary), so "exec" won't match "execution"
+    for (pos, _) in text.match_indices(keyword) {
+        let left_boundary = pos == 0
+            || !text[..pos]
+                .chars()
+                .next_back()
+                .map_or(true, char::is_alphanumeric);
+        let right_pos = pos + keyword.len();
+        let right_boundary = right_pos == text.len()
+            || !text[right_pos..]
+                .chars()
+                .next()
+                .map_or(true, char::is_alphanumeric);
+        if left_boundary && right_boundary {
+            return true;
+        }
+    }
+    false
+}
+
 /// Dangerous keyword definition
 struct DangerousKeyword {
     keyword: &'static str,
@@ -132,7 +165,7 @@ impl PermissionAuditor {
         // 1. Check dangerous keywords in procedures
         for step in &ir.procedures {
             for keyword in &self.dangerous_keywords {
-                if step.instruction.contains(keyword.keyword) {
+                if matches_dangerous_keyword(&step.instruction, keyword.keyword) {
                     let has_permission = self.check_permission_for_keyword(
                         &ir.permissions,
                         keyword,
@@ -452,6 +485,52 @@ mod tests {
         let diagnostics = auditor.audit(&ir);
         assert!(diagnostics.iter().any(|d|
             d.code == "nsc::security::permission_warning" && d.is_warning()
+        ));
+    }
+
+    // 13. matches_dangerous_keyword — word boundary matching prevents false positives
+    #[test]
+    fn test_matches_dangerous_keyword_word_boundary() {
+        // "exec" should NOT match "execution", "executive", "execute"
+        assert!(!matches_dangerous_keyword("master-level execution", "exec"));
+        assert!(!matches_dangerous_keyword("executive leadership team", "exec"));
+        assert!(!matches_dangerous_keyword("execute these tasks", "exec"));
+        assert!(!matches_dangerous_keyword("the product of deep expertise", "exec"));
+
+        // "exec" SHOULD match standalone "exec"
+        assert!(matches_dangerous_keyword("exec /usr/bin/script", "exec"));
+        assert!(matches_dangerous_keyword("run exec command", "exec"));
+
+        // Multi-word keywords should use substring matching
+        assert!(matches_dangerous_keyword("rm -rf /var/log", "rm -rf"));
+        assert!(matches_dangerous_keyword("something rm -rf else", "rm -rf")); // multi-word: substring match, "rm -rf" IS present
+
+        // "sudo" should match standalone
+        assert!(matches_dangerous_keyword("sudo apt-get install", "sudo"));
+        assert!(!matches_dangerous_keyword("pseudo-science approach", "sudo")); // "sudo" not at boundary in "pseudo"
+
+        // "DELETE" should match standalone
+        assert!(matches_dangerous_keyword("DELETE FROM users", "DELETE"));
+        assert!(!matches_dangerous_keyword("completed task yesterday", "DELETE")); // "DELETE" not in this string
+    }
+
+    // 14. exec_false_positive_regression — "execution" in step should NOT trigger exec error
+    #[test]
+    fn test_exec_false_positive_regression() {
+        let auditor = PermissionAuditor::new();
+        let ir = make_skill_ir(vec![], vec![ProcedureStep {
+            order: 1,
+            instruction: "The philosophy MUST stress master-level execution of the design".to_string(),
+            is_critical: false,
+            constraints: vec![],
+            expected_output: None,
+            on_error: None,
+        }]);
+        let diagnostics = auditor.audit(&ir);
+        // Should NOT produce an error for "exec" found in "execution"
+        assert!(!diagnostics.iter().any(|d|
+            d.code == "nsc::security::missing_permission" &&
+            d.message.contains("exec")
         ));
     }
 }

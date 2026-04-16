@@ -435,6 +435,81 @@ def _extract_procedure_steps(skill_content: str) -> List[str]:
             step_clean = re.sub(r"<[^>]+>", "", step_text).strip()
             if step_clean:
                 steps.append(step_clean)
+
+        # Extract approach names from <execution_approaches> as additional steps
+        for match in re.finditer(r'<approach[^>]*name="([^"]+)"[^>]*>', skill_content):
+            approach_name = match.group(1).strip()
+            if approach_name:
+                steps.append(approach_name)
+
+        # Fallback: when no <execution_steps> tag exists, extract procedure
+        # steps from <additional_context> <section> content.  Skills without
+        # ## Procedures heading have all procedural content in additional_context.
+        # In compiled XML, numbered steps like "1. **Extracts Ads**:" become
+        # "Verb Noun: Description" patterns (colon-separated, no digit prefix),
+        # often concatenated on one line without separators.
+        if not steps and "<execution_steps>" not in skill_content:
+            ac_match = re.search(
+                r"<additional_context[^>]*>(.*?)</additional_context>",
+                skill_content, re.DOTALL
+            )
+            if ac_match:
+                ac_inner = ac_match.group(1)
+
+                # Strategy 1: Extract "Verb Noun:" action patterns from
+                # section body text — these are compiled numbered steps.
+                # In XML compilation, multi-line step lists are concatenated
+                # on one line (e.g., "approachesProvides Insights"), so we
+                # must split at lowercase→uppercase word boundaries first.
+                for sec in re.finditer(
+                    r"<section[^>]*>(.*?)</section>",
+                    ac_inner, re.DOTALL,
+                ):
+                    body_text = re.sub(r"<[^>]+>", "", sec.group(1)).strip()
+                    # Split concatenated text at [a-z][A-Z] boundaries
+                    # (e.g., "approachesProvides" → "approaches\nProvides",
+                    # "hierarchyCRITICAL" → "hierarchy\nCRITICAL").
+                    # Hyphens (User-Friendly) are preserved because the
+                    # boundary only matches direct lowercase-uppercase adjacency
+                    # with no intervening hyphen.
+                    expanded = re.sub(
+                        r"([a-z])([A-Z])", r"\1\n\2", body_text
+                    )
+                    # Find all "Title:" action-label patterns (1-5 words
+                    # starting with a capital letter before a colon).
+                    # Use [ \t] instead of \s to prevent cross-line matching.
+                    actions = re.findall(
+                        r"([A-Z][a-z]+(?:[ \t][A-Za-z→\-]+){0,4})[ \t]*:",
+                        expanded,
+                    )
+                    for action in actions:
+                        action_clean = action.strip()
+                        if action_clean and len(action_clean) > 3:
+                            steps.append(action_clean)
+
+                # Strategy 2: If no action patterns found, use section titles
+                # as procedural anchors (covers skills where procedure content
+                # is in section headings like "Basic Enhancement", "Ad Campaign
+                # Planning").  Skip generic/meta titles that aren't procedural.
+                if not steps:
+                    skip_titles = {
+                        "overview", "when to use this skill",
+                        "what this skill does", "tips",
+                        "related use cases", "quick reference",
+                        "common use cases", "output formats",
+                    }
+                    for sec in re.finditer(
+                        r"<section[^>]*>(.*?)</section>",
+                        ac_inner, re.DOTALL,
+                    ):
+                        title_match = re.search(
+                            r'title="([^"]+)"', sec.group(0)
+                        )
+                        if title_match:
+                            title = title_match.group(1).strip()
+                            if title.lower() not in skip_titles and len(title) > 3:
+                                steps.append(title)
+
         return steps
 
     # Markdown format: extract numbered steps and Step N: patterns
@@ -470,6 +545,7 @@ def _extract_key_sections(skill_content: str) -> List[str]:
             "permissions": "instructions",
             "mcp_servers": "instructions",
             "additional_context": "description",
+            "execution_approaches": "procedures",
         }
         for tag, section_name in tag_to_section.items():
             if f"<{tag}" in skill_content:
@@ -500,15 +576,18 @@ def _extract_completeness_keywords(skill_content: str) -> List[str]:
     if _is_xml_format(skill_content):
         # XML: extract meaningful text from each major section tag
         keywords = []
+        # Top-level tags (additional_context handled separately below)
         section_tags = [
             "intent", "execution_steps", "strict_constraints",
             "examples", "fallbacks", "pre_conditions",
-            "context_gathering", "permissions", "additional_context",
+            "context_gathering", "permissions",
+            "execution_approaches",
         ]
         filler = {"the", "this", "that", "with", "from", "for", "and",
                   "but", "not", "all", "can", "will", "may", "should",
                   "must", "also", "then", "than", "been", "being", "have",
                   "having", "does", "did", "would", "could", "about"}
+
         for tag in section_tags:
             match = re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", skill_content, re.DOTALL)
             if match:
@@ -516,6 +595,44 @@ def _extract_completeness_keywords(skill_content: str) -> List[str]:
                 words = [w.lower() for w in text.split()
                          if len(w) > 3 and w.lower() not in filler]
                 keywords.extend(words[:3])
+
+        # Recursively extract keywords from <section> sub-tags inside
+        # <additional_context>.  Each section contributes 2-3 keywords
+        # from its title attribute and body text — this covers skills
+        # without ## Procedures whose content is entirely in additional_context.
+        ac_match = re.search(
+            r"<additional_context[^>]*>(.*?)</additional_context>",
+            skill_content, re.DOTALL,
+        )
+        if ac_match:
+            for sec in re.finditer(
+                r"<section[^>]*>(.*?)</section>",
+                ac_match.group(1), re.DOTALL,
+            ):
+                # Title attribute keywords (up to 2)
+                title_match = re.search(r'title="([^"]+)"', sec.group(0))
+                if title_match:
+                    title_words = [w.lower() for w in title_match.group(1).split()
+                                   if len(w) > 3 and w.lower() not in filler]
+                    keywords.extend(title_words[:2])
+                # Body text keywords (up to 2)
+                body_text = re.sub(r"<[^>]+>", "", sec.group(1)).strip()
+                body_words = [w.lower() for w in body_text.split()
+                              if len(w) > 3 and w.lower() not in filler]
+                keywords.extend(body_words[:2])
+
+        # Extract keywords from <execution_approaches> <approach> tags
+        ea_match = re.search(r'<execution_approaches[^>]*>(.*?)</execution_approaches>', skill_content, re.DOTALL)
+        if ea_match:
+            for approach in re.finditer(r'<approach[^>]*name="([^"]+)"[^>]*>(.*?)</approach>', ea_match.group(1), re.DOTALL):
+                # Approach name keywords
+                name_words = [w.lower() for w in approach.group(1).split() if len(w) > 3 and w.lower() not in filler]
+                keywords.extend(name_words[:2])
+                # Approach description keywords
+                desc_text = re.sub(r'<[^>]+>', '', approach.group(2)).strip()
+                desc_words = [w.lower() for w in desc_text.split() if len(w) > 3 and w.lower() not in filler]
+                keywords.extend(desc_words[:2])
+
         return keywords[:20]
 
     # Markdown: extract keywords from headings and step descriptions

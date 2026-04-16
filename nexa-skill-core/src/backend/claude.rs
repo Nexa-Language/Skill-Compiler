@@ -3,7 +3,7 @@
 //! Emits Claude-compatible XML format using Askama templates.
 
 use askama::Template;
-use nexa_skill_templates::{ClaudeContext, ConstraintContext, ExampleContext, PermissionContext, SectionContext, StepContext};
+use nexa_skill_templates::{ApproachContext, ClaudeContext, ConstraintContext, ExampleContext, PermissionContext, SectionContext, StepContext};
 
 use crate::analyzer::ValidatedSkillIR;
 use crate::error::EmitError;
@@ -76,6 +76,16 @@ impl Emitter for ClaudeEmitter {
                 .collect(),
             mcp_servers: inner.mcp_servers.iter().map(|s| s.to_string()).collect(),
             security_level: inner.security_level.to_string().to_lowercase(),
+            approaches: inner
+                .approaches
+                .iter()
+                .map(|a| ApproachContext {
+                    name: a.name.to_string(),
+                    description: a.description.to_string(),
+                    instructions: a.instructions.to_string(),
+                })
+                .collect(),
+            skill_mode: inner.mode.to_string(),
             extra_sections: inner
                 .extra_sections
                 .iter()
@@ -134,7 +144,7 @@ mod tests {
     #[test]
     fn test_claude_emitter_xml_output() {
         let ir = make_test_ir();
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = ClaudeEmitter::new();
         let result = emitter.emit(&validated).unwrap();
         assert!(result.contains("<agent_skill>"));

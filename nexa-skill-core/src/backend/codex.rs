@@ -17,7 +17,7 @@
 //! Reference: "高级提示词工程格式与智能体技能架构" research report
 
 use askama::Template;
-use nexa_skill_templates::{CodexContext, ConstraintContext, ExampleContext, StepContext};
+use nexa_skill_templates::{ApproachContext, CodexContext, ConstraintContext, ExampleContext, PermissionContext, SectionContext, StepContext};
 
 use crate::analyzer::ValidatedSkillIR;
 use crate::error::EmitError;
@@ -141,6 +141,37 @@ impl CodexEmitter {
                 })
                 .collect(),
             fallbacks: ir.fallbacks.clone(),
+            pre_conditions: ir.pre_conditions.clone(),
+            post_conditions: ir.post_conditions.clone(),
+            permissions: ir
+                .permissions
+                .iter()
+                .map(|p| PermissionContext {
+                    kind_name: p.kind.display_name().to_string(),
+                    scope: p.scope.clone(),
+                    read_only: p.read_only,
+                    description: p.description.clone().unwrap_or_default(),
+                })
+                .collect(),
+            extra_sections: ir
+                .extra_sections
+                .iter()
+                .map(|s| SectionContext {
+                    level: s.level,
+                    title: s.title.clone(),
+                    content: s.content.clone(),
+                })
+                .collect(),
+            approaches: ir
+                .approaches
+                .iter()
+                .map(|a| ApproachContext {
+                    name: a.name.to_string(),
+                    description: a.description.to_string(),
+                    instructions: a.instructions.to_string(),
+                })
+                .collect(),
+            skill_mode: ir.mode.to_string(),
         }
     }
 }
@@ -171,7 +202,7 @@ mod tests {
             ..Default::default()
         };
 
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = CodexEmitter::new();
         let output = emitter.emit(&validated).unwrap();
 
@@ -188,7 +219,7 @@ mod tests {
     #[test]
     fn test_codex_no_json_assets() {
         let ir = SkillIR::default();
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = CodexEmitter::new();
         let assets = emitter.generate_assets(&validated);
 

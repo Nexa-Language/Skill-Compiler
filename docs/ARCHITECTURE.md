@@ -4,7 +4,7 @@
 >
 > **架构版本**：v2.0（基于《高级提示词工程格式与智能体技能架构》调研报告重构）
 
-> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的架构设计已全部在源码中实现（WASM除外，见Section 7）。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+> ⚠️ **实现状态声明 (Updated 2026-04-16):** 本文档描述的架构设计大部分已在源码中实现。部分早期设计（如 Codex 双负载架构、Analyzer trait 统一接口、Warning 诊断保留）在实现过程中进行了简化，详见下方各节标注。完整审查见 [审查报告](../plans/RE_AUDIT_REPORT_20260416.md)。实现状态如下：
 >
 > | 文档描述 | 实现状态 |
 > |----------|---------|
@@ -16,6 +16,9 @@
 > | Askama 模板引擎 | ✅ 4个 .j2 模板 + context structs |
 > | `nexa-skill-wasm/` crate | ⏳ 暂不实现（未来扩展） |
 > | `index.rs` (CLI命令) | ✅ 已实现 |
+> | Codex 双负载生成 | ❌ 未实现 — 已重构为纯Markdown |
+> | Analyzer trait 统一接口 | ❌ 未实现 — 使用独立 struct |
+> | Warning 诊断保留（compile_file Ok 路径） | ✅ check/validate 模式返回 diagnostics，build 模式通过 tracing::warn! 输出 |
 
 ---
 
@@ -76,7 +79,7 @@ graph TB
     
     subgraph "Phase 4: Backend"
         M[Claude Emitter<br/>XML原教旨主义]
-        O[Codex Emitter<br/>双负载生成]
+        O[Codex Emitter<br/>纯Markdown输出]
         P[Gemini Emitter<br/>YAML优化注入]
         Q[Kimi Emitter<br/>完整Markdown]
     end
@@ -85,7 +88,7 @@ graph TB
         R[manifest.json]
         S[routing_manifest.yaml<br/>渐进式路由清单]
         T[claude.xml]
-        U[codex.md + codex_schema.json]
+        U[codex.md]
         V[gemini.md<br/>含YAML块]
         W[kimi.md]
         X[signature.sha256]
@@ -163,7 +166,7 @@ nexa-skill-compiler/
 │   │   │   ├── mod.rs
 │   │   │   ├── emitter.rs    # Emitter Trait
 │   │   │   ├── claude.rs     # XML发射器
-│   │   │   ├── codex.rs      # 双负载发射器（重构）
+│   │   │   ├── codex.rs      # 纯Markdown发射器
 │   │   │   ├── gemini.rs     # YAML优化发射器（重构）
 │   │   │   ├── kimi.rs       # 完整Markdown发射器
 │   │   │   └── routing.rs    # 路由清单生成器（新增）
@@ -320,26 +323,14 @@ graph LR
 **Emitter Trait 定义**：
 
 ```rust
-pub trait Emitter {
-    /// 目标平台标识
+pub trait Emitter: Send + Sync {
     fn target(&self) -> TargetPlatform;
-    
-    /// 将 ValidatedSkillIR 发射为字符串
     fn emit(&self, ir: &ValidatedSkillIR) -> Result<String, EmitError>;
-    
-    /// 发射产物文件扩展名
-    fn file_extension(&self) -> &'static str;
-    
-    /// 是否支持双负载生成（Codex专用）
-    fn supports_dual_payload(&self) -> bool { false }
-    
-    /// 发射JSON Schema负载（用于API工具调用层）
-    fn emit_schema_payload(&self, ir: &ValidatedSkillIR) -> Result<Option<String>, EmitError> {
-        Ok(None)
-    }
-    
-    /// 是否需要生成 manifest.json
+    fn file_extension(&self) -> &'static str { self.target().extension() }
     fn requires_manifest(&self) -> bool { true }
+    fn generate_assets(&self, _ir: &ValidatedSkillIR) -> Vec<(String, String)> { Vec::new() }
+    fn pre_process(&self, _ir: &ValidatedSkillIR) -> Result<(), EmitError> { Ok(()) }
+    fn post_process(&self, content: &str) -> Result<String, EmitError> { Ok(content.to_string()) }
 }
 ```
 
@@ -348,7 +339,7 @@ pub trait Emitter {
 | 平台 | 发射策略 | 学术依据 |
 |------|----------|----------|
 | Claude | XML原教旨主义，强标签嵌套 | Anthropic官方指南 + 23%推理准确率提升 |
-| Codex | **双负载生成**：Markdown指令 + JSON Schema分离 | Format Tax消除 + 100% Schema遵循率 |
+| Codex | **纯Markdown输出**，Schema由API层（Structured Outputs）负责 | Format Tax消除 + 词元效率优化 |
 | Gemini | **AST优化**：嵌套数据自动转YAML | YAML 51.9% > MD 48.2% > JSON 43.1% |
 | Kimi | 完整Markdown，保留所有细节 | 超长上下文优势 |
 
@@ -545,7 +536,7 @@ graph TB
 |----------|----------|------------|
 | `ParseError` | 立即终止，显示精确行号 | ✅ 必须显示 |
 | `ValidationError` | 收集所有错误后统一显示 | ✅ 必须显示 |
-| `Warning` | 继续编译，但记录警告 | ✅ 显示但不阻断 |
+| `Warning` | 继续编译，但记录警告 | ✅ check/validate 模式显示；build 模式静默接受（见 N3 修复计划） |
 | `EmitError` | 终止当前目标，继续其他目标 | ✅ 显示目标失败原因 |
 | `IOError` | 立即终止 | ✅ 显示文件路径 |
 
@@ -649,29 +640,45 @@ impl Emitter for KimiEmitter {
 通过实现 `Analyzer` Trait 添加自定义校验逻辑：
 
 ```rust
-pub trait Analyzer {
-    fn analyze(&self, ir: &mut SkillIR) -> Result<Vec<Diagnostic>, AnalyzeError>;
+/// Analyzer orchestrator — 实际实现为独立 struct，非 trait
+pub struct Analyzer {
+    schema_validator: SchemaValidator,
+    mcp_checker: MCPDependencyChecker,
+    permission_auditor: PermissionAuditor,
+    anti_skill_injector: AntiSkillInjector,
+    nested_data_detector: NestedDataDetector,
 }
 
-// 示例：自定义命名规范检查器
-pub struct NamingConventionAnalyzer;
-
-impl Analyzer for NamingConventionAnalyzer {
-    fn analyze(&self, ir: &mut SkillIR) -> Result<Vec<Diagnostic>, AnalyzeError> {
-        let mut diagnostics = Vec::new();
-        
-        // 检查 name 是否符合 kebab-case
-        if !is_kebab_case(&ir.name) {
-            diagnostics.push(Diagnostic::warning(
-                "name should be in kebab-case format",
-                "naming-convention"
-            ));
+impl Analyzer {
+    pub fn new() -> Self {
+        Self {
+            schema_validator: SchemaValidator::new(),
+            mcp_checker: MCPDependencyChecker::new(),
+            permission_auditor: PermissionAuditor::new(),
+            anti_skill_injector: AntiSkillInjector::new(),
+            nested_data_detector: NestedDataDetector::new(),
         }
-        
-        Ok(diagnostics)
+    }
+
+    /// Analyze SkillIR, returning validated IR with warnings or blocking diagnostics
+    pub fn analyze(&self, ir: SkillIR) -> Result<ValidatedSkillIR, (SkillIR, Vec<Diagnostic>)> {
+        let mut diagnostics = Vec::new();
+        let ir = self.nested_data_detector.detect(ir);
+        diagnostics.extend(self.schema_validator.validate(&ir));
+        diagnostics.extend(self.mcp_checker.check(&ir));
+        diagnostics.extend(self.permission_auditor.audit(&ir));
+        let ir = self.anti_skill_injector.inject(ir);
+
+        if diagnostics.iter().any(|d| d.is_blocking()) {
+            return Err((ir, diagnostics));
+        }
+
+        Ok(ValidatedSkillIR::new(ir, diagnostics))  // warnings preserved!
     }
 }
 ```
+
+> ⚠️ **与早期设计的差异**：早期设计定义了 `trait Analyzer`，但实际实现使用独立的 `Analyzer` struct + 各子分析器（`SchemaValidator`, `MCPDependencyChecker`, `PermissionAuditor`, `AntiSkillInjector`, `NestedDataDetector`），通过 `Vec<Diagnostic>` 收集诊断结果。`ValidatedSkillIR` 现携带 `Vec<Diagnostic>` 保留非阻断警告（N3修复）。
 
 ---
 
@@ -729,7 +736,7 @@ graph TB
 
 | 发现 | 数据 | 影响 |
 |------|------|------|
-| Format Tax | 强制JSON输入导致40%性能衰退 | Codex采用双负载生成 |
+| Format Tax | 强制JSON输入导致40%性能衰退 | Codex采用纯Markdown输出，Schema由API层负责 |
 | XML优势 | Claude XML比JSON高23%推理准确率 | Claude Emitter保持XML原教旨主义 |
 | YAML嵌套优势 | YAML 51.9% > MD 48.2% > JSON 43.1% | Gemini实现AST优化注入 |
 | 词元效率 | Markdown比JSON节省34%-38%词元 | Codex主负载采用Markdown |
@@ -739,7 +746,7 @@ graph TB
 | 决策 | 原因 | 效果 |
 |------|------|------|
 | 四阶段管线 | 编译器经典理论 | 关注点分离，易于扩展 |
-| 双负载生成 | 消除格式税 | 节省34%-38%词元，避免推理衰退 |
+| 纯Markdown输出 | 消除格式税 | 词元效率优化，Schema由API层负责 |
 | YAML优化 | 套数据准确率 | +8.8%解析准确率 |
 | 渐进式路由 | 解决上下文膨胀 | 常驻词元极小化 |
 

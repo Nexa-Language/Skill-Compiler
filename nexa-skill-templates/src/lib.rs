@@ -41,6 +41,17 @@ pub struct PermissionContext {
     pub description: String,
 }
 
+/// Approach context for mode-selector skills
+#[derive(Debug, Clone)]
+pub struct ApproachContext {
+    /// Approach name (e.g. "Basic Extraction", "Advanced Analysis")
+    pub name: String,
+    /// One-line description
+    pub description: String,
+    /// Full instructions for this approach
+    pub instructions: String,
+}
+
 /// Example context for few-shot demonstrations
 #[derive(Debug, Clone)]
 pub struct ExampleContext {
@@ -99,6 +110,10 @@ pub struct ClaudeContext {
     pub security_level: String,
     /// Additional sections from the Markdown body
     pub extra_sections: Vec<SectionContext>,
+    /// Alternative execution approaches (for mode-selector skills)
+    pub approaches: Vec<ApproachContext>,
+    /// Skill execution mode (e.g. "sequential", "alternative", "toolkit", "guideline")
+    pub skill_mode: String,
 }
 
 // ===== Codex Markdown Template =====
@@ -139,6 +154,18 @@ pub struct CodexContext {
     pub examples: Vec<ExampleContext>,
     /// Fallback strategies
     pub fallbacks: Vec<String>,
+    /// Pre-execution conditions
+    pub pre_conditions: Vec<String>,
+    /// Post-execution conditions
+    pub post_conditions: Vec<String>,
+    /// Permission declarations
+    pub permissions: Vec<PermissionContext>,
+    /// Additional sections from the Markdown body
+    pub extra_sections: Vec<SectionContext>,
+    /// Alternative execution approaches (for mode-selector skills)
+    pub approaches: Vec<ApproachContext>,
+    /// Skill execution mode (e.g. "sequential", "alternative", "toolkit", "guideline")
+    pub skill_mode: String,
 }
 
 // ===== Gemini Markdown Template =====
@@ -171,6 +198,24 @@ pub struct GeminiContext {
     pub procedures: Vec<StepContext>,
     /// Anti-skill constraints
     pub anti_skill_constraints: Vec<ConstraintContext>,
+    /// Context gathering steps (replace hardcoded defaults)
+    pub context_gathering: Vec<String>,
+    /// Pre-execution conditions
+    pub pre_conditions: Vec<String>,
+    /// Post-execution conditions
+    pub post_conditions: Vec<String>,
+    /// Permission declarations
+    pub permissions: Vec<PermissionContext>,
+    /// Few-shot examples
+    pub examples: Vec<ExampleContext>,
+    /// Error recovery strategies (fallbacks)
+    pub fallbacks: Vec<String>,
+    /// Additional sections from the Markdown body
+    pub extra_sections: Vec<SectionContext>,
+    /// Alternative execution approaches (for mode-selector skills)
+    pub approaches: Vec<ApproachContext>,
+    /// Skill execution mode (e.g. "sequential", "alternative", "toolkit", "guideline")
+    pub skill_mode: String,
 }
 
 // ===== Kimi Full Markdown Template =====
@@ -211,4 +256,10 @@ pub struct KimiContext {
     pub output_schema_json: String,
     /// Few-shot examples
     pub examples: Vec<ExampleContext>,
+    /// Additional sections from the Markdown body
+    pub extra_sections: Vec<SectionContext>,
+    /// Alternative execution approaches (for mode-selector skills)
+    pub approaches: Vec<ApproachContext>,
+    /// Skill execution mode (e.g. "sequential", "alternative", "toolkit", "guideline")
+    pub skill_mode: String,
 }

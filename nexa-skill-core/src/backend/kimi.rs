@@ -14,7 +14,7 @@
 
 use askama::Template;
 use nexa_skill_templates::{
-    ConstraintContext, ExampleContext, KimiContext, PermissionContext, StepContext,
+    ApproachContext, ConstraintContext, ExampleContext, KimiContext, PermissionContext, SectionContext, StepContext,
 };
 
 use crate::analyzer::ValidatedSkillIR;
@@ -128,6 +128,25 @@ impl KimiEmitter {
                     agent_response: e.agent_response.clone(),
                 })
                 .collect(),
+            extra_sections: ir
+                .extra_sections
+                .iter()
+                .map(|s| SectionContext {
+                    level: s.level,
+                    title: s.title.clone(),
+                    content: s.content.clone(),
+                })
+                .collect(),
+            approaches: ir
+                .approaches
+                .iter()
+                .map(|a| ApproachContext {
+                    name: a.name.to_string(),
+                    description: a.description.to_string(),
+                    instructions: a.instructions.to_string(),
+                })
+                .collect(),
+            skill_mode: ir.mode.to_string(),
         }
     }
 }
@@ -229,7 +248,7 @@ mod tests {
     #[test]
     fn test_kimi_generates_full_markdown() {
         let ir = make_test_ir();
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = KimiEmitter::new();
         let result = emitter.emit(&validated).unwrap();
 
@@ -276,7 +295,7 @@ mod tests {
     #[test]
     fn test_kimi_no_assets() {
         let ir = make_test_ir();
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = KimiEmitter::new();
         let assets = emitter.generate_assets(&validated);
         assert!(assets.is_empty());
@@ -311,7 +330,7 @@ mod tests {
             }],
             ..Default::default()
         };
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = KimiEmitter::new();
         let result = emitter.emit(&validated).unwrap();
 
@@ -347,7 +366,7 @@ mod tests {
             }],
             ..Default::default()
         };
-        let validated = ValidatedSkillIR::new(ir);
+        let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = KimiEmitter::new();
         let result = emitter.emit(&validated).unwrap();
 

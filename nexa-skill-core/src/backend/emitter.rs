@@ -1,7 +1,6 @@
 //! Emitter Trait
 //!
 //! Defines the interface for all backend emitters.
-//! Supports dual-payload output for format-tax optimization.
 
 use crate::analyzer::ValidatedSkillIR;
 use crate::error::EmitError;
@@ -38,7 +37,7 @@ pub trait Emitter: Send + Sync {
         true
     }
 
-    /// Generate additional asset files (e.g., schema files for dual-payload mode)
+    /// Generate additional asset files (e.g., YAML configs for Gemini)
     /// Returns a list of (relative_path, content) tuples
     fn generate_assets(&self, _ir: &ValidatedSkillIR) -> Vec<(String, String)> {
         Vec::new()
