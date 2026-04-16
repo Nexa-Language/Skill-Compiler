@@ -1,0 +1,102 @@
+<agent_skill>
+  <metadata>
+    <name>{{ name }}</name>
+    <version>{{ version }}</version>
+    <security_level>{{ security_level }}</security_level>
+  </metadata>
+
+  <intent>{{ description }}</intent>
+
+{% if hitl_required %}
+  <system_constraint>
+    Wait for human explicit approval before execution.
+    This skill is marked as requiring Human-In-The-Loop (HITL) confirmation.
+  </system_constraint>
+
+{% endif %}
+{% if !mcp_servers.is_empty() %}
+  <mcp_servers>
+{% for server in mcp_servers %}
+    <server>{{ server }}</server>
+{% endfor %}
+  </mcp_servers>
+
+{% endif %}
+{% if !pre_conditions.is_empty() %}
+  <pre_conditions>
+{% for condition in pre_conditions %}
+    <condition>{{ condition }}</condition>
+{% endfor %}
+  </pre_conditions>
+
+{% endif %}
+{% if !context_gathering.is_empty() %}
+  <context_gathering>
+{% for step in context_gathering %}
+    <step>{{ step }}</step>
+{% endfor %}
+  </context_gathering>
+
+{% endif %}
+{% if !procedures.is_empty() %}
+  <execution_steps>
+{% for step in procedures %}
+    <step order="{{ step.order }}"{% if step.is_critical %} critical="true"{% endif %}>{{ step.instruction }}</step>
+{% endfor %}
+  </execution_steps>
+
+{% endif %}
+{% if !anti_skill_constraints.is_empty() %}
+  <strict_constraints>
+{% for constraint in anti_skill_constraints %}
+    <anti_pattern source="{{ constraint.source }}">{{ constraint.content }}</anti_pattern>
+{% endfor %}
+  </strict_constraints>
+
+{% endif %}
+{% if !permissions.is_empty() %}
+  <permissions>
+{% for permission in permissions %}
+    <permission kind="{{ permission.kind_name }}" scope="{{ permission.scope }}" read_only="{{ permission.read_only }}">{{ permission.description }}</permission>
+{% endfor %}
+  </permissions>
+
+{% endif %}
+{% if !examples.is_empty() %}
+  <examples>
+{% for example in examples %}
+    <example{% if !example.title.is_empty() %} title="{{ example.title }}"{% endif %}>
+      <user_input>{{ example.user_input }}</user_input>
+      <agent_response>{{ example.agent_response }}</agent_response>
+    </example>
+{% endfor %}
+  </examples>
+
+{% endif %}
+{% if !fallbacks.is_empty() %}
+  <fallbacks>
+{% for fallback in fallbacks %}
+    <strategy>{{ fallback }}</strategy>
+{% endfor %}
+  </fallbacks>
+
+{% endif %}
+{% if !post_conditions.is_empty() %}
+  <post_conditions>
+{% for condition in post_conditions %}
+    <condition>{{ condition }}</condition>
+{% endfor %}
+  </post_conditions>
+
+{% endif %}
+{% if !extra_sections.is_empty() %}
+  <additional_context>
+{% for section in extra_sections %}
+    <section title="{{ section.title }}">
+{{ section.content }}
+    </section>
+{% endfor %}
+  </additional_context>
+
+{% endif %}
+</agent_skill>

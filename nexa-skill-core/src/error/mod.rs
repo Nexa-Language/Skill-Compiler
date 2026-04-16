@@ -92,6 +92,22 @@ pub enum ParseError {
     )]
     YamlError(String),
 
+    /// XML tags detected in description field
+    #[error("XML tags detected in description: {0}")]
+    #[diagnostic(
+        code(nsc::parse::xml_tags_in_description),
+        help("Remove XML tags from description — they interfere with LLM parsing. Use plain text instead.")
+    )]
+    XmlTagsInDescription(String),
+
+    /// Invalid name format (not kebab-case)
+    #[error("Invalid name format: '{0}'")]
+    #[diagnostic(
+        code(nsc::parse::invalid_name),
+        help("Name must be kebab-case: lowercase letters, numbers, hyphens. 1-64 chars. No leading/trailing/double hyphens.")
+    )]
+    InvalidNameFormat(String),
+
     /// File read error
     #[error("Failed to read file '{0}': {1}")]
     #[diagnostic(

@@ -4,6 +4,19 @@
 >
 > **重要更新**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），本文档已全面重构后端适配策略，消除"格式税"并实现编译期AST优化。
 
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的设计规格已全部在源码中实现。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+>
+> | 文档描述 | 实现状态 |
+> |----------|---------|
+> | `Emitter` Trait 同步方法 `fn emit()` | ✅ sync trait，无 async_trait |
+> | `pre_process()` / `post_process()` 方法 | ✅ 默认方法存在 |
+> | `EmitterRegistry` | ✅ `registry.rs` 已创建 |
+> | `KimiEmitter::new()` | ✅ 独立 KimiEmitter 实现 |
+> | `Copilot` / `VSCode` 平台 | ⏳ 暂不实现（未来扩展） |
+> | Askama 模板引擎 | ✅ 4个 .j2 模板 + context structs |
+> | 编译期模板错误检查 | ✅ Askama 编译期检查 |
+> | Emitter `Send + Sync` | ✅ sync trait，无 async_trait |
+
 ---
 
 ## 1. 后端设计概述
@@ -99,11 +112,7 @@ pub enum TargetPlatform {
     /// Kimi (Moonshot) - 纯文本/完整Markdown
     Kimi,
     
-    /// GitHub Copilot
-    Copilot,
-    
-    /// VS Code Agent
-    VSCode,
+    // Copilot / VSCode: 暂不实现，作为未来扩展
 }
 
 impl TargetPlatform {
@@ -114,8 +123,6 @@ impl TargetPlatform {
             TargetPlatform::Codex => "codex",
             TargetPlatform::Gemini => "gemini",
             TargetPlatform::Kimi => "kimi",
-            TargetPlatform::Copilot => "copilot",
-            TargetPlatform::VSCode => "vscode",
         }
     }
     
@@ -126,8 +133,6 @@ impl TargetPlatform {
             TargetPlatform::Codex => ".md",  // 主负载为Markdown
             TargetPlatform::Gemini => ".md",
             TargetPlatform::Kimi => ".md",
-            TargetPlatform::Copilot => ".json",
-            TargetPlatform::VSCode => ".md",
         }
     }
     
@@ -146,8 +151,6 @@ impl TargetPlatform {
             TargetPlatform::Codex => "OpenAI Codex",
             TargetPlatform::Gemini => "Gemini CLI",
             TargetPlatform::Kimi => "Kimi CLI",
-            TargetPlatform::Copilot => "GitHub Copilot",
-            TargetPlatform::VSCode => "VS Code Agent",
         }
     }
 }
@@ -1431,24 +1434,26 @@ pub fn generate_manifest(
 2. 创建 Askama 模板（可选）
 3. 注册到 `EmitterRegistry`
 
-### 9.2 示例：自定义 VS Code Emitter
+### 9.2 示例：KimiEmitter 扩展参考
+
+> **注意**：KimiEmitter 已作为核心平台内置实现（见 `nexa-skill-core/src/backend/kimi.rs`）。以下仅作扩展模式参考。
 
 ```rust
-// 自定义 VS Code Agent Emitter
+// KimiEmitter 已内置，此处仅展示扩展模式
 
 use crate::backend::{Emitter, TargetPlatform};
 use crate::ir::ValidatedSkillIR;
 use crate::error::EmitError;
 
-pub struct VSCodeEmitter;
+pub struct KimiEmitter;
 
-impl Emitter for VSCodeEmitter {
+impl Emitter for KimiEmitter {
     fn target(&self) -> TargetPlatform {
-        TargetPlatform::VSCode
+        TargetPlatform::Kimi
     }
     
     fn emit(&self, ir: &ValidatedSkillIR) -> Result<String, EmitError> {
-        // VS Code 使用标准 Markdown 格式
+        // Kimi 偏好纯文本/完整Markdown，弱约束强推理
         let inner = ir.as_ref();
         
         let mut output = format!(
@@ -1471,7 +1476,7 @@ impl Emitter for VSCodeEmitter {
 
 // 注册
 let mut registry = EmitterRegistry::default();
-registry.register(Box::new(VSCodeEmitter));
+registry.register(Box::new(KimiEmitter));
 ```
 
 ---

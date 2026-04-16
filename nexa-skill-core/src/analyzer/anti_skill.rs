@@ -2,6 +2,8 @@
 //!
 //! Injects safety constraints based on detected patterns.
 
+use std::sync::Arc;
+
 use crate::ir::{Constraint, ConstraintLevel, ConstraintScope, SkillIR};
 
 /// Anti-skill injector
@@ -67,7 +69,7 @@ impl AntiSkillInjector {
 
             if matches {
                 ir.anti_skill_constraints.push(Constraint {
-                    source: "anti-skill-injector".to_string(),
+                    source: Arc::from("anti-skill-injector"),
                     content: pattern.constraint_content.to_string(),
                     level: ConstraintLevel::Warning,
                     scope: ConstraintScope::Global,
@@ -82,5 +84,109 @@ impl AntiSkillInjector {
 impl Default for AntiSkillInjector {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::ir::{ConstraintLevel, ProcedureStep, SkillIR};
+    use std::sync::Arc;
+
+    fn make_step(order: u32, instruction: &str) -> ProcedureStep {
+        ProcedureStep {
+            order,
+            instruction: instruction.to_string(),
+            is_critical: false,
+            constraints: vec![],
+            expected_output: None,
+            on_error: None,
+        }
+    }
+
+    fn make_test_ir(name: &str, procedures: Vec<ProcedureStep>) -> SkillIR {
+        SkillIR {
+            name: Arc::from(name),
+            version: Arc::from("1.0.0"),
+            description: "A test skill".to_string(),
+            procedures,
+            ..Default::default()
+        }
+    }
+
+    #[test]
+    fn test_inject_drop_constraint() {
+        // Procedure containing "DROP" triggers db-destructive pattern
+        let ir = make_test_ir("db-skill", vec![make_step(1, "Execute database changes with DROP")]);
+        let injector = AntiSkillInjector::new();
+        let result = injector.inject(ir);
+        assert!(!result.anti_skill_constraints.is_empty());
+        let db_constraint = result.anti_skill_constraints.iter().find(|c| {
+            c.source == Arc::from("anti-skill-injector")
+                && c.content.contains("destructive database")
+        });
+        assert!(db_constraint.is_some());
+        assert_eq!(db_constraint.unwrap().level, ConstraintLevel::Warning);
+    }
+
+    #[test]
+    fn test_inject_http_constraint() {
+        let ir = make_test_ir("http-skill", vec![make_step(1, "Make HTTP request to API")]);
+        let injector = AntiSkillInjector::new();
+        let result = injector.inject(ir);
+        let http_constraint = result.anti_skill_constraints.iter().find(|c| c.content.contains("timeout"));
+        assert!(http_constraint.is_some());
+    }
+
+    #[test]
+    fn test_no_injection_for_safe_skill() {
+        let ir = make_test_ir("safe-skill", vec![make_step(1, "Read and display data safely")]);
+        let injector = AntiSkillInjector::new();
+        let result = injector.inject(ir);
+        assert!(result.anti_skill_constraints.is_empty());
+    }
+
+    #[test]
+    fn test_preserves_existing_fields() {
+        let ir = SkillIR {
+            name: Arc::from("test"),
+            version: Arc::from("1.0.0"),
+            description: "Test skill".to_string(),
+            mcp_servers: vec![Arc::from("postgres-server")],
+            hitl_required: true,
+            procedures: vec![make_step(1, "DROP table")],
+            ..Default::default()
+        };
+        let injector = AntiSkillInjector::new();
+        let result = injector.inject(ir);
+        assert_eq!(result.name, Arc::from("test"));
+        assert_eq!(result.mcp_servers, vec![Arc::from("postgres-server")]);
+        assert!(result.hitl_required);
+        assert!(!result.anti_skill_constraints.is_empty());
+    }
+
+    #[test]
+    fn test_multiple_dangerous_keywords() {
+        // "loop" matches loop pattern, "DROP"/"TRUNCATE" match the same db-destructive pattern
+        let ir = make_test_ir(
+            "dangerous-skill",
+            vec![make_step(1, "Use loop and DROP and TRUNCATE")],
+        );
+        let injector = AntiSkillInjector::new();
+        let result = injector.inject(ir);
+        // At least 2 constraints: loop + db-destructive
+        assert!(result.anti_skill_constraints.len() >= 2);
+    }
+
+    #[test]
+    fn test_default_patterns_loaded() {
+        let injector = AntiSkillInjector::new();
+        // Verify by injecting an IR that triggers all 4 default patterns
+        let ir = make_test_ir(
+            "all-patterns",
+            vec![make_step(1, "HTTP BeautifulSoup DROP while")],
+        );
+        let result = injector.inject(ir);
+        assert_eq!(result.anti_skill_constraints.len(), 4);
     }
 }

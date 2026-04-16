@@ -33,10 +33,14 @@ pub struct Section {
 pub struct RawProcedureStep {
     /// Step order (1-based)
     pub order: u32,
-    /// Step text
+    /// Step text (title only, e.g. "Discover Available Tools")
     pub text: String,
     /// Whether this is a critical step
     pub is_critical: bool,
+    /// Step body content — original Markdown text under the step heading,
+    /// including code blocks, parameter lists, examples, etc.
+    /// Empty for list-based procedure steps.
+    pub body: String,
 }
 
 /// A raw example from the Markdown
@@ -57,6 +61,128 @@ pub struct CodeBlock {
     pub language: Option<String>,
     /// Code content
     pub content: String,
+}
+
+/// Check if a section title indicates procedure-like content.
+///
+/// Extended matching covers real-world skill patterns:
+/// - "Procedures" (standard)
+/// - "步骤", "执行" (Chinese)
+/// - "Core Workflow Pattern" (Slack/Discord/Salesforce automation skills)
+/// - "Instructions" (file-organizer, invoice-organizer, etc.)
+/// - "How to Use" / "How to" (changelog, canvas, etc.)
+/// - "Common Workflow" (xlsx)
+/// - "Skill Creation Process" (skill-creator)
+/// - "Editing Workflow" (docx, pptx)
+/// - "Creation Process" (skill-creator)
+/// - Phases with steps (mcp-builder's "High-Level Workflow")
+#[must_use]
+fn is_procedure_section(title: &str) -> bool {
+    let t = title.to_lowercase();
+    t.contains("procedure")
+        || t.contains("步骤")
+        || t.contains("执行")
+        || t.contains("workflow")
+        || t.contains("instructions")
+        || t.contains("how to use")
+        || t.contains("how to")
+        || t.contains("common workflow")
+        || t.contains("core workflow")
+        || t.contains("creation process")
+        || t.contains("editing workflow")
+        || t.contains("editing existing")
+}
+
+/// Extract procedure steps from section titles that match step/phase patterns.
+///
+/// Many real-world skills use sub-heading patterns like:
+/// - "### Step 1: Discover Available Tools"
+/// - "### 1. Gather Information"
+/// - "#### 1.1 Understand Agent-Centric Design"
+/// - "### Phase 1: Deep Research and Planning"
+///
+/// These appear as separate `Section` entries in the parsed result.
+/// This function scans them and converts matching titles into procedure steps.
+fn extract_heading_steps(sections: &[Section]) -> Vec<RawProcedureStep> {
+    let mut steps = Vec::new();
+    let mut order = 0u32;
+
+    for section in sections {
+        let title = section.title.trim();
+        let body = section.content.trim().to_string();
+
+        // Helper: create a step with title text and section body content
+        fn make_step(order: &mut u32, text: String, body: String) -> Option<RawProcedureStep> {
+            if text.is_empty() {
+                return None;
+            }
+            *order += 1;
+            let is_critical = text.contains("[CRITICAL]");
+            Some(RawProcedureStep {
+                order: *order,
+                text,
+                is_critical,
+                body,
+            })
+        }
+
+        // Pattern: "Step 1: Discover Available Tools"
+        if let Some(rest) = title.strip_prefix("Step ") {
+            let text = rest.split_once(':')
+                .or_else(|| rest.split_once(' '))
+                .map(|(_, t)| t.trim().to_string())
+                .unwrap_or(rest.trim().to_string());
+            if let Some(step) = make_step(&mut order, text, body) {
+                steps.push(step);
+            }
+            continue;
+        }
+
+        // Pattern: "Phase 1: Deep Research and Planning"
+        if let Some(rest) = title.strip_prefix("Phase ") {
+            let text = rest.split_once(':')
+                .or_else(|| rest.split_once(' '))
+                .map(|(_, t)| t.trim().to_string())
+                .unwrap_or(rest.trim().to_string());
+            if let Some(step) = make_step(&mut order, text, body) {
+                steps.push(step);
+            }
+            continue;
+        }
+
+        // Pattern: "1.1 Understand ..." (dotted sub-step like "1.1", "2.3")
+        // Must be checked BEFORE the simple "N." pattern to avoid mis-matching
+        if let Some(space_pos) = title.find(' ') {
+            let prefix = &title[..space_pos];
+            // Verify prefix matches "N.N" (single digit, dot, single/triple digit)
+            if prefix.chars().next().is_some_and(|c| c.is_ascii_digit())
+                && prefix.contains('.')
+                && prefix.chars().filter(|c| *c == '.').count() == 1
+                && prefix.ends_with(|c: char| c.is_ascii_digit())
+            {
+                let text = title[space_pos + 1..].trim().to_string();
+                if let Some(step) = make_step(&mut order, text, body) {
+                    steps.push(step);
+                }
+                continue;
+            }
+        }
+
+        // Pattern: "1. Gather Information" (numbered sub-heading, N. ...)
+        if let Some(dot_pos) = title.find('.') {
+            if dot_pos > 0 && dot_pos <= 3 {
+                let prefix = &title[..dot_pos];
+                if prefix.chars().all(|c| c.is_ascii_digit()) {
+                    let text = title[dot_pos + 1..].trim().to_string();
+                    if let Some(step) = make_step(&mut order, text, body) {
+                        steps.push(step);
+                    }
+                }
+            }
+        }
+    }
+
+    steps
 }
 
 /// Parse Markdown body content
@@ -139,6 +265,7 @@ pub fn parse_markdown_body(body: &str) -> MarkdownBody {
                                 order: procedure_counter,
                                 text: clean_text,
                                 is_critical,
+                                body: String::new(), // List-based steps have no separate body
                             });
                         }
                     }
@@ -152,10 +279,11 @@ pub fn parse_markdown_body(body: &str) -> MarkdownBody {
             }
 
             Event::Start(Tag::List(Some(_))) => {
-                // Ordered list - check if this is a procedures section
-                if current_section_title.contains("Procedure")
-                    || current_section_title.contains("步骤")
-                    || current_section_title.contains("执行")
+                // Ordered list - check if this is a procedure-like section.
+                // Extended matching to cover real-world skill patterns:
+                // "Procedures", "步骤", "执行", "Core Workflow Pattern",
+                // "Instructions", "How to Use", "Common Workflow", etc.
+                if is_procedure_section(&current_section_title)
                 {
                     state = ParseState::InProcedureList;
                     procedure_counter = 0;
@@ -182,6 +310,24 @@ pub fn parse_markdown_body(body: &str) -> MarkdownBody {
                     language: current_code_lang.clone(),
                     content: current_code_block.trim().to_string(),
                 });
+                // Also append code block to current section content as Markdown-formatted text,
+                // so that Section.content preserves the full body including code examples.
+                // This is critical for heading-based procedure steps to carry their
+                // code blocks, parameter descriptions, etc. into the compiled output.
+                if !current_code_block.is_empty() {
+                    if let Some(lang) = &current_code_lang {
+                        current_content.push_str(&format!(
+                            "\n```{}\n{}\n```",
+                            lang,
+                            current_code_block.trim()
+                        ));
+                    } else {
+                        current_content.push_str(&format!(
+                            "\n```\n{}\n```",
+                            current_code_block.trim()
+                        ));
+                    }
+                }
                 state = ParseState::Default;
             }
 
@@ -212,6 +358,15 @@ pub fn parse_markdown_body(body: &str) -> MarkdownBody {
         });
     }
 
+    // Post-processing: extract procedure steps from heading patterns.
+    // Many real-world skills use "### Step 1:", "### 1. Gather Information",
+    // "#### 1.1 Understand ..." sub-headings instead of ordered lists.
+    // Only add heading-based steps if we haven't already extracted from lists.
+    if result.procedures.is_empty() {
+        let heading_steps = extract_heading_steps(&result.sections);
+        result.procedures.extend(heading_steps);
+    }
+
     result
 }
 
@@ -229,12 +384,12 @@ mod tests {
 "#;
 
         let result = parse_markdown_body(body);
-        // Parser may create duplicate entries, check we have at least the expected ones
         assert!(!result.procedures.is_empty(), "Should parse procedures");
-        // Find the first procedure with order 1
         let first = result.procedures.iter().find(|p| p.order == 1);
         assert!(first.is_some(), "Should find first procedure");
         assert_eq!(first.unwrap().text, "First step.");
+        // List-based steps have empty body
+        assert_eq!(first.unwrap().body, "");
     }
 
     #[test]
@@ -252,5 +407,102 @@ This is a description.
 
         let result = parse_markdown_body(body);
         assert!(!result.sections.is_empty());
+    }
+
+    #[test]
+    fn test_heading_steps_with_body() {
+        let body = r#"## Core Workflow Pattern
+
+### Step 1: Discover Available Tools
+
+```
+RUBE_SEARCH_TOOLS
+queries: [{use_case: "your task"}]
+session: {generate_id: true}
+```
+
+This returns available tool slugs and input schemas.
+
+### Step 2: Check Connection
+
+```
+RUBE_MANAGE_CONNECTIONS
+toolkits: ["active_campaign"]
+session_id: "your_session_id"
+```
+
+### Step 3: Execute Tools
+
+Some final step content.
+"#;
+
+        let result = parse_markdown_body(body);
+        assert_eq!(result.procedures.len(), 3, "Should extract 3 heading-based steps");
+
+        // Step 1 should have body with code block
+        let step1 = result.procedures.iter().find(|p| p.order == 1).unwrap();
+        assert_eq!(step1.text, "Discover Available Tools");
+        assert!(step1.body.contains("RUBE_SEARCH_TOOLS"), "Body should contain code block content");
+        assert!(step1.body.contains("```"), "Body should preserve code block fences");
+
+        // Step 2 should have body with code block
+        let step2 = result.procedures.iter().find(|p| p.order == 2).unwrap();
+        assert_eq!(step2.text, "Check Connection");
+        assert!(step2.body.contains("RUBE_MANAGE_CONNECTIONS"));
+
+        // Step 3 should have body with plain text
+        let step3 = result.procedures.iter().find(|p| p.order == 3).unwrap();
+        assert_eq!(step3.text, "Execute Tools");
+        assert!(step3.body.contains("Some final step content"));
+    }
+
+    #[test]
+    fn test_section_content_includes_code_blocks() {
+        let body = r#"## Setup
+
+1. Add the MCP server:
+```
+https://rube.app/mcp
+```
+2. Connect your account when prompted.
+"#;
+
+        let result = parse_markdown_body(body);
+        let setup_section = result.sections.iter().find(|s| s.title == "Setup");
+        assert!(setup_section.is_some(), "Should find Setup section");
+        let content = &setup_section.unwrap().content;
+        // Section content should now include the code block as Markdown
+        assert!(content.contains("https://rube.app/mcp"), "Section content should include code block text");
+        assert!(content.contains("```"), "Section content should preserve code fences");
+    }
+
+    #[test]
+    fn test_numbered_heading_step_with_body() {
+        let body = r#"## Procedures
+
+### 1. Gather Information
+
+First, collect all relevant data from the system.
+
+```
+SELECT * FROM users WHERE active = true;
+```
+
+### 2. Analyze Results
+
+Process the gathered data.
+"#;
+
+        let result = parse_markdown_body(body);
+        assert_eq!(result.procedures.len(), 2);
+
+        let step1 = result.procedures.iter().find(|p| p.order == 1).unwrap();
+        assert_eq!(step1.text, "Gather Information");
+        assert!(step1.body.contains("SELECT * FROM users"));
+        assert!(step1.body.contains("```"));
+
+        let step2 = result.procedures.iter().find(|p| p.order == 2).unwrap();
+        assert_eq!(step2.text, "Analyze Results");
+        assert!(step2.body.contains("Process the gathered data"));
     }
 }

@@ -1,0 +1,69 @@
+---
+name: {{ name }}
+description: {{ clean_description }}
+version: {{ version }}
+{% if hitl_required %}
+hitl_required: true
+{% endif %}
+security_level: {{ security_level }}
+{% if !mcp_servers.is_empty() %}
+mcp_servers:
+{% for server in mcp_servers %}
+  - {{ server }}
+{% endfor %}
+{% endif %}
+---
+
+# {{ name }}
+
+## Identity
+
+You are an AI assistant executing a structured skill workflow.
+
+## Constraints
+
+Follow these boundaries strictly:
+
+{% if hitl_required %}
+- **HITL Required**: Request user approval before critical operations
+{% endif %}
+- **Security Level: {{ security_level_display }}**: {{ security_instruction }}
+
+## Description
+
+{{ description }}
+
+## Context Gathering
+
+Before execution, gather the following information:
+
+{% if has_input_schema %}
+- Review input parameters from `assets/input.yaml`
+{% endif %}
+- Verify all required dependencies are available
+- Check system state and prerequisites
+
+{% if !procedures.is_empty() %}
+## Execution Steps
+
+Execute in exact sequence:
+
+{% for step in procedures %}
+{{ step.order }}. {{ step.instruction }}{% if step.is_critical %} ⚠️ **[CRITICAL]**{% endif %}
+{% endfor %}
+
+{% endif %}
+{% if !anti_skill_constraints.is_empty() %}
+## Strict Constraints
+
+NEVER perform these actions:
+
+{% for constraint in anti_skill_constraints %}
+- {{ constraint.content }}{{ constraint.level_marker }}
+{% endfor %}
+
+{% endif %}
+## Output Format
+
+After completion, format output according to `assets/output.yaml`.
+For CI/CD pipeline integration, use `-p` non-interactive mode.

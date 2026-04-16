@@ -4,6 +4,19 @@
 >
 > **架构版本**：v2.0（基于《高级提示词工程格式与智能体技能架构》调研报告重构）
 
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的架构设计已全部在源码中实现（WASM除外，见Section 7）。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+>
+> | 文档描述 | 实现状态 |
+> |----------|---------|
+> | `NestedDataDetector` (Analyzer阶段) | ✅ `analyzer/nested_data.rs` 已创建 |
+> | `nested_data.rs` (IR阶段) | ✅ `ir/nested_data.rs` 已创建 |
+> | `KimiEmitter` 独立实现 | ✅ 独立 `kimi.rs` 已创建 |
+> | `EmitterRegistry` | ✅ `backend/registry.rs` 已创建 |
+> | `routing.rs` 路由清单生成器 | ✅ 实现为 `routing_manifest.rs` |
+> | Askama 模板引擎 | ✅ 4个 .j2 模板 + context structs |
+> | `nexa-skill-wasm/` crate | ⏳ 暂不实现（未来扩展） |
+> | `index.rs` (CLI命令) | ✅ 已实现 |
+
 ---
 
 ## 1. 架构愿景
@@ -538,35 +551,11 @@ graph TB
 
 ---
 
-## 7. WASM 架构 (可选扩展)
+## 7. WASM 架构 (暂不实现)
 
-NSC 核心库可编译为 WebAssembly，用于浏览器端实时校验和预览。
+WASM 架构暂不实现，作为未来扩展。当前仅支持4个平台（Claude/Codex/Gemini/Kimi）。未来计划将 NSC 核心库编译为 WebAssembly，用于浏览器端实时校验和预览。
 
-```mermaid
-graph LR
-    subgraph "Browser"
-        A[React/Vue App]
-        B[nexa-skill-wasm]
-    end
-    
-    subgraph "Server"
-        C[Skill Registry API]
-    end
-    
-    A --> |WebAssembly| B
-    A --> |HTTP| C
-    B --> |本地编译| D[实时预览]
-    B --> |本地校验| E[错误提示]
-```
-
-**WASM 功能范围**：
-
-- ✅ Frontend 解析
-- ✅ IR 构建
-- ✅ Analyzer 校验
-- ✅ Backend 生成（部分）
-- ✅ 路由清单生成
-- ❌ 文件系统操作（需通过 JS Bridge）
+> **设计预留**：WASM 功能范围规划如下——Frontend 解析、IR 构建、Analyzer 校验、Backend 生成（部分）、路由清单生成；文件系统操作需通过 JS Bridge。
 
 ---
 

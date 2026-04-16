@@ -4,6 +4,16 @@
 >
 > **重要更新**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），新增嵌套数据检测标记，支持AST优化决策。
 
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的设计规格已全部在源码中实现。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+>
+> | 文档描述 | 实现状态 |
+> |----------|---------|
+> | `Arc<str>` 类型（零拷贝优化） | ✅ 已使用 `Arc<str>` |
+> | `requires_yaml_optimization` 字段 | ✅ `SkillIR` 中已添加 |
+> | `nested_data_depth` 字段 | ✅ `SkillIR` 中已添加 |
+> | `NestedDataDetector` (Analyzer阶段) | ✅ `nested_data.rs` 已创建 |
+> | `source_path` 使用 `Arc<str>` | ✅ 已使用 `Arc<str>` |
+
 ---
 
 ## 1. IR 设计哲学

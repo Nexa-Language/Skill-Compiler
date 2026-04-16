@@ -6,7 +6,7 @@
     <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"/>
     <img src="https://img.shields.io/badge/Version-v1.0-brightgreen.svg?style=for-the-badge" alt="Version"/>
     <img src="https://img.shields.io/badge/Rust-1.75%2B-orange.svg?style=for-the-badge" alt="Rust"/>
-    <img src="https://img.shields.io/badge/Status-Stable-green.svg?style=for-the-badge" alt="Status"/>
+    <img src="https://img.shields.io/badge/Status-Alpha-orange.svg?style=for-the-badge" alt="Status"/>
   </p>
   
   **中文版** | **[English](#overview)**
@@ -31,13 +31,9 @@ cd Skill-Compiler
 cargo install --path nexa-skill-cli
 ```
 
-### VS Code Extension
+### VS Code Extension (暂不实现)
 
-Search "Nexa Skill Compiler" in VS Code Marketplace, or install manually:
-
-```bash
-code --install-extension nexa-skill-compiler-1.0.0.vsix
-```
+> VS Code 扩展（`vscode-nexa-skill/`）作为未来扩展，当前不在开发范围内。后续版本将提供 IDE 内集成支持。
 
 ---
 
@@ -61,7 +57,7 @@ nsc init my-skill
 
 ## ⚡ What is NSC?
 
-**Nexa Skill Compiler (NSC)** 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。它实现了 AI Agent 技能的 **"一次编写，到处运行"**——支持 Claude Code、OpenAI Codex/GPT 和 Google Gemini 等多个平台。
+**Nexa Skill Compiler (NSC)** 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。它实现了 AI Agent 技能的 **"一次编写，到处运行"**——支持 Claude Code、OpenAI Codex/GPT、Google Gemini 和 Kimi 等多个平台。
 
 ---
 
@@ -86,33 +82,38 @@ nsc init my-skill
 - **Claude Target** - 生成 Claude Code 兼容的 SKILL.md
 - **Codex Target** - 生成 OpenAI Codex/GPT 格式
 - **Gemini Target** - 生成 Google Gemini 系统指令
+- **Kimi Target** - 生成 Kimi (Moonshot) Markdown 格式
 - **Parallel Emission** - 并行多目标生成，提升编译效率
 
 ### ⚡ High Performance
-实验验证的执行效率提升：
-- **16.9% faster** - 编译后的技能执行速度提升（大规模对比实验验证）
+高性能原生实现：
 - **Rust Native** - 高性能原生编译器实现
-- **Zero-Copy Parsing** - 零拷贝解析，内存高效
+- **Structured Pipeline** - 四阶段编译管线，阶段边界清晰
+- **Async Emission** - 异步多目标并行生成
+
+> ⚠️ **实验数据说明**：前期对比实验因 Claude Code 权限模型限制（headless模式下无法交互审批），所有任务实际成功率为 0%，因此暂不引用执行速度对比数据。详见 [审查报告](plans/REPO_AUDIT_REPORT.md)。
 
 ---
 
-## 📈 Performance Highlights
+## 📈 Compilation Quality
 
-基于 25 个真实任务的大规模对比实验结果：
+编译器核心质量指标（基于内部测试）：
 
-| Metric | Original Skills | Compiled Skills | Improvement |
-|--------|-----------------|-----------------|-------------|
-| Avg Duration | 45.2s | 37.6s | **16.9% faster** |
-| Success Rate | 96% | 100% | +4% |
-| Quality Score | 0.92 | 0.94 | +2.2% |
+| Metric | Value | Description |
+|--------|-------|-------------|
+| Compilation Success Rate | 100% | 32 skills 成功编译（含合成测试数据） |
+| Validation Rules | ~10 | Schema + Permission + Anti-Skill 检查规则 |
+| Target Platforms | 4 | Claude (XML), Codex (Markdown), Gemini (Markdown+YAML), Kimi (Markdown) |
 
-详见 [Large-Scale Experiment Report](experiments/LARGE_SCALE_EXPERIMENT_REPORT.md)
+> ⚠️ 前期大规模对比实验因权限模型限制存在方法论缺陷，数据暂不可引用。实验框架修复后将重新评估。
+
+详见 [审查报告](plans/REPO_AUDIT_REPORT.md) | [实验报告](experiments/LARGE_SCALE_EXPERIMENT_REPORT.md)
 
 ---
 
 ## Overview
 
-**Nexa Skill Compiler (NSC)** is an industrial-grade compiler that transforms unified `SKILL.md` specifications into platform-specific agent instructions. It enables **Write Once, Run Anywhere** for AI agent skills across Claude Code, OpenAI Codex/GPT, and Google Gemini.
+**Nexa Skill Compiler (NSC)** is an industrial-grade compiler that transforms unified `SKILL.md` specifications into platform-specific agent instructions. It enables **Write Once, Run Anywhere** for AI agent skills across Claude Code, OpenAI Codex/GPT, Google Gemini, and Kimi.
 
 ### Why NSC?
 
@@ -120,15 +121,15 @@ nsc init my-skill
 |---------|----------|
 | Skills are platform-specific | Unified `SKILL.md` specification |
 | Manual adaptation is error-prone | Automated compilation pipeline |
-| No semantic validation | Built-in analyzer with 100+ checks |
+| No semantic validation | Built-in analyzer with schema, permission, and anti-skill checks |
 | Security risks in skills | Permission auditor & Anti-Skill injection |
 
 ### Key Features
 
-- 🚀 **Multi-Target Compilation** - Single source to Claude, Codex, Gemini
+- 🚀 **Multi-Target Compilation** - Single source to Claude, Codex, Gemini, Kimi
 - 🔒 **Security-First Design** - Permission auditing, HITL triggers, Anti-Skill patterns
-- 📊 **Semantic Validation** - 100+ validation rules with actionable diagnostics
-- ⚡ **High Performance** - 16.9% faster execution with compiled skills (validated by experiments)
+- 📊 **Semantic Validation** - Schema, permission, and anti-skill validation with actionable diagnostics
+- ⚡ **High Performance** - Rust-native compiler with async parallel emission
 - 🛠️ **Developer Experience** - Beautiful CLI with miette error reporting
 - 📦 **Extensible Architecture** - Plugin-based Analyzer and Emitter system
 
@@ -269,21 +270,21 @@ NSC follows a classic compiler architecture with four phases:
 |-------|---------|
 | [`nexa-skill-core`](nexa-skill-core/) | Compiler pipeline, IR, Analyzer, Backend |
 | [`nexa-skill-cli`](nexa-skill-cli/) | Command-line interface with beautiful UX |
-| [`nexa-skill-templates`](nexa-skill-templates/) | Askama-based template engine |
+| [`nexa-skill-templates`](nexa-skill-templates/) | Template utilities for skill scaffolding |
 
 ---
 
 ## Performance
 
-Large-scale comparative experiments demonstrate **16.9% execution speed improvement** with compiled skills:
+编译器核心管线性能（编译阶段耗时）：
 
-| Metric | Original Skill | Compiled Skill | Improvement |
-|--------|---------------|----------------|-------------|
-| Mean Execution Time | 45.2s | 37.6s | **16.9% faster** |
-| Success Rate | 92% | 96% | +4% |
-| Error Recovery | 68% | 85% | +17% |
+| Metric | Value | Description |
+|--------|-------|-------------|
+| Compilation Time | <100ms | 单文件四阶段编译耗时（Rust native） |
+| Compilation Success Rate | 100% | 内部测试数据集全部编译成功 |
+| Target Coverage | 4 platforms | Claude XML, Codex Markdown, Gemini Markdown+YAML, Kimi Markdown |
 
-*Based on 25 tasks across document processing, code analysis, and data operations. See [Experiment Report](experiments/LARGE_SCALE_EXPERIMENT_REPORT.md).*
+> ⚠️ 前期执行速度对比实验（声称"16.9% faster"）因实验方法论缺陷（0%成功率）暂不可引用。详见 [审查报告](plans/REPO_AUDIT_REPORT.md)。
 
 ---
 
@@ -303,8 +304,8 @@ Large-scale comparative experiments demonstrate **16.9% execution speed improvem
 ## Roadmap
 
 ### v1.0 (Current)
-- ✅ Multi-target compilation (Claude, Codex, Gemini)
-- ✅ Semantic validation with 100+ rules
+- ✅ Multi-target compilation (Claude, Codex, Gemini, Kimi)
+- ✅ Semantic validation with schema, permission, and anti-skill rules
 - ✅ Permission auditing & security levels
 - ✅ Anti-Skill pattern injection
 - ✅ Beautiful CLI with miette diagnostics

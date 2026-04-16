@@ -3,10 +3,12 @@
 //! This is the central data structure that represents a skill
 //! throughout the compilation pipeline.
 
+use std::sync::Arc;
+
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-use super::{Constraint, Example, Permission, ProcedureStep};
+use super::{Constraint, Example, Permission, ProcedureStep, SectionInfo};
 
 /// Nexa Skill Compiler Core Intermediate Representation
 ///
@@ -16,10 +18,12 @@ use super::{Constraint, Example, Permission, ProcedureStep};
 pub struct SkillIR {
     // ===== Metadata & Routing =====
     /// Skill unique identifier (kebab-case, 1-64 characters)
-    pub name: String,
+    /// Shared across all Emitters — zero-copy via `Arc<str>`
+    pub name: Arc<str>,
 
     /// Version number (semantic versioning)
-    pub version: String,
+    /// Shared across all Emitters — zero-copy via `Arc<str>`
+    pub version: Arc<str>,
 
     /// Description with trigger conditions
     pub description: String,
@@ -27,7 +31,7 @@ pub struct SkillIR {
     // ===== Interfaces & MCP =====
     /// MCP server dependencies
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
-    pub mcp_servers: Vec<String>,
+    pub mcp_servers: Vec<Arc<str>>,
 
     /// Input parameter JSON Schema
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,6 +83,28 @@ pub struct SkillIR {
     /// Anti-skill constraints (injected by Analyzer)
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub anti_skill_constraints: Vec<Constraint>,
+
+    // ===== Additional Sections =====
+    /// Sections from the Markdown body not captured by specific fields
+    /// (e.g. "Setup", "Prerequisites", "Known Pitfalls", "Quick Reference").
+    /// These carry context essential for LLM instruction adherence.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub extra_sections: Vec<SectionInfo>,
+
+    // ===== AST Optimization Flags =====
+    /// Whether YAML optimization is required for nested data
+    ///
+    /// When nested_data_depth >= 3, Gemini Emitter should use YAML format.
+    /// Academic basis: YAML nested data accuracy 51.9% > Markdown 48.2% > JSON 43.1%
+    #[serde(default, skip_serializing_if = "is_false")]
+    pub requires_yaml_optimization: bool,
+
+    /// Nested data depth
+    ///
+    /// Computed by NestedDataDetector during the Analyzer phase.
+    /// Used for backend format selection decisions.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nested_data_depth: Option<usize>,
 
     // ===== Meta Information =====
     /// Source file path
@@ -152,6 +178,11 @@ fn default_security_level() -> SecurityLevel {
     SecurityLevel::default()
 }
 
+/// Helper for serde skip_serializing_if on bool fields
+fn is_false(v: &bool) -> bool {
+    !v
+}
+
 impl SkillIR {
     /// Validate the IR
     ///
@@ -164,7 +195,7 @@ impl SkillIR {
             return Err(IRError::MissingRequiredField("name"));
         }
         if !Self::is_valid_name(&self.name) {
-            return Err(IRError::InvalidNameFormat(self.name.clone()));
+            return Err(IRError::InvalidNameFormat(self.name.to_string()));
         }
 
         // Validate description
@@ -184,7 +215,7 @@ impl SkillIR {
     }
 
     /// Check if name is valid kebab-case
-    fn is_valid_name(name: &str) -> bool {
+    pub fn is_valid_name(name: &str) -> bool {
         !name.is_empty()
             && name.len() <= 64
             && name
@@ -247,8 +278,8 @@ mod tests {
         let valid_names = vec!["test-skill", "database-migration", "skill123", "a"];
         for name in valid_names {
             let ir = SkillIR {
-                name: name.to_string(),
-                version: "1.0.0".to_string(),
+                name: Arc::from(name),
+                version: Arc::from("1.0.0"),
                 description: "Test".to_string(),
                 ..Default::default()
             };
@@ -260,8 +291,8 @@ mod tests {
 impl Default for SkillIR {
     fn default() -> Self {
         Self {
-            name: String::new(),
-            version: "1.0.0".to_string(),
+            name: Arc::from(""),
+            version: Arc::from("1.0.0"),
             description: String::new(),
             mcp_servers: Vec::new(),
             input_schema: None,
@@ -276,6 +307,9 @@ impl Default for SkillIR {
             procedures: Vec::new(),
             few_shot_examples: Vec::new(),
             anti_skill_constraints: Vec::new(),
+            extra_sections: Vec::new(),
+            requires_yaml_optimization: false,
+            nested_data_depth: None,
             source_path: String::new(),
             source_hash: String::new(),
             compiled_at: None,

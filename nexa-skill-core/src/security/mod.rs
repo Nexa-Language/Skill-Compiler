@@ -1,9 +1,11 @@
 //! Security Module
 //!
-//! This module provides security-related functionality.
+//! Provides security baseline, permission validation, and security level validation.
 
+mod baseline;
 mod level;
 mod permission;
 
-pub use level::SecurityLevel;
-pub use permission::PermissionAuditor as SecurityAuditor;
+pub use baseline::{DbOperation, SecurityBaseline};
+pub use level::{AuditCheck, SecurityLevel, SecurityLevelValidator};
+pub use permission::PermissionRequest;

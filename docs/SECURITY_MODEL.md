@@ -2,6 +2,19 @@
 
 > **权限系统、安全等级、Anti-Skill 注入机制与 Human-In-The-Loop 审批流程**
 
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的安全模型设计已全部在源码中实现。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+>
+> | 文档描述 | 实现状态 |
+> |----------|---------|
+> | `SecurityBaseline`（允许的网络域名/文件路径/数据库操作等） | ✅ `baseline.rs` 已创建 |
+> | `PermissionRequest` 结构 | ✅ `permission.rs` 中定义 |
+> | `DangerousKeyword` 含 `required_scope` 字段 | ✅ `required_scope` 字段已添加 |
+> | `security/permission.rs` 完整实现 | ✅ `PermissionRequest` 定义存在 |
+> | `security/level.rs` 完整实现 | ✅ `AuditCheck` + `SecurityLevelValidator` |
+> | 权限范围格式验证（URL pattern/路径 pattern等） | ✅ `SecurityBaseline::validate_scope_format()` |
+> | `read_only` 权限标记 | ✅ `SecurityBaseline::derive_read_only()` |
+> | description XML标签验证（编译期报错） | ✅ frontmatter 编译期报错 + `SchemaValidator` 检测 |
+
 ---
 
 ## 1. 安全模型概述

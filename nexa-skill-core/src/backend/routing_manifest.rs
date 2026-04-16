@@ -62,7 +62,7 @@ impl RoutingManifest {
     /// Add a skill to the routing manifest
     pub fn add_skill(&mut self, ir: &SkillIR) {
         let entry = RoutingEntry {
-            name: ir.name.clone(),
+            name: ir.name.to_string(),
             description: if ir.description.len() > 1024 {
                 ir.description[..1024].to_string()
             } else {
@@ -73,7 +73,7 @@ impl RoutingManifest {
             security_level: Some(format!("{:?}", ir.security_level).to_lowercase()),
         };
 
-        self.skills.insert(ir.name.clone(), entry);
+        self.skills.insert(ir.name.to_string(), entry);
         self.total_skills = self.skills.len();
     }
 
@@ -176,6 +176,7 @@ fn extract_file_patterns(description: &str) -> Vec<String> {
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
     use super::*;
     use crate::ir::{SkillIR, SecurityLevel};
 
@@ -184,9 +185,9 @@ mod tests {
         let mut manifest = RoutingManifest::new();
         
         let ir = SkillIR {
-            name: "test-skill".to_string(),
+            name: Arc::from("test-skill"),
             description: "A test skill for demonstration. Use this when testing.".to_string(),
-            version: "1.0".to_string(),
+            version: Arc::from("1.0"),
             security_level: SecurityLevel::Medium,
             ..Default::default()
         };
@@ -202,9 +203,9 @@ mod tests {
         let mut manifest = RoutingManifest::new();
         
         let ir = SkillIR {
-            name: "yaml-test".to_string(),
+            name: Arc::from("yaml-test"),
             description: "Test YAML generation".to_string(),
-            version: "1.0".to_string(),
+            version: Arc::from("1.0"),
             security_level: SecurityLevel::Low,
             ..Default::default()
         };

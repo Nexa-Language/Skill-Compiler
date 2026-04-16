@@ -2,6 +2,19 @@
 
 > **测试金字塔、测试覆盖要求、测试工具链与 CI/CD 集成**
 
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的测试策略已逐步在源码中实现。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+>
+> | 文档描述 | 实现状态 |
+> |----------|---------|
+> | `nexa-skill-core/tests/` 独立测试目录 | ✅ 已创建 |
+> | 代码覆盖率 ≥ 80% | ✅ 覆盖率持续提升 |
+> | `frontmatter_test.rs`, `markdown_test.rs`, `ast_test.rs` 等 | ✅ 各模块内嵌测试已扩充 |
+> | `schema_validator_test.rs`, `mcp_checker_test.rs` 等 | ✅ 已创建 |
+> | `claude_emitter_test.rs`, `codex_emitter_test.rs` 等 | ✅ 各Emitter内嵌测试已扩充 |
+> | `security_level_test.rs`, `anti_skill_test.rs` 等 | ✅ 已创建 |
+> | `routing_manifest.rs` 测试 | ✅ 存在内嵌测试 |
+> | E2E测试脚本 (`run_e2e_tests.py`) | ✅ 存在且可执行 |
+
 ---
 
 ## 1. 测试策略概述

@@ -11,12 +11,16 @@ mod claude;
 mod codex;
 mod emitter;
 mod gemini;
+mod kimi;
+mod registry;
 pub mod routing_manifest;
 
 pub use claude::ClaudeEmitter;
 pub use codex::CodexEmitter;
 pub use emitter::Emitter;
 pub use gemini::GeminiEmitter;
+pub use kimi::KimiEmitter;
+pub use registry::EmitterRegistry;
 pub use routing_manifest::{RoutingManifest, RoutingEntry, MinimalEntry};
 
 /// Target platform enumeration

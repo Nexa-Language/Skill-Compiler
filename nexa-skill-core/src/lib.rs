@@ -34,15 +34,13 @@ pub mod security;
 
 // Re-export main types for convenience
 pub use analyzer::{Analyzer, ValidatedSkillIR};
-pub use backend::{ClaudeEmitter, CodexEmitter, Emitter, GeminiEmitter, TargetPlatform};
+pub use backend::{ClaudeEmitter, CodexEmitter, Emitter, EmitterRegistry, GeminiEmitter, TargetPlatform};
 pub use error::{CompileError, Diagnostic};
 pub use frontend::{ASTBuilder, RawAST};
 pub use ir::{build_ir, SkillIR};
 
 use std::fs;
 use std::path::Path;
-
-use tokio::runtime::Runtime;
 
 /// Main compiler orchestrator
 pub struct Compiler {
@@ -125,7 +123,7 @@ impl Compiler {
         self.emit_outputs(&validated_ir, targets, output_dir)?;
 
         Ok(CompileOutput {
-            skill_name: validated_ir.as_ref().name.clone(),
+            skill_name: validated_ir.as_ref().name.to_string(),
             output_dir: output_dir.to_string(),
             targets: targets.to_vec(),
             manifest_path: format!("{}/manifest.json", output_dir),
@@ -139,6 +137,8 @@ impl Compiler {
         targets: &[TargetPlatform],
         output_dir: &str,
     ) -> Result<(), CompileError> {
+        let registry = EmitterRegistry::new();
+
         // Create output directory
         let output_path = Path::new(output_dir);
         if !output_path.exists() {
@@ -146,34 +146,18 @@ impl Compiler {
                 .map_err(|e| CompileError::IOError(e.to_string()))?;
         }
 
-        // Create tokio runtime for async emitters
-        let rt = Runtime::new()
-            .map_err(|e| CompileError::IOError(e.to_string()))?;
-
-        // Emit for each target
+        // Emit for each target using registry
         for target in targets {
-            let (output_content, assets) = match target {
-                TargetPlatform::Claude => {
-                    let emitter = ClaudeEmitter::new();
-                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
-                }
-                TargetPlatform::Codex => {
-                    let emitter = CodexEmitter::new();
-                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
-                }
-                TargetPlatform::Gemini => {
-                    let emitter = GeminiEmitter::new();
-                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
-                }
-                TargetPlatform::Kimi => {
-                    // Kimi uses same format as Gemini
-                    let emitter = GeminiEmitter::new();
-                    (rt.block_on(emitter.emit(ir))?, emitter.generate_assets(ir))
-                }
-            };
+            let emitter = registry.get(target)?;
+
+            // pre_process → emit → post_process
+            emitter.pre_process(ir)?;
+            let output_content = emitter.emit(ir)?;
+            let output_content = emitter.post_process(&output_content)?;
+            let assets = emitter.generate_assets(ir);
 
             // Write output file
-            let skill_name = ir.as_ref().name.clone();
+            let skill_name = ir.as_ref().name.to_string();
             let file_name = format!("{}{}", skill_name, target.extension());
             let file_path = output_path.join(&file_name);
             fs::write(&file_path, output_content)
@@ -345,7 +329,7 @@ impl Compiler {
         self.emit_outputs(&validated_ir, targets, output_dir)?;
 
         Ok(CompileOutput {
-            skill_name: validated_ir.as_ref().name.clone(),
+            skill_name: validated_ir.as_ref().name.to_string(),
             output_dir: output_dir.to_string(),
             targets: targets.to_vec(),
             manifest_path: format!("{}/manifest.json", output_dir),

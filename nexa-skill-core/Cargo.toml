@@ -27,6 +27,9 @@ path = "src/lib.rs"
 # Internal crates
 nexa-skill-templates.workspace = true
 
+# Template engine (for Template trait .render())
+askama.workspace = true
+
 # Serialization
 serde.workspace = true
 serde_json.workspace = true
@@ -41,7 +44,6 @@ miette.workspace = true
 
 # Async runtime
 tokio.workspace = true
-async-trait.workspace = true
 
 # Logging
 tracing.workspace = true

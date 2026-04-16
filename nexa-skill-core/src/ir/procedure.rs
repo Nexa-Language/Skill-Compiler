@@ -48,3 +48,44 @@ pub enum ErrorHandlingStrategy {
     /// Request human intervention
     RequestHumanInput,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_procedure_step_construction() {
+        let step = ProcedureStep {
+            order: 1,
+            instruction: "Do task".to_string(),
+            is_critical: true,
+            constraints: vec![],
+            expected_output: None,
+            on_error: None,
+        };
+        assert_eq!(step.order, 1);
+        assert!(step.is_critical);
+        assert!(step.constraints.is_empty());
+        assert!(step.expected_output.is_none());
+        assert!(step.on_error.is_none());
+    }
+
+    #[test]
+    fn test_error_handling_strategy_stop() {
+        let strategy = ErrorHandlingStrategy::Stop;
+        let serialized = serde_json::to_string(&strategy).unwrap();
+        assert!(serialized.contains("stop"));
+    }
+
+    #[test]
+    fn test_error_handling_strategy_retry() {
+        let strategy = ErrorHandlingStrategy::Retry {
+            max_attempts: 3,
+            delay_ms: 1000,
+        };
+        let serialized = serde_json::to_string(&strategy).unwrap();
+        assert!(serialized.contains("retry"));
+        assert!(serialized.contains("3"));
+        assert!(serialized.contains("1000"));
+    }
+}

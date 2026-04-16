@@ -2,13 +2,15 @@
 //!
 //! Represents anti-skill constraints injected by the analyzer.
 
+use std::sync::Arc;
+
 use serde::{Deserialize, Serialize};
 
 /// Anti-skill constraint
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Constraint {
-    /// Constraint source (pattern ID)
-    pub source: String,
+    /// Constraint source (pattern ID) — shared identifier across Emitters
+    pub source: Arc<str>,
     /// Constraint content
     pub content: String,
     /// Constraint level
@@ -49,4 +51,39 @@ pub enum ConstraintScope {
         /// Keywords to match
         keywords: Vec<String>,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_constraint_level_serde() {
+        // ConstraintLevel uses serde rename_all = "lowercase"
+        assert_eq!(serde_json::to_string(&ConstraintLevel::Block).unwrap(), "\"block\"");
+        assert_eq!(serde_json::to_string(&ConstraintLevel::Error).unwrap(), "\"error\"");
+        assert_eq!(serde_json::to_string(&ConstraintLevel::Warning).unwrap(), "\"warning\"");
+    }
+
+    #[test]
+    fn test_constraint_level_default() {
+        assert_eq!(ConstraintLevel::default(), ConstraintLevel::Warning);
+    }
+
+    #[test]
+    fn test_constraint_level_equality() {
+        assert!(ConstraintLevel::Block == ConstraintLevel::Block);
+        assert!(ConstraintLevel::Block != ConstraintLevel::Warning);
+    }
+
+    #[test]
+    fn test_constraint_scope_default() {
+        assert!(matches!(ConstraintScope::default(), ConstraintScope::Global));
+    }
+
+    #[test]
+    fn test_constraint_scope_serde() {
+        let global = serde_json::to_string(&ConstraintScope::Global).unwrap();
+        assert!(global.contains("global"));
+    }
 }

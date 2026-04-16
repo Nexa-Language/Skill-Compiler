@@ -127,6 +127,24 @@ impl Diagnostic {
         }
     }
 
+    /// Create a diagnostic with a specified error level
+    ///
+    /// Use this when the level needs to be determined dynamically
+    /// (e.g., strict mode vs warning mode).
+    #[must_use]
+    pub fn new(message: impl Into<String>, code: impl Into<String>, level: ErrorLevel) -> Self {
+        Self {
+            message: message.into(),
+            code: code.into(),
+            level,
+            help: None,
+            file_path: None,
+            line: None,
+            column: None,
+            url: None,
+        }
+    }
+
     /// Add help text
     #[must_use]
     pub fn with_help(mut self, help: impl Into<String>) -> Self {

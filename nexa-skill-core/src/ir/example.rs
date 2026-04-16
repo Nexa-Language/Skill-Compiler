@@ -33,3 +33,19 @@ pub enum ExampleDifficulty {
     /// Advanced example
     Advanced,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_example_difficulty_serde() {
+        // ExampleDifficulty uses serde rename_all = "lowercase"
+        assert_eq!(serde_json::to_string(&ExampleDifficulty::Basic).unwrap(), "\"basic\"");
+        assert_eq!(
+            serde_json::to_string(&ExampleDifficulty::Intermediate).unwrap(),
+            "\"intermediate\""
+        );
+        assert_eq!(serde_json::to_string(&ExampleDifficulty::Advanced).unwrap(), "\"advanced\"");
+    }
+}

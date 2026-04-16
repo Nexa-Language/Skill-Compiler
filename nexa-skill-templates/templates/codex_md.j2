@@ -1,0 +1,100 @@
+---
+name: {{ name }}
+description: {{ clean_description }}
+version: {{ version }}
+{% if hitl_required %}
+hitl_required: true
+{% endif %}
+security_level: {{ security_level }}
+{% if !mcp_servers.is_empty() %}
+mcp_servers:
+{% for server in mcp_servers %}
+  - {{ server }}
+{% endfor %}
+{% endif %}
+---
+
+# {{ name }}
+
+## Identity
+
+You are an AI assistant executing a structured skill workflow.
+
+## Outcome
+
+Define what constitutes successful completion of this skill.
+
+## Constraints
+
+Follow these boundaries strictly:
+
+- **Security Level: {{ security_level_upper }}**: {{ security_instruction }}
+{% for constraint in anti_skill_constraints %}
+- {{ constraint.content }}{{ constraint.level_marker }}
+{% endfor %}
+
+## Description
+
+{{ description }}
+
+## Context Gathering
+
+Before execution, gather the following information:
+
+{% for item in context_gathering %}
+- {{ item }}
+{% endfor %}
+
+{% if !procedures.is_empty() %}
+## Execution Steps
+
+Execute in exact sequence:
+
+{% for step in procedures %}
+{{ step.order }}. {{ step.instruction }}{% if step.is_critical %} **[CRITICAL - Requires HITL approval]**{% endif %}
+{% endfor %}
+
+{% endif %}
+{% if !examples.is_empty() %}
+## Examples
+
+{% for example in examples %}
+{% if !example.title.is_empty() %}
+### {{ example.title }}
+
+{% endif %}
+**User Input:**
+```
+{{ example.user_input }}
+```
+
+**Agent Response:**
+```
+{{ example.agent_response }}
+```
+
+{% endfor %}
+{% endif %}
+## Edge Cases
+
+Handle these situations gracefully:
+
+- If input is ambiguous: Ask user for clarification before proceeding
+- If external API fails: Report error, do not fabricate data
+- If required data missing: Halt and notify user
+
+{% if !fallbacks.is_empty() %}
+## Fallbacks
+
+If primary approach fails:
+
+{% for fb in fallbacks %}
+- {{ fb }}
+{% endfor %}
+
+{% endif %}
+## Output Format
+
+After completion, format output as a clear, structured response.
+Use appropriate formatting: headers, bullet points, or code blocks as needed.
+For CI/CD pipeline integration, use `-p` non-interactive mode.

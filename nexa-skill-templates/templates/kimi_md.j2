@@ -1,0 +1,108 @@
+# {{ name }}
+
+**Version**: {{ version }}
+**Security Level**: {{ security_level }}
+
+## Description
+
+{{ description }}
+
+{% if hitl_required %}
+> **注意**: 此技能需要人工审批后才能执行。
+
+{% endif %}
+{% if !mcp_servers.is_empty() %}
+## MCP Dependencies
+
+{% for server in mcp_servers %}
+- {{ server }}
+{% endfor %}
+
+{% endif %}
+{% if !permissions.is_empty() %}
+## Permissions
+
+{% for perm in permissions %}
+- {{ perm.kind_name }}: {{ perm.scope }}{% if perm.read_only %} (read-only){% endif %}
+{% endfor %}
+
+{% endif %}
+{% if !pre_conditions.is_empty() %}
+## Pre-Conditions
+
+{% for cond in pre_conditions %}
+- {{ cond }}
+{% endfor %}
+
+{% endif %}
+{% if !context_gathering.is_empty() %}
+## Context Gathering
+
+{% for item in context_gathering %}
+- {{ item }}
+{% endfor %}
+
+{% endif %}
+{% if !input_schema_json.is_empty() %}
+## Input Schema
+
+```json
+{{ input_schema_json }}
+```
+
+{% endif %}
+{% if !procedures.is_empty() %}
+## Procedures
+
+{% for step in procedures %}
+{{ step.order }}. {{ step.instruction }}{% if step.is_critical %} [CRITICAL]{% endif %}
+{% endfor %}
+
+{% endif %}
+{% if !anti_skill_constraints.is_empty() %}
+## Safety Constraints
+
+{% for constraint in anti_skill_constraints %}
+> {{ constraint.content }}
+{% endfor %}
+
+{% endif %}
+{% if !fallbacks.is_empty() %}
+## Fallbacks
+
+{% for fb in fallbacks %}
+- {{ fb }}
+{% endfor %}
+
+{% endif %}
+{% if !post_conditions.is_empty() %}
+## Post-Conditions
+
+{% for cond in post_conditions %}
+- {{ cond }}
+{% endfor %}
+
+{% endif %}
+{% if !output_schema_json.is_empty() %}
+## Output Schema
+
+```json
+{{ output_schema_json }}
+```
+
+{% endif %}
+{% if !examples.is_empty() %}
+## Examples
+
+{% for example in examples %}
+{% if !example.title.is_empty() %}
+### {{ example.title }}
+
+{% endif %}
+**User**: {{ example.user_input }}
+
+**Agent**:
+{{ example.agent_response }}
+
+{% endfor %}
+{% endif %}

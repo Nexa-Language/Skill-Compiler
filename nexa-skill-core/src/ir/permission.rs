@@ -67,3 +67,28 @@ impl PermissionKind {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_permission_kind_display_name() {
+        assert_eq!(PermissionKind::Network.display_name(), "Network");
+        assert_eq!(PermissionKind::FileSystem.display_name(), "FileSystem");
+        assert_eq!(PermissionKind::Database.display_name(), "Database");
+        assert_eq!(PermissionKind::Execute.display_name(), "Execute");
+        assert_eq!(PermissionKind::MCP.display_name(), "MCP");
+        assert_eq!(PermissionKind::Environment.display_name(), "Environment");
+    }
+
+    #[test]
+    fn test_permission_kind_scope_format() {
+        assert!(PermissionKind::Network.scope_format().contains("URL"));
+        assert!(PermissionKind::FileSystem.scope_format().contains("path"));
+        assert!(PermissionKind::Database.scope_format().contains("db_type"));
+        assert!(PermissionKind::Execute.scope_format().contains("Command"));
+        assert!(PermissionKind::MCP.scope_format().contains("MCP server"));
+        assert!(PermissionKind::Environment.scope_format().contains("variable"));
+    }
+}

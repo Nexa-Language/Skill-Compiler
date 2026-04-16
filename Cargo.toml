@@ -37,7 +37,7 @@ categories = ["compilers", "development-tools", "text-processing", "command-line
 [workspace.dependencies]
 
 # === Serialization ===
-serde = { version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
 toml = "0.8"
