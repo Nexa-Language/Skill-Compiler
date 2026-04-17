@@ -74,11 +74,11 @@ pub struct SectionContext {
     pub content: String,
 }
 
-// ===== Claude XML Template =====
+// ===== Claude Markdown+XML Template =====
 
-/// Claude XML template context — produces `<agent_skill>` XML format
+/// Claude SKILL.md template context — produces YAML frontmatter + Markdown header + `<agent_skill>` XML body
 #[derive(Debug, Clone, Template)]
-#[template(path = "claude_xml.j2", escape = "none")]
+#[template(path = "claude_md.j2", escape = "none")]
 pub struct ClaudeContext {
     /// Skill name
     pub name: String,

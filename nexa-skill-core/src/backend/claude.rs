@@ -142,11 +142,19 @@ mod tests {
     }
 
     #[test]
-    fn test_claude_emitter_xml_output() {
+    fn test_claude_emitter_skill_md_output() {
         let ir = make_test_ir();
         let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = ClaudeEmitter::new();
         let result = emitter.emit(&validated).unwrap();
+        // Verify YAML frontmatter (required for Claude Code skill discovery)
+        assert!(result.starts_with("---\n"));
+        assert!(result.contains("name: test-skill"));
+        assert!(result.contains("description:"));
+        assert!(result.contains("---\n\n# test-skill"));
+        // Verify Markdown header
+        assert!(result.contains("# test-skill\n"));
+        // Verify XML body (Claude's preferred structured format)
         assert!(result.contains("<agent_skill>"));
         assert!(result.contains("<name>test-skill</name>"));
         assert!(result.contains("<intent>Test description</intent>"));

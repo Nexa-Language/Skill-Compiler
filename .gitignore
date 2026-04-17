@@ -48,3 +48,7 @@ data/*.db-wal
 
 # Large generated files
 *.json.bak
+
+# Experiments
+experiments/
+jobs/

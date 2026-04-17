@@ -26,7 +26,7 @@ pub use routing_manifest::{RoutingManifest, RoutingEntry, MinimalEntry};
 /// Target platform enumeration
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum TargetPlatform {
-    /// Claude (Anthropic) - XML tags preferred
+    /// Claude (Anthropic) - YAML frontmatter + Markdown/XML hybrid SKILL.md format
     Claude,
     /// Codex (OpenAI) - Markdown input, JSON Schema output (Decoupled)
     Codex,
@@ -53,7 +53,7 @@ impl TargetPlatform {
     #[must_use]
     pub const fn extension(&self) -> &'static str {
         match self {
-            Self::Claude => ".xml",
+            Self::Claude => ".md",  // SKILL.md format (YAML frontmatter + Markdown/XML hybrid)
             Self::Codex => ".md",  // Changed from _schema.json to .md (dual-payload)
             Self::Gemini => ".md",
             Self::Kimi => ".md",
