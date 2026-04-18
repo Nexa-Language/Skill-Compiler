@@ -36,6 +36,10 @@ experiments/logs/
 experiments/analysis/
 experiments/tasks/input/
 experiments/tasks/output/
+experiments/exp_*
+experiments/skillsbench_results
+experiments/skillsbench_compiled
+experiments/claude_binary_cache
 
 # Test results (generated)
 test_results/compiled/
@@ -50,5 +54,4 @@ data/*.db-wal
 *.json.bak
 
 # Experiments
-experiments/
 jobs/
