@@ -163,14 +163,13 @@ impl Compiler {
             let assets = emitter.generate_assets(ir);
 
             // Write output file
-            // Claude target uses fixed filename "SKILL.md" (required by Claude Code skill discovery)
-            // Other targets use skill-name + extension
+            // Platforms with fixed_output_filename() use "SKILL.md" (per Agent Skills spec,
+            // required by skill discovery in Claude Code, SkillsBench/Harbor, etc.)
+            // Other platforms use skill-name + extension
             let skill_name = ir.as_ref().name.to_string();
-            let file_name = if *target == TargetPlatform::Claude {
-                "SKILL.md".to_string()
-            } else {
-                format!("{}{}", skill_name, target.extension())
-            };
+            let file_name = target.fixed_output_filename()
+                .map(|f| f.to_string())
+                .unwrap_or_else(|| format!("{}{}", skill_name, target.extension()));
             let file_path = output_path.join(&file_name);
             fs::write(&file_path, output_content)
                 .map_err(|e| CompileError::IOError(e.to_string()))?;

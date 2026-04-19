@@ -12,6 +12,7 @@ Cargo.lock
 # Environment
 .env
 .env.local
+.env.kimi
 
 # Build artifacts (moved to old_backup, but keep these in case they reappear)
 build/
@@ -45,6 +46,7 @@ experiments/tasks/output/
 experiments/exp_*
 experiments/skillsbench_results
 experiments/skillsbench_compiled
+experiments/skillsbench_kimi_compiled
 experiments/claude_binary_cache
 experiments/skillsbench_results_round4_failed
 experiments/skillsbench_vanilla

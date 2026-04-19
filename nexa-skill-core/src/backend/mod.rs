@@ -81,4 +81,21 @@ impl TargetPlatform {
             Self::Kimi => "Standard Markdown",
         }
     }
+
+    /// Get the fixed output filename if the platform requires one.
+    ///
+    /// Per the Agent Skills specification, the standard skill discovery filename
+    /// is `SKILL.md`. Platforms that follow this convention return `Some("SKILL.md")`,
+    /// while others that use skill-name-based filenames return `None`.
+    ///
+    /// Currently Claude and Kimi use `SKILL.md` (required by skill discovery mechanisms
+    /// in Claude Code and SkillsBench/Harbor). Codex and Gemini may transition to
+    /// `SKILL.md` in future versions per the spec.
+    #[must_use]
+    pub const fn fixed_output_filename(&self) -> Option<&'static str> {
+        match self {
+            Self::Claude | Self::Kimi => Some("SKILL.md"),
+            Self::Codex | Self::Gemini => None,
+        }
+    }
 }

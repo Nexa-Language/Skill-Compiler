@@ -185,6 +185,16 @@ mod tests {
     }
 
     #[test]
+    fn fixed_output_filename_claude_and_kimi() {
+        // Claude and Kimi must return SKILL.md (per Agent Skills spec)
+        assert_eq!(TargetPlatform::Claude.fixed_output_filename(), Some("SKILL.md"));
+        assert_eq!(TargetPlatform::Kimi.fixed_output_filename(), Some("SKILL.md"));
+        // Codex and Gemini use skill-name-based filenames (no fixed name)
+        assert_eq!(TargetPlatform::Codex.fixed_output_filename(), None);
+        assert_eq!(TargetPlatform::Gemini.fixed_output_filename(), None);
+    }
+
+    #[test]
     fn replace_emitter() {
         let mut registry = EmitterRegistry::new();
 
