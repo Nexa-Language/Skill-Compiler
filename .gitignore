@@ -13,10 +13,16 @@ Cargo.lock
 .env
 .env.local
 
-# Build artifacts
+# Build artifacts (moved to old_backup, but keep these in case they reappear)
 build/
 dist/
 build_outputs/
+
+# Archive backup (3.7G, not for git)
+/old_backup/
+
+# Harbor jobs (moved to old_backup)
+/jobs/
 
 # OS
 .DS_Store
@@ -40,6 +46,8 @@ experiments/exp_*
 experiments/skillsbench_results
 experiments/skillsbench_compiled
 experiments/claude_binary_cache
+experiments/skillsbench_results_round4_failed
+experiments/skillsbench_vanilla
 
 # Test results (generated)
 test_results/compiled/

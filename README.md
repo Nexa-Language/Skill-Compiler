@@ -91,7 +91,7 @@ nsc init my-skill
 - **Structured Pipeline** - 四阶段编译管线，阶段边界清晰
 - **Async Emission** - 异步多目标并行生成
 
-> ⚠️ **实验数据说明**：前期对比实验因 Claude Code 权限模型限制（headless模式下无法交互审批），所有任务实际成功率为 0%，因此暂不引用执行速度对比数据。详见 [审查报告](plans/REPO_AUDIT_REPORT.md)。
+> ⚠️ **实验数据说明**：前期对比实验因 Claude Code 权限模型限制（headless模式下无法交互审批），所有任务实际成功率为 0%，因此暂不引用执行速度对比数据。详见 [审查报告](old_backup/dev_plans/plans/REPO_AUDIT_REPORT.md)。
 
 ---
 
@@ -107,7 +107,7 @@ nsc init my-skill
 
 > ⚠️ 前期大规模对比实验因权限模型限制存在方法论缺陷，数据暂不可引用。实验框架修复后将重新评估。
 
-详见 [审查报告](plans/REPO_AUDIT_REPORT.md) | [实验报告](experiments/LARGE_SCALE_EXPERIMENT_REPORT.md)
+详见 [审查报告](old_backup/dev_plans/plans/REPO_AUDIT_REPORT.md) | [实验报告](old_backup/exp_interim_files/LARGE_SCALE_EXPERIMENT_REPORT.md)
 
 ---
 
@@ -284,7 +284,7 @@ NSC follows a classic compiler architecture with four phases:
 | Compilation Success Rate | 100% | 内部测试数据集全部编译成功 |
 | Target Coverage | 4 platforms | Claude XML, Codex Markdown, Gemini Markdown+YAML, Kimi Markdown |
 
-> ⚠️ 前期执行速度对比实验（声称"16.9% faster"）因实验方法论缺陷（0%成功率）暂不可引用。详见 [审查报告](plans/REPO_AUDIT_REPORT.md)。
+> ⚠️ 前期执行速度对比实验（声称"16.9% faster"）因实验方法论缺陷（0%成功率）暂不可引用。详见 [审查报告](old_backup/dev_plans/plans/REPO_AUDIT_REPORT.md)。
 
 ---
 

@@ -1,5 +1,0 @@
-hitl_required: false
-mcp_servers: []
-name: langsmith-fetch
-security_level: medium
-version: 0.1.0

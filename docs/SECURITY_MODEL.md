@@ -2,7 +2,7 @@
 
 > **权限系统、安全等级、Anti-Skill 注入机制与 Human-In-The-Loop 审批流程**
 
-> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的安全模型设计已全部在源码中实现。详见 [审查报告](../plans/REPO_AUDIT_REPORT.md)。实现状态如下：
+> ✅ **实现状态声明 (Updated 2026-04-15):** 本文档描述的安全模型设计已全部在源码中实现。详见 [审查报告](../old_backup/dev_plans/plans/REPO_AUDIT_REPORT.md)。实现状态如下：
 >
 > | 文档描述 | 实现状态 |
 > |----------|---------|

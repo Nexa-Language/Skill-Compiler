@@ -284,3 +284,18 @@
   - emitter.rs 注释修正 (dual-payload → actual)
   - 13 处 ValidatedSkillIR::new(ir) → ::new(ir, vec![]) 调用点更新
 - 新增 ADR-008: Warning 诊断保留策略
+
+### 2026-04-18
+- SkillsBench Round-5 完整数据备份与分析报告完成
+- 数据真实性审计完成: 97个成功trial数据链完整，汇总与任务级数据完全匹配
+- Harbor框架bug修复:
+  - `claude_code.py:163` 的 `"else; "` bash语法错误 → 修复为 `"else "`
+  - Docker镜像源 DNS超时(daocloud.io) → 切换为 tencentyun.com + dockerhub.icu
+  - Claude Code native binary host cache mount方案实现
+- Pilot测试(v2): 发现系统性网络问题(容器内pip/apt超时)，无法继续跑新数据
+- 最终分析报告完成:
+  - C vs V: p=0.0096**, NSC编译显著优于vanilla
+  - C vs O: p=0.0103*, NSC编译显著优于original
+  - O vs V: p=0.9756 ns, original与vanilla差异不显著
+  - Compiled pass rate 33.3% > Original 21.1% > Vanilla 15.6%
+  - Token效率: Compiled每任务0.65M tokens获得0.378 reward
