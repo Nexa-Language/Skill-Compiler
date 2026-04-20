@@ -1,0 +1,94 @@
+---
+name: {{ name }}
+description: {{ clean_description }}
+version: {{ version }}
+{% if hitl_required %}
+hitl_required: true
+{% endif %}
+{% if !mcp_servers.is_empty() %}
+mcp_servers:
+{% for server in mcp_servers %}
+  - {{ server }}
+{% endfor %}
+{% endif %}
+---
+
+# {{ name }}
+
+{{ description }}
+
+{% if !procedures.is_empty() %}
+## Execution Steps
+
+{% for step in procedures %}
+### {{ step.order }}. {{ step.instruction }}{% if step.is_critical %} ⚠️ **[CRITICAL]**{% endif %}
+
+{% endif %}
+{% endif %}
+{% if !approaches.is_empty() %}
+{% if approaches.len() > 1 %}
+## Approaches
+
+Select the appropriate approach based on the task:
+
+{% for approach in approaches %}
+### {{ approach.name }}
+{{ approach.description }}
+
+{% endfor %}
+{% else %}
+## Approach
+
+{{ approaches.first().description }}
+
+{% endif %}
+{% endif %}
+{% if !examples.is_empty() %}
+## Examples
+
+{% for example in examples %}
+{% if !example.title.is_empty() %}
+### {{ example.title }}
+
+{% endif %}
+**User Input:**
+```
+{{ example.user_input }}
+```
+
+**Agent Response:**
+```
+{{ example.agent_response }}
+```
+
+{% endfor %}
+{% endif %}
+{% if !extra_sections.is_empty() %}
+## Reference
+
+{% for section in extra_sections %}
+### {{ section.title }}
+{{ section.content }}
+
+{% endfor %}
+{% endif %}
+{% if !anti_skill_constraints.is_empty() %}
+## Strict Constraints
+
+NEVER perform these actions:
+
+{% for constraint in anti_skill_constraints %}
+- {{ constraint.content }}{{ constraint.level_marker }}
+{% endfor %}
+
+{% endif %}
+{% if !fallbacks.is_empty() %}
+## Fallbacks
+
+If primary approach fails:
+
+{% for fb in fallbacks %}
+- {{ fb }}
+{% endfor %}
+
+{% endif %}
