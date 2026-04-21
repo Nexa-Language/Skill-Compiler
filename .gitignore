@@ -72,4 +72,7 @@ experiments/*
 !experiments/analyze_per_task_results.py
 !experiments/postprocess_compiled_skills.py
 !experiments/skillsbench_gemini/
+experiments/skillsbench_gemini/*
+!experiments/skillsbench_gemini/EXPERIMENT_RESULTS.md
+!experiments/skillsbench_gemini/detailed_results.json
 jobs/
