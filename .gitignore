@@ -71,6 +71,9 @@ experiments/*
 !experiments/analyze_skillsbench_results.py
 !experiments/analyze_per_task_results.py
 !experiments/postprocess_compiled_skills.py
+!experiments/prepare_skillsbench_codex.py
+!experiments/run_skillsbench_codex.py
+!experiments/postprocess_compiled_skills_codex.py
 !experiments/skillsbench_gemini/
 experiments/skillsbench_gemini/*
 !experiments/skillsbench_gemini/EXPERIMENT_RESULTS.md
