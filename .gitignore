@@ -18,6 +18,7 @@ Cargo.lock
 build/
 dist/
 build_outputs/
+example-skills/
 
 # Archive backup (3.7G, not for git)
 /old_backup/
