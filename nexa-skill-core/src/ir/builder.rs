@@ -207,7 +207,16 @@ fn infer_skill_mode(
     } else if !procedures.is_empty()
         && procedures.iter().any(|p| {
             let t = p.instruction.to_lowercase();
-            t.contains("operation") || t.contains("extract") || t.contains("merge")
+            t.contains("operation")
+                || t.contains("extract")
+                || t.contains("merge")
+                || t.contains("creating")
+                || t.contains("editing")
+                || t.contains("reading")
+                || t.contains("analyzing")
+                || t.contains("recalculat")
+                || t.contains("library")
+                || t.contains("common workflow")
         })
     {
         *mode = SkillMode::Toolkit;
