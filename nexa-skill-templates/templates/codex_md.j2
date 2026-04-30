@@ -12,135 +12,112 @@ mcp_servers:
   - {{ server }}
 {% endfor %}
 {% endif %}
+mode: {{ skill_mode }}
 ---
 
-# {{ name }}
-
-## Identity
-
-You are an AI assistant executing a structured skill workflow.
-
-## Outcome
-
-Define what constitutes successful completion of this skill.
-
-## Constraints
-
-Follow these boundaries strictly:
-
-- **Security Level: {{ security_level_upper }}**: {{ security_instruction }}
-{% for constraint in anti_skill_constraints %}
-- {{ constraint.content }}{{ constraint.level_marker }}
-{% endfor %}
-
-## Description
-
+<skill name="{{ name }}">
+  <instructions>
 {{ description }}
 
-## Context Gathering
-
-Before execution, gather the following information:
-
-{% for item in context_gathering %}
-- {{ item }}
-{% endfor %}
-
-{% if !procedures.is_empty() %}
-## Execution Steps
-
-Execute in exact sequence:
-
-{% for step in procedures %}
-{{ step.order }}. {{ step.instruction }}{% if step.is_critical %} **[CRITICAL - Requires HITL approval]**{% endif %}
-{% endfor %}
-
-{% endif %}
-{% if !approaches.is_empty() %}
-## Approaches ({{ skill_mode }})
-
-{% for approach in approaches %}
-### {{ approach.name }}
-{{ approach.description }}
-
-{% endfor %}
-{% endif %}
-{% if !pre_conditions.is_empty() %}
-## Pre-Conditions
-
-Before execution, verify:
-
-{% for cond in pre_conditions %}
-- {{ cond }}
-{% endfor %}
-
-{% endif %}
-{% if !permissions.is_empty() %}
-## Permissions
-
-{% for perm in permissions %}
-- **{{ perm.kind_name }}**: {{ perm.scope }}{% if perm.read_only %} (read-only){% endif %} — {{ perm.description }}
-{% endfor %}
-
-{% endif %}
-{% if !examples.is_empty() %}
-## Examples
-
-{% for example in examples %}
-{% if !example.title.is_empty() %}
-### {{ example.title }}
-
-{% endif %}
-**User Input:**
-```
-{{ example.user_input }}
-```
-
-**Agent Response:**
-```
-{{ example.agent_response }}
-```
-
-{% endfor %}
-{% endif %}
-## Edge Cases
-
-Handle these situations gracefully:
-
-- If input is ambiguous: Ask user for clarification before proceeding
-- If external API fails: Report error, do not fabricate data
-- If required data missing: Halt and notify user
-
-{% if !fallbacks.is_empty() %}
-## Fallbacks
-
-If primary approach fails:
-
-{% for fb in fallbacks %}
-- {{ fb }}
-{% endfor %}
-
-{% endif %}
-{% if !post_conditions.is_empty() %}
-## Post-Conditions
-
-After execution, verify:
-
-{% for cond in post_conditions %}
-- {{ cond }}
-{% endfor %}
-
-{% endif %}
 {% if !extra_sections.is_empty() %}
-## Additional Context
-
 {% for section in extra_sections %}
-### {{ section.title }}
+{% match section.level %}
+{% when 1 %}# {{ section.title }}
+{% when 2 %}## {{ section.title }}
+{% when 3 %}### {{ section.title }}
+{% when 4 %}#### {{ section.title }}
+{% when 5 %}##### {{ section.title }}
+{% when 6 %}###### {{ section.title }}
+{% else %}### {{ section.title }}
+{% endmatch %}
 {{ section.content }}
 
 {% endfor %}
 {% endif %}
-## Output Format
+  </instructions>
 
+{% if !anti_skill_constraints.is_empty() %}
+  <constraints>
+{% for constraint in anti_skill_constraints %}
+    <forbidden>{{ constraint.content }}{{ constraint.level_marker }}</forbidden>
+{% endfor %}
+  </constraints>
+
+{% endif %}
+{% if !approaches.is_empty() %}
+  <approaches>
+{% for approach in approaches %}
+    <approach name="{{ approach.name }}">
+      <description>{{ approach.description }}</description>
+      <instructions>{{ approach.instructions }}</instructions>
+    </approach>
+{% endfor %}
+  </approaches>
+
+{% endif %}
+{% if !pre_conditions.is_empty() %}
+  <pre_conditions>
+{% for cond in pre_conditions %}
+    <condition>{{ cond }}</condition>
+{% endfor %}
+  </pre_conditions>
+
+{% endif %}
+{% if !permissions.is_empty() %}
+  <permissions>
+{% for perm in permissions %}
+    <permission kind="{{ perm.kind_name }}" scope="{{ perm.scope }}"{% if perm.read_only %} read_only="true"{% endif %}>{{ perm.description }}</permission>
+{% endfor %}
+  </permissions>
+
+{% endif %}
+{% if !examples.is_empty() %}
+  <examples>
+{% for example in examples %}
+    <example{% if !example.title.is_empty() %} title="{{ example.title }}"{% endif %}>
+      <input>{{ example.user_input }}</input>
+      <output>{{ example.agent_response }}</output>
+    </example>
+{% endfor %}
+  </examples>
+
+{% endif %}
+{% if !fallbacks.is_empty() %}
+  <fallbacks>
+{% for fb in fallbacks %}
+    <strategy>{{ fb }}</strategy>
+{% endfor %}
+  </fallbacks>
+
+{% endif %}
+{% if !post_conditions.is_empty() %}
+  <post_conditions>
+{% for cond in post_conditions %}
+    <condition>{{ cond }}</condition>
+{% endfor %}
+  </post_conditions>
+
+{% endif %}
+  <output_format>
 After completion, format output as a clear, structured response.
 Use appropriate formatting: headers, bullet points, or code blocks as needed.
 For CI/CD pipeline integration, use `-p` non-interactive mode.
+
+Before considering the task complete, verify ALL of the following:
+- Output file exists at the specified path
+- Output format matches the required schema
+- All computed values are present (no empty cells unless explicitly allowed)
+- Edge cases handled: empty inputs, missing data, API failures
+{% if !post_conditions.is_empty() %}
+{% for cond in post_conditions %}
+- {{ cond }}
+{% endfor %}
+{% endif %}
+  </output_format>
+
+  <edge_cases>
+- If input is ambiguous: Ask user for clarification before proceeding
+- If external API fails: Report error, do not fabricate data
+- If required data missing: Halt and notify user
+  </edge_cases>
+</skill>
