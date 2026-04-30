@@ -170,9 +170,10 @@ pub struct CodexContext {
 
 // ===== Gemini Markdown Template =====
 
-/// Gemini Markdown template context — produces Markdown + YAML assets
+/// Gemini Markdown template context — produces clean Markdown + YAML frontmatter
+/// Uses gemini_md_v2.j2 template with improved structure for Gemini CLI
 #[derive(Debug, Clone, Template)]
-#[template(path = "gemini_md.j2", escape = "none")]
+#[template(path = "gemini_md_v2.j2", escape = "none")]
 pub struct GeminiContext {
     /// Skill name
     pub name: String,
