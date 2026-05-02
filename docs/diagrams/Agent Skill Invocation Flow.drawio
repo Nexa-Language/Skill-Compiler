@@ -20,7 +20,7 @@
           <mxGeometry height="29" width="30" x="480" y="331" as="geometry" />
         </mxCell>
         <mxCell id="GbDw877KBz16GuJ-Mpes-6" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;&lt;font style=&quot;font-size: 22px;&quot;&gt;Agent Skill Invocation Flow&lt;/font&gt;&lt;/b&gt;" vertex="1">
-          <mxGeometry height="30" width="290" x="355" y="242" as="geometry" />
+          <mxGeometry height="30" width="290" x="370" y="180" as="geometry" />
         </mxCell>
         <mxCell id="GbDw877KBz16GuJ-Mpes-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Skill&lt;/b&gt;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Authoring&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;&lt;b&gt;Layer&lt;/b&gt;&lt;/font&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="30" width="60" x="329" y="295" as="geometry" />
