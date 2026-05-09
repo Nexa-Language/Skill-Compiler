@@ -1,4 +1,4 @@
-//! Nexa Skill Compiler CLI
+//! SkCC CLI
 //!
 //! Command-line interface for compiling SKILL.md files to platform-native formats.
 //!
@@ -17,12 +17,12 @@ mod commands;
 mod config;
 mod logging;
 
-/// Nexa Skill Compiler - Transform SKILL.md to platform-native formats
+/// SkCC - Transform SKILL.md to platform-native formats
 #[derive(Parser)]
 #[command(name = "nexa-skill")]
 #[command(author = "Nexa Dev Team")]
 #[command(version)]
-#[command(about = "AI Agent Skill Compiler", long_about = None)]
+#[command(about = "SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents", long_about = None)]
 struct Cli {
     /// Enable verbose output (debug level logging)
     #[arg(short, long, global = true)]

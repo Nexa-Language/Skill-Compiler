@@ -1,12 +1,12 @@
-# Nexa Skill Compiler (NSC) - 开发进度追踪
+# SkCC - 开发进度追踪
 
-> **本文档记录 NSC 项目的开发进度、核心决策 (ADR) 和技术债务**
+> **本文档记录 SkCC 项目的开发进度、核心决策 (ADR) 和技术债务**
 
 ---
 
 ## 📋 项目概览
 
-- **项目名称**: Nexa Skill Compiler (NSC)
+- **项目名称**: SkCC (Skill Compiler)
 - **技术栈**: Rust (Edition 2024), pulldown-cmark, serde, clap, miette, askama, tokio
 - **目标**: 构建工业级 Agent 过程性知识 (SOP) 编译器
 - **开始时间**: 2026-04-03
@@ -294,8 +294,8 @@
   - Claude Code native binary host cache mount方案实现
 - Pilot测试(v2): 发现系统性网络问题(容器内pip/apt超时)，无法继续跑新数据
 - 最终分析报告完成:
-  - C vs V: p=0.0096**, NSC编译显著优于vanilla
-  - C vs O: p=0.0103*, NSC编译显著优于original
+  - C vs V: p=0.0096**, SkCC编译显著优于vanilla
+  - C vs O: p=0.0103*, SkCC编译显著优于original
   - O vs V: p=0.9756 ns, original与vanilla差异不显著
   - Compiled pass rate 33.3% > Original 21.1% > Vanilla 15.6%
   - Token效率: Compiled每任务0.65M tokens获得0.378 reward

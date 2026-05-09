@@ -1,4 +1,4 @@
-//! Nexa Skill Core Library
+//! SkCC Core Library
 //!
 //! This crate provides the core compilation pipeline for transforming
 //! SKILL.md files into platform-native formats.

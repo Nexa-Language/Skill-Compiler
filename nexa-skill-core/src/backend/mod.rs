@@ -2,7 +2,7 @@
 //!
 //! This module provides code emission for different target platforms.
 //!
-//! Architecture based on empirical research ("高级提示词工程格式与智能体技能架构"):
+//! Architecture based on empirical research on format sensitivity:
 //! - Claude: XML tags for semantic layering (23% higher accuracy in math reasoning)
 //! - Codex: Decoupled Reasoning and Formatting (avoid JSON format tax)
 //! - Gemini: Markdown + YAML for nested data (51.9% accuracy vs JSON 43.1%)

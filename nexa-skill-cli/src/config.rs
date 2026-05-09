@@ -61,7 +61,7 @@ impl std::fmt::Display for TargetPlatform {
 
 /// Application configuration
 ///
-/// This struct holds all configuration options for the Nexa Skill Compiler.
+/// This struct holds all configuration options for SkCC.
 /// It can be loaded from environment variables, configuration files, or defaults.
 /// Note: Some fields are reserved for future features and may not be used currently.
 #[derive(Debug, Clone, Deserialize)]

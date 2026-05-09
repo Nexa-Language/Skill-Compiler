@@ -236,7 +236,7 @@ nexa-skill clean --dry-run
 
 use clap::{Parser, Subcommand};
 
-/// Nexa Skill Compiler - 将 SKILL.md 编译为 AI Agent 可执行产物
+/// SkCC - 将 SKILL.md 编译为 AI Agent 可执行产物
 #[derive(Parser)]
 #[command(name = "nexa-skill")]
 #[command(author = "Nexa Dev Team")]
@@ -817,7 +817,7 @@ Result: PASSED
 ### 6.1 nsc.toml 配置格式
 
 ```toml
-# Nexa Skill Compiler 配置文件
+# SkCC 配置文件
 
 [compiler]
 # 默认输出目录

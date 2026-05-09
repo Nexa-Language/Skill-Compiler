@@ -1,6 +1,6 @@
 //! Error Handling Module
 //!
-//! This module provides unified error types and diagnostics for the Nexa Skill Compiler.
+//! This module provides unified error types and diagnostics for SkCC.
 //! It uses `thiserror` for error derivation and `miette` for beautiful error reporting.
 //!
 //! # Error Hierarchy

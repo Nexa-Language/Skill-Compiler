@@ -1,6 +1,6 @@
 # 系统架构总览
 
-> **Nexa Skill Compiler (NSC) 的整体架构设计、模块划分与数据流**
+> **SkCC 的整体架构设计、模块划分与数据流**
 >
 > **架构版本**：v2.0（基于《高级提示词工程格式与智能体技能架构》调研报告重构）
 
@@ -24,7 +24,7 @@
 
 ## 1. 架构愿景
 
-NSC 采用经典编译器的**四阶段管线架构**，将人类可读的 `SKILL.md` 源文件转化为 AI Agent 可执行的结构化产物。整体设计遵循以下原则：
+SkCC 采用经典编译器的**四阶段管线架构**，将人类可读的 `SKILL.md` 源文件转化为 AI Agent 可执行的结构化产物。整体设计遵循以下原则：
 
 ### 1.1 核心设计原则
 
@@ -124,7 +124,7 @@ graph TB
 
 ## 3. 模块划分
 
-NSC 采用 Rust 的 **Crate 模块化架构**，每个编译阶段对应一个独立的 Crate：
+SkCC 采用 Rust 的 **Crate 模块化架构**，每个编译阶段对应一个独立的 Crate：
 
 ### 3.1 Crate 结构
 
@@ -350,7 +350,7 @@ pub trait Emitter: Send + Sync {
 ### 5.1 SkillIR 完整定义
 
 ```rust
-/// Nexa Skill Compiler 的核心中间表示
+/// SkCC 的核心中间表示
 /// 
 /// 这是编译管线中所有阶段的数据交换载体
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -502,7 +502,7 @@ pub struct RoutingEntry {
 
 ## 6. 错误处理架构
 
-NSC 采用分层错误处理策略，所有错误最终汇聚为 `Diagnostic` 结构，由 `miette` 渲染为终端可视化报告。
+SkCC 采用分层错误处理策略，所有错误最终汇聚为 `Diagnostic` 结构，由 `miette` 渲染为终端可视化报告。
 
 ```mermaid
 graph TB
@@ -544,7 +544,7 @@ graph TB
 
 ## 7. WASM 架构 (暂不实现)
 
-WASM 架构暂不实现，作为未来扩展。当前仅支持4个平台（Claude/Codex/Gemini/Kimi）。未来计划将 NSC 核心库编译为 WebAssembly，用于浏览器端实时校验和预览。
+WASM 架构暂不实现，作为未来扩展。当前仅支持4个平台（Claude/Codex/Gemini/Kimi）。未来计划将 SkCC 核心库编译为 WebAssembly，用于浏览器端实时校验和预览。
 
 > **设计预留**：WASM 功能范围规划如下——Frontend 解析、IR 构建、Analyzer 校验、Backend 生成（部分）、路由清单生成；文件系统操作需通过 JS Bridge。
 
@@ -688,9 +688,9 @@ impl Analyzer {
 
 Agent Skills 开放标准之前，传统做法是将所有指令打包放入全局配置文件（如 `agents.md`），导致"上下文膨胀"：模型在处理每一个简单请求时都需要重新阅读数以万计的无关背景信息。
 
-### 10.2 NSC解决方案
+### 10.2 SkCC解决方案
 
-NSC 在编译期生成**渐进式路由清单**（`routing_manifest.yaml`），仅提取所有技能的 `name` 和 `description`：
+SkCC 在编译期生成**渐进式路由清单**（`routing_manifest.yaml`），仅提取所有技能的 `name` 和 `description`：
 
 ```yaml
 # routing_manifest.yaml

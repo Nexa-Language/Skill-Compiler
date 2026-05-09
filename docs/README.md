@@ -1,4 +1,4 @@
-# Nexa Skill Compiler (NSC)
+# SkCC
 
 > **将人类可读的 SKILL.md 编译为 AI Agent 可执行的过程性知识库**
 
@@ -10,7 +10,7 @@
 
 ## 🎯 项目愿景
 
-Nexa Skill Compiler (NSC) 是一个针对大语言模型 (LLM) 过程性知识（Procedural Knowledge）的**跨端编译器**。它并非一个单纯的 Markdown 格式化工具，而是一个完整的编译系统，能够：
+SkCC 是一个针对大语言模型 (LLM) 过程性知识（Procedural Knowledge）的**跨端编译器**。它并非一个单纯的 Markdown 格式化工具，而是一个完整的编译系统，能够：
 
 - **接收**：符合人类阅读直觉与书写习惯的标准化 `SKILL.md`（包含 YAML Frontmatter 和 SOP 流程）
 - **编译期 (AOT)**：完成依赖校验、权限审计、JSON Schema 映射和反向逻辑注入
@@ -18,7 +18,7 @@ Nexa Skill Compiler (NSC) 是一个针对大语言模型 (LLM) 过程性知识�
 
 ### 核心价值主张
 
-| 传统方式 | NSC 编译方式 |
+| 传统方式 | SkCC 编译方式 |
 |---------|-------------|
 | 直接读取文本并塞入 Prompt | 解析 → 约束 → 优化 → 多态分发 |
 | 松散的自然语言描述 | 强类型元数据 + 结构化 SOP |
@@ -33,8 +33,8 @@ Nexa Skill Compiler (NSC) 是一个针对大语言模型 (LLM) 过程性知识�
 
 ```bash
 # 从源码构建（需要 Rust 1.75+）
-git clone https://github.com/nexa-org/nexa-skill-compiler
-cd nexa-skill-compiler
+git clone https://github.com/Nexa-Language/Skill-Compiler
+cd Skill-Compiler
 cargo build --release
 
 # 安装到系统路径
@@ -111,7 +111,7 @@ build/database-migration/
 
 ## 🎨 设计哲学
 
-NSC 遵循 **"静态编译、动态执行、多态分发"** 的设计哲学：
+SkCC 遵循 **"静态编译、动态执行、多态分发"** 的设计哲学：
 
 1. **静态编译 (AOT)**：所有校验、优化、注入在编译期完成，运行时零开销
 2. **动态执行**：生成的产物可被 Agent 按需加载，支持渐进式披露
@@ -121,7 +121,7 @@ NSC 遵循 **"静态编译、动态执行、多态分发"** 的设计哲学：
 
 ## 🤝 兼容性
 
-NSC 生成的产物兼容以下 Agent 平台（基于格式敏感性实证研究）：
+SkCC 生成的产物兼容以下 Agent 平台（基于格式敏感性实证研究）：
 
 | 平台 | 底层模型 | 输出格式 | 核心策略 | 学术依据 | 支持状态 |
 |------|----------|----------|----------|----------|----------|

@@ -1,4 +1,4 @@
-# Nexa Skill Compiler (NSC) - 2026 Roadmap
+# SkCC - 2026 Roadmap
 
 **Document Version:** 1.0  
 **Last Updated:** 2026-04-04  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This roadmap outlines the strategic development plan for Nexa Skill Compiler (NSC) based on comprehensive market research, competitive analysis, and community feedback. The document identifies current strengths and weaknesses, maps opportunities in the rapidly evolving AI Agent ecosystem, and defines actionable milestones for 2026-2027.
+This roadmap outlines the strategic development plan for SkCC based on comprehensive market research, competitive analysis, and community feedback. The document identifies current strengths and weaknesses, maps opportunities in the rapidly evolving AI Agent ecosystem, and defines actionable milestones for 2026-2027.
 
 ---
 
@@ -16,23 +16,23 @@ This roadmap outlines the strategic development plan for Nexa Skill Compiler (NS
 
 ### 1.1 Industry Trends (2025-2026)
 
-| Trend | Impact on NSC |
+| Trend | Impact on SkCC |
 |-------|---------------|
 | **"Year of the Agent"** - 83% organizations plan agentic AI deployment | Massive demand for skill management tools |
 | **Claude Code $1B revenue** - Autonomous agents proven commercially | Validates skill compilation market opportunity |
 | **AI Market $757.6B by 2026** (19.2% CAGR) | Rapid ecosystem expansion |
 | **200+ new Claude Skills daily on GitHub** | Growing skill corpus needs standardization |
-| **MCP becomes industry standard** | Integration opportunity for NSC |
+| **MCP becomes industry standard** | Integration opportunity for SkCC |
 | **Model-agnostic enterprise demand** | Cross-platform compilation is key differentiator |
 
 ### 1.2 Competitive Landscape
 
-| Category | Players | NSC Position |
+| Category | Players | SkCC Position |
 |----------|---------|--------------|
-| **Official Skill Tools** | Anthropic skill-creator, Claude Console | Complementary - NSC adds multi-target |
+| **Official Skill Tools** | Anthropic skill-creator, Claude Console | Complementary - SkCC adds multi-target |
 | **Community Collections** | awesome-claude-skills (22K stars), antigravity-skills (1,234 skills) | Integration target - compile community skills |
-| **LLM Frameworks** | LangChain, Spring AI, CrewAI, AutoGen | Potential partners - embed NSC as compiler |
-| **Prompt Engineering Tools** | LangSmith, Langfuse, Agenta | Different focus - NSC is compilation, not experimentation |
+| **LLM Frameworks** | LangChain, Spring AI, CrewAI, AutoGen | Potential partners - embed SkCC as compiler |
+| **Prompt Engineering Tools** | LangSmith, Langfuse, Agenta | Different focus - SkCC is compilation, not experimentation |
 | **MCP Servers** | 50+ new tools monthly | Backend integration opportunity |
 
 ### 1.3 User Pain Points (From Research)
@@ -76,10 +76,10 @@ This roadmap outlines the strategic development plan for Nexa Skill Compiler (NS
 │                    AI Agent Skill Ecosystem                      │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│   Skill Sources          NSC (Compiler)         Targets         │
+│   Skill Sources          SkCC (Compiler)        Targets         │
 │   ┌──────────┐           ┌──────────┐          ┌──────────┐    │
 │   │ Anthropic│──────────▶│          │─────────▶│  Claude  │    │
-│   │ Official │           │   NSC    │          │  Code    │    │
+│   │ Official │           │   SkCC   │          │  Code    │    │
 │   └──────────┘           │          │          └──────────┘    │
 │   ┌──────────┐           │ Multi    │          ┌──────────┐    │
 │   │ Community│──────────▶│ Target   │─────────▶│  Codex   │    │
@@ -90,7 +90,7 @@ This roadmap outlines the strategic development plan for Nexa Skill Compiler (NS
 │   │ SOPs     │           │          │          └──────────┘    │
 │   └──────────┘           └──────────┘                           │
 │                                                                 │
-│   Current Gap: NSC is the ONLY multi-target skill compiler      │
+│   Current Gap: SkCC is the ONLY multi-target skill compiler     │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -141,7 +141,7 @@ This roadmap outlines the strategic development plan for Nexa Skill Compiler (NS
 | **Community Skill Compilation** | 1,234+ skills need cross-platform support | Create skill-pack command |
 | **MCP Server Integration** | 50+ new MCP tools monthly | Add MCP backend emitter |
 | **Enterprise Pilot Program** | Security features already implemented | Target enterprise early adopters |
-| **Framework Partnerships** | LangChain, Spring AI need skill support | Offer NSC as embedded compiler |
+| **Framework Partnerships** | LangChain, Spring AI need skill support | Offer SkCC as embedded compiler |
 
 ### 4.2 Medium-Term Opportunities (Q3-Q4 2026)
 
@@ -195,7 +195,7 @@ This roadmap outlines the strategic development plan for Nexa Skill Compiler (NS
 
 | Milestone | Deliverable | Success Metric |
 |-----------|-------------|-----------------|
-| M3.1 LangChain Integration | NSC as LangChain skill compiler | LangChain docs reference |
+| M3.1 LangChain Integration | SkCC as LangChain skill compiler | LangChain docs reference |
 | M3.2 Spring AI Integration | Java ecosystem support | Spring blog feature |
 | M3.3 Custom Target SDK | Plugin development kit | 3 custom targets |
 | M3.4 Skill Dependency Manager | Import/resolve skill dependencies | 20 dependent skills |
@@ -242,13 +242,13 @@ SKILL.md ──▶ Frontend ──▶ IR ──▶ Analyzer ──▶ Backend �
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    NSC 2.0 Architecture                          │
+│                    SkCC 2.0 Architecture                         │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
 │  │ Sources  │───▶│ Compiler │───▶│ Registry │───▶│ Runtime  │  │
 │  │          │    │          │    │          │    │          │  │
-│  │ • GitHub │    │ • NSC    │    │ • Search │    │ • WASM   │  │
+│  │ • GitHub │    │ • SkCC   │    │ • Search │    │ • WASM   │  │
 │  │ • Local  │    │ • Plugins│    │ • Version│    │ • Native │  │
 │  │ • Cloud  │    │ • Deps   │    │ • Analytics│   │ • MCP   │  │
 │  └──────────┘    └──────────┘    └──────────┘    └──────────┘  │
@@ -377,7 +377,7 @@ SKILL.md ──▶ Frontend ──▶ IR ──▶ Analyzer ──▶ Backend �
 
 ### Week 1-2: Community Outreach
 
-1. [ ] Publish blog post on NSC vision
+1. [ ] Publish blog post on SkCC vision
 2. [ ] Submit to awesome-claude-skills list
 3. [ ] Create demo video for YouTube
 4. [ ] Post on r/ClaudeAI, r/LocalLLaMA
@@ -403,14 +403,14 @@ SKILL.md ──▶ Frontend ──▶ IR ──▶ Analyzer ──▶ Backend �
 
 ## 11. Conclusion
 
-NSC is uniquely positioned as the **only multi-target skill compiler** in a rapidly growing AI Agent ecosystem. The project's technical foundation is solid, with proven performance benefits and enterprise-ready security. The primary challenges are:
+SkCC is uniquely positioned as the **only multi-target skill compiler** in a rapidly growing AI Agent ecosystem. The project's technical foundation is solid, with proven performance benefits and enterprise-ready security. The primary challenges are:
 
 1. **Developer Experience** - VS Code extension is critical for adoption
 2. **Community Integration** - Skill registry and framework partnerships
 3. **Team Expansion** - Single developer velocity constraint
 4. **Enterprise Features** - SSO, audit, cloud deployment
 
-By executing this roadmap, NSC can become the **standard skill compilation layer** for the AI Agent ecosystem, serving developers, enterprises, and framework vendors with a unified, secure, and performant skill management solution.
+By executing this roadmap, SkCC can become the **standard skill compilation layer** for the AI Agent ecosystem, serving developers, enterprises, and framework vendors with a unified, secure, and performant skill management solution.
 
 ---
 

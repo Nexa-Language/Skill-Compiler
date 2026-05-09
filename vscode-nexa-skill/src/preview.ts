@@ -29,7 +29,7 @@ export class SkillPreviewPanel {
         // Create a new panel
         const panel = vscode.window.createWebviewPanel(
             SkillPreviewPanel.viewType,
-            'NSC Preview',
+            'SkCC Preview',
             column || vscode.ViewColumn.Two,
             {
                 enableScripts: true,
@@ -124,7 +124,7 @@ export class SkillPreviewPanel {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NSC Preview - ${fileName}</title>
+    <title>SkCC Preview - ${fileName}</title>
     <style>
         * {
             box-sizing: border-box;

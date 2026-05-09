@@ -15,7 +15,7 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 homepage.workspace = true
-description = "Core library for Nexa Skill Compiler - Parsing, IR, Analysis, and Emission"
+description = "Core library for SkCC - Parsing, IR, Analysis, and Emission"
 keywords.workspace = true
 categories.workspace = true
 

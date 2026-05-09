@@ -41,7 +41,7 @@ use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use chrono::{DateTime, Utc};
 
-/// Nexa Skill Compiler 核心中间表示
+/// SkCC 核心中间表示
 /// 
 /// 这是编译管线中所有阶段的数据交换载体
 #[derive(Debug, Clone, Serialize, Deserialize)]

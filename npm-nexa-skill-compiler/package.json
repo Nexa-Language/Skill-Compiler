@@ -1,7 +1,7 @@
 {
   "name": "nexa-skill-compiler",
   "version": "1.0.0",
-  "description": "Industrial-grade multi-target compiler for AI Agent Skills - Write Once, Run Anywhere",
+  "description": "SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents",
   "main": "index.js",
   "bin": {
     "nsc": "./bin/nsc.js"
@@ -26,12 +26,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ouyangyipeng/Skill-Compiler.git"
+    "url": "https://github.com/Nexa-Language/Skill-Compiler.git"
   },
   "bugs": {
-    "url": "https://github.com/ouyangyipeng/Skill-Compiler/issues"
+    "url": "https://github.com/Nexa-Language/Skill-Compiler/issues"
   },
-  "homepage": "https://github.com/ouyangyipeng/Skill-Compiler#readme",
+  "homepage": "https://github.com/Nexa-Language/Skill-Compiler#readme",
   "engines": {
     "node": ">=14.0.0"
   },

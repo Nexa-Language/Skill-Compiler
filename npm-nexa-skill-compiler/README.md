@@ -1,6 +1,6 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/ouyangyipeng/Skill-Compiler/main/docs/img/nsc-logo.png" alt="NSC Logo" width="100" />
-  <h1>Nexa Skill Compiler</h1>
+  <img src="https://raw.githubusercontent.com/Nexa-Language/Skill-Compiler/main/docs/img/nsc-logo.png" alt="SkCC Logo" width="100" />
+  <h1>SkCC</h1>
   <p><b><i>Write Once, Run Anywhere for AI Agent Skills</i></b></p>
   <p>
     <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"/>
@@ -38,9 +38,9 @@ nsc validate skill.md
 nsc init my-skill
 ```
 
-## What is NSC?
+## What is SkCC?
 
-**Nexa Skill Compiler (NSC)** is an industrial-grade multi-target compiler that transforms unified `SKILL.md` specifications into platform-specific agent instructions.
+**SkCC** is an industrial-grade multi-target compiler that transforms unified `SKILL.md` specifications into platform-specific agent instructions.
 
 ### 🔍 Frontend: Parsing & Validation
 - YAML Frontmatter Parser with type validation
@@ -68,9 +68,9 @@ Based on large-scale comparative experiments:
 
 ## Links
 
-- 📚 [Documentation](https://github.com/ouyangyipeng/Skill-Compiler#readme)
-- 🐛 [Issue Tracker](https://github.com/ouyangyipeng/Skill-Compiler/issues)
-- 💬 [Discussions](https://github.com/ouyangyipeng/Skill-Compiler/discussions)
+- 📚 [Documentation](https://github.com/Nexa-Language/Skill-Compiler#readme)
+- 🐛 [Issue Tracker](https://github.com/Nexa-Language/Skill-Compiler/issues)
+- 💬 [Discussions](https://github.com/Nexa-Language/Skill-Compiler/discussions)
 
 ## License
 

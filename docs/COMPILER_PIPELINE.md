@@ -1,6 +1,6 @@
 # 编译管线详细设计
 
-> **Nexa Skill Compiler 四阶段编译管线的完整实现细节**
+> **SkCC 四阶段编译管线的完整实现细节**
 >
 > **重要更新**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），Backend阶段已全面重构，实现消除格式税、AST优化注入和渐进式路由清单生成。
 
@@ -67,7 +67,7 @@ pub struct FrontmatterMeta {
     pub metadata: Option<serde_json::Map<String, serde_json::Value>>,
     pub allowed_tools: Option<String>,
     
-    // NSC 扩展字段
+    //SkCC 扩展字段
     pub mcp_servers: Option<Vec<String>>,
     pub input_schema: Option<serde_json::Value>,
     pub output_schema: Option<serde_json::Value>,

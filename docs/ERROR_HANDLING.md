@@ -130,7 +130,7 @@ use miette::{Diagnostic, SourceSpan};
 use thiserror::Error;
 use serde::{Serialize, Deserialize};
 
-/// NSC 诊断信息
+///SkCC 诊断信息
 /// 
 /// 所有错误和警告的统一载体
 #[derive(Debug, Clone, Error, Diagnostic, Serialize, Deserialize)]
@@ -1076,7 +1076,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install Nexa Skill Compiler
+      - name: Install SkCC
         run: |
           cargo install nexa-skill-cli
       

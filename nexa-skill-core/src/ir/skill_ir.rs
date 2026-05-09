@@ -1,4 +1,4 @@
-//! SkillIR - Core Intermediate Representation
+//! SkIR - Core Intermediate Representation
 //!
 //! This is the central data structure that represents a skill
 //! throughout the compilation pipeline.
@@ -52,7 +52,7 @@ impl std::fmt::Display for SkillMode {
     }
 }
 
-/// Nexa Skill Compiler Core Intermediate Representation
+/// SkCC Core Intermediate Representation (SkIR)
 ///
 /// This is the central data structure that all compilation stages
 /// operate on. It represents a fully parsed and validated skill.

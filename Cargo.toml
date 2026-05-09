@@ -1,7 +1,7 @@
-# Nexa Skill Compiler (NSC) - Workspace Configuration
-# 
+# SkCC (Skill Compiler) - Workspace Configuration
+#
 # This is the root Cargo.toml that defines the workspace structure
-# for the Nexa Skill Compiler project.
+# for the SkCC project.
 #
 # Project: Industrial-grade Agent Skill Compiler
 # License: MIT
@@ -24,9 +24,9 @@ edition = "2024"
 rust-version = "1.85"
 authors = ["Nexa Dev Team <dev@nexa.ai>"]
 license = "MIT"
-repository = "https://github.com/nexa-org/nexa-skill-compiler"
-homepage = "https://nexa.ai"
-description = "Industrial-grade Agent Skill Compiler for transforming SKILL.md to platform-native formats"
+repository = "https://github.com/Nexa-Language/Skill-Compiler"
+homepage = "https://skcc.nexa-lang.com"
+description = "SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents"
 keywords = ["agent", "skill", "compiler", "llm", "markdown", "ai", "sop"]
 categories = ["compilers", "development-tools", "text-processing", "command-line-utilities"]
 

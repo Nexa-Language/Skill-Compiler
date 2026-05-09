@@ -1,4 +1,4 @@
-# Nexa Skill Compiler (NSC) - 用户使用手册
+# SkCC - 用户使用手册
 
 **版本:** 1.0.0
 **最后更新:** 2026-04-04
@@ -24,9 +24,9 @@
 
 ## 1. 简介
 
-### 1.1 什么是Nexa Skill Compiler?
+### 1.1 什么是SkCC?
 
-Nexa Skill Compiler (NSC) 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。采用三段式编译架构：
+SkCC 是一个工业级的多目标编译器，将统一的 `SKILL.md` 规范转换为平台特定的 AI Agent 指令。采用三段式编译架构：
 
 - **Frontend (前端)**: YAML解析、类型验证、权限审计、MCP依赖检查
 - **Mid-end (中端)**: SkillIR中间表示、Anti-Skill注入优化、安全等级分析
@@ -90,7 +90,7 @@ cargo install --path nexa-skill-cli
 
 ### 2.4 VS Code 扩展
 
-在 VS Code 扩展市场搜索 "Nexa Skill Compiler" 安装。
+在 VS Code 扩展市场搜索 "SkCC" 安装。
 
 ### 2.5 验证安装
 
@@ -419,7 +419,7 @@ permissions:
 
 ### 6.1 配置文件
 
-NSC使用TOML格式的配置文件 `.nsc.toml`：
+SkCC使用TOML格式的配置文件 `.nsc.toml`：
 
 ```toml
 # .nsc.toml
@@ -444,10 +444,10 @@ pretty_print = true
 
 | 变量 | 描述 | 默认值 |
 |------|------|--------|
-| `NSC_DEFAULT_TARGET` | 默认目标平台 | `claude` |
-| `NSC_OUTPUT_DIR` | 输出目录 | `dist` |
-| `NSC_CONFIG_PATH` | 配置文件路径 | `.nsc.toml` |
-| `NSC_LOG_LEVEL` | 日志级别 | `info` |
+| `SKCC_DEFAULT_TARGET` | 默认目标平台 | `claude` |
+| `SKCC_OUTPUT_DIR` | 输出目录 | `dist` |
+| `SKCC_CONFIG_PATH` | 配置文件路径 | `.nsc.toml` |
+| `SKCC_LOG_LEVEL` | 日志级别 | `info` |
 
 ### 6.3 命令行优先级
 
@@ -588,7 +588,7 @@ jobs:
         with:
           toolchain: stable
           
-      - name: Install NSC
+      - name: Install SkCC
         run: cargo install --path nexa-skill-cli
         
       - name: Compile Skills
@@ -745,7 +745,7 @@ print(result.content)
 
 ## 12. 常见问题
 
-### Q: NSC支持哪些平台？
+### Q: SkCC支持哪些平台？
 
 **A:** 目前支持Claude、GPT/Codex和Gemini三个平台。
 
@@ -784,7 +784,7 @@ pub trait Emitter: Send + Sync {
 name: document-summarizer
 description: Summarizes documents using AI
 version: "1.0.0"
-author: NSC Team
+author: SkCC Team
 security_level: low
 permissions:
   - kind: file_read
@@ -851,5 +851,5 @@ Key Points:
 ---
 
 **文档版本:** 1.0.0  
-**最后更新:** 2026-04-04  
-**维护者:** NSC Team
+**最后更新:** 2026-04-04
+**维护者:** SkCC Team

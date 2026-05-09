@@ -1,5 +1,5 @@
 /**
- * Skill Compiler - Interface to the NSC CLI
+ * Skill Compiler - Interface to the SkCC CLI
  */
 
 import * as vscode from 'vscode';

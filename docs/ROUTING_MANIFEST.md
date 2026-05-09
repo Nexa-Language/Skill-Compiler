@@ -83,7 +83,7 @@ graph LR
 
 ---
 
-## 3. NSC 编译期生成机制
+## 3.SkCC 编译期生成机制
 
 ### 3.1 路由清单生成器
 
@@ -296,7 +296,7 @@ Claude Code 在启动时会自动扫描 `.claude/skills/` 目录，读取 `routi
 ```text
 .claude/
 ├── skills/
-│   ├── routing_manifest.yaml   # NSC 生成的路由清单
+│   ├── routing_manifest.yaml   #SkCC 生成的路由清单
 │   ├── database-migration/
 │   │   └── SKILL.md
 │   └── api-client/

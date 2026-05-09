@@ -1,12 +1,12 @@
 <div align="center">
-  <img src="images/icon.png" alt="NSC Logo" width="128" height="128">
-  <h1>Nexa Skill Compiler - VS Code Extension</h1>
+  <img src="images/icon.png" alt="SkCC Logo" width="128" height="128">
+  <h1>SkCC - VS Code Extension</h1>
 </div>
 
-[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code-Extension-blue?style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=ouyangyipeng.nexa-skill-compiler)
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code-Extension-blue?style=flat-square&logo=visual-studio-code)](https://marketplace.visualstudio.com/items?itemName=Nexa-Language.nexa-skill-compiler)
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
-A comprehensive VS Code extension for **Nexa Skill Compiler (NSC)** - providing syntax highlighting, validation, compilation, and intelligent completions for SKILL.md files.
+A comprehensive VS Code extension for **SkCC** - providing syntax highlighting, validation, compilation, and intelligent completions for SKILL.md files.
 
 ## Features
 
@@ -29,11 +29,11 @@ Automatic diagnostics as you type:
 ### 🚀 Compilation Commands
 
 One-click compilation directly from VS Code:
-- **NSC: Compile Skill** - Compile current skill file
-- **NSC: Compile All Skills** - Compile all skills in workspace
-- **NSC: Validate Skill** - Validate skill structure
-- **NSC: Check Skill** - Run diagnostics check
-- **NSC: Initialize New Skill** - Create new skill from template
+- **SkCC: Compile Skill** - Compile current skill file
+- **SkCC: Compile All Skills** - Compile all skills in workspace
+- **SkCC: Validate Skill** - Validate skill structure
+- **SkCC: Check Skill** - Run diagnostics check
+- **SkCC: Initialize New Skill** - Create new skill from template
 
 ### 📝 Intelligent Completions
 
@@ -67,7 +67,7 @@ Real-time compilation status in the status bar.
 
 1. Open VS Code
 2. Go to Extensions (Ctrl+Shift+X)
-3. Search for "Nexa Skill Compiler"
+3. Search for "SkCC"
 4. Click Install
 
 ### From Source
@@ -99,16 +99,16 @@ The extension automatically activates for:
 
 | Command | Shortcut | Description |
 |---------|----------|-------------|
-| `NSC: Compile Skill` | - | Compile current skill to all platforms |
-| `NSC: Compile All Skills` | - | Find and compile all SKILL.md files |
-| `NSC: Validate Skill` | - | Validate skill structure |
-| `NSC: Check Skill` | - | Run diagnostics |
-| `NSC: Initialize New Skill` | - | Create new skill from template |
-| `NSC: Show Preview` | - | Open preview panel |
+| `SkCC: Compile Skill` | - | Compile current skill to all platforms |
+| `SkCC: Compile All Skills` | - | Find and compile all SKILL.md files |
+| `SkCC: Validate Skill` | - | Validate skill structure |
+| `SkCC: Check Skill` | - | Run diagnostics |
+| `SkCC: Initialize New Skill` | - | Create new skill from template |
+| `SkCC: Show Preview` | - | Open preview panel |
 
 ### Configuration
 
-Open VS Code settings and search for "NSC":
+Open VS Code settings and search for "SkCC":
 
 ```json
 {
@@ -123,7 +123,7 @@ Open VS Code settings and search for "NSC":
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| `compilerPath` | Path to NSC binary | `nsc` |
+| `compilerPath` | Path to SkCC binary | `nsc` |
 | `defaultTarget` | Default compilation target | `all` |
 | `outputDirectory` | Output directory for compiled skills | `dist` |
 | `enableDiagnostics` | Enable real-time diagnostics | `true` |
@@ -201,21 +201,21 @@ A skill that automates useful tasks.
 - REQUIRE user confirmation for destructive actions
 ```
 
-5. Right-click and select **NSC: Compile Skill**
+5. Right-click and select **SkCC: Compile Skill**
 
 ## Requirements
 
 - VS Code 1.85.0 or higher
-- Nexa Skill Compiler (NSC) installed
+- SkCC installed
 
-### Installing NSC
+### Installing SkCC
 
 ```bash
 # From crates.io
-cargo install nexa-skill-compiler
+cargo install nexa-skill-cli
 
 # From source
-git clone https://github.com/ouyangyipeng/Skill-Compiler
+git clone https://github.com/Nexa-Language/Skill-Compiler
 cd Skill-Compiler
 cargo install --path nexa-skill-cli
 ```
@@ -224,7 +224,7 @@ cargo install --path nexa-skill-cli
 
 ### "nsc command not found"
 
-Make sure NSC is installed and in your PATH, or set the full path in settings:
+Make sure SkCC is installed and in your PATH, or set the full path in settings:
 
 ```json
 {
@@ -238,11 +238,11 @@ Ensure `enableDiagnostics` is set to `true` in settings.
 
 ### Compilation fails
 
-Check the Output panel (View > Output > NSC) for error details.
+Check the Output panel (View > Output > SkCC) for error details.
 
 ## Contributing
 
-Contributions are welcome! Please see the [main repository](https://github.com/ouyangyipeng/Skill-Compiler) for contribution guidelines.
+Contributions are welcome! Please see the [main repository](https://github.com/Nexa-Language/Skill-Compiler) for contribution guidelines.
 
 ## License
 
@@ -250,6 +250,6 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Related
 
-- [Nexa Skill Compiler](https://github.com/ouyangyipeng/Skill-Compiler) - The main compiler project
-- [User Guide](https://github.com/ouyangyipeng/Skill-Compiler/blob/main/docs/USER_GUIDE.md) - Complete documentation
-- [Skill Specification](https://github.com/ouyangyipeng/Skill-Compiler/blob/main/docs/SPECIFICATION.md) - SKILL.md format
+- [SkCC](https://github.com/Nexa-Language/Skill-Compiler) - The main compiler project
+- [User Guide](https://github.com/Nexa-Language/Skill-Compiler/blob/main/docs/USER_GUIDE.md) - Complete documentation
+- [Skill Specification](https://github.com/Nexa-Language/Skill-Compiler/blob/main/docs/SPECIFICATION.md) - SKILL.md format

@@ -73,7 +73,7 @@ export class SkillDiagnosticsProvider {
                 'Missing YAML frontmatter. Skills must start with ---',
                 vscode.DiagnosticSeverity.Error
             );
-            diagnostic.code = 'NSC001';
+            diagnostic.code = 'SKCC001';
             diagnostics.push(diagnostic);
         } else {
             const frontmatter = frontmatterMatch[1];
@@ -90,7 +90,7 @@ export class SkillDiagnosticsProvider {
                         `Missing required field: ${field}`,
                         vscode.DiagnosticSeverity.Error
                     );
-                    diagnostic.code = `NSC002`;
+                    diagnostic.code = `SKCC002`;
                     diagnostics.push(diagnostic);
                 }
             }
@@ -108,7 +108,7 @@ export class SkillDiagnosticsProvider {
                             `Invalid security_level. Must be one of: ${validLevels.join(', ')}`,
                             vscode.DiagnosticSeverity.Error
                         );
-                        diagnostic.code = 'NSC003';
+                        diagnostic.code = 'SKCC003';
                         diagnostics.push(diagnostic);
                     }
                 }
@@ -124,7 +124,7 @@ export class SkillDiagnosticsProvider {
                 'Missing Procedures section. Skills should define execution steps.',
                 vscode.DiagnosticSeverity.Warning
             );
-            diagnostic.code = 'NSC101';
+            diagnostic.code = 'SKCC101';
             diagnostics.push(diagnostic);
         }
 

@@ -1,6 +1,6 @@
 # SKILL.md 规范定义
 
-> **Nexa Skill Compiler 源文件的完整语法规范与元数据定义**
+> **SkCC 源文件的完整语法规范与元数据定义**
 >
 > **重要更新**：基于《高级提示词工程格式与智能体技能架构》调研报告（2026-04），本规范已更新格式偏好说明，确保源文件设计符合各Agent平台的最佳实践。
 
@@ -8,7 +8,7 @@
 
 ## 1. 规范概述
 
-`SKILL.md` 是 NSC 编译器的源文件格式，它基于标准 Markdown 语法，通过 YAML Frontmatter 定义元数据，通过 Markdown Body 定义执行逻辑。本规范遵循 [Agent Skills 官方规范](https://agentskills.io/) 并进行了扩展以支持 NSC 的编译特性。
+`SKILL.md` 是 SkCC 编译器的源文件格式，它基于标准 Markdown 语法，通过 YAML Frontmatter 定义元数据，通过 Markdown Body 定义执行逻辑。本规范遵循 [Agent Skills 官方规范](https://agentskills.io/) 并进行了扩展以支持 SkCC 的编译特性。
 
 ### 1.1 设计原则
 
@@ -179,9 +179,9 @@ metadata:
 allowed-tools: Bash(git:*) Bash(jq:*) Read Write
 ```
 
-### 3.3 NSC 扩展字段
+### 3.3 SkCC 扩展字段
 
-以下字段是 NSC 编译器的扩展，用于支持高级编译特性：
+以下字段是 SkCC 编译器的扩展，用于支持高级编译特性：
 
 | 字段 | 类型 | 描述 |
 |------|------|------|
@@ -352,7 +352,7 @@ Body 内容应遵循以下章节结构（顺序建议）：
 
 ### 4.2 Procedures 章节规范
 
-Procedures 是 Body 的核心，NSC 会将其解析为 `ProcedureStep` 结构。
+Procedures 是 Body 的核心，SkCC 会将其解析为 `ProcedureStep` 结构。
 
 **格式要求**：
 - 使用有序列表（`1.`, `2.`, `3.`）
@@ -419,7 +419,7 @@ Examples 提供 Few-shot 示例，帮助 Agent 理解预期行为。
 
 ### 4.4 代码块规范
 
-代码块应标注语言类型，NSC 会保留代码块内容：
+代码块应标注语言类型，SkCC 会保留代码块内容：
 
 ```markdown
 ## Procedures
@@ -525,7 +525,7 @@ metadata:
 - 如果遇到反爬机制，建议降低频率或使用代理
 ```
 
-### 5.2 高级技能示例（完整 NSC 扩展）
+### 5.2 高级技能示例（完整 SkCC 扩展）
 
 ```markdown
 ---
@@ -718,13 +718,13 @@ ALTER TABLE orders ALTER COLUMN amount TYPE INTEGER USING amount::INTEGER;
 
 ### 7.1 规范版本
 
-NSC 支持的 SKILL.md 规范版本：
+SkCC 支持的 SKILL.md 规范版本：
 
 | 版本 | 状态 | 主要特性 |
 |------|------|----------|
 | `v1.0` | 稳定 | 基础字段 (name, description) |
 | `v1.1` | 稳定 | MCP 支持, JSON Schema |
-| `v2.0` | 当前 | NSC 扩展字段, 权限系统, Anti-Skill |
+| `v2.0` | 当前 | SkCC 扩展字段, 权限系统, Anti-Skill |
 
 ### 7.2 向后兼容策略
 
@@ -748,7 +748,7 @@ NSC 支持的 SKILL.md 规范版本：
 
 ### 8.2 源文件格式选择
 
-NSC 源文件采用 **YAML Frontmatter + Markdown Body** 的组合格式，原因如下：
+SkCC 源文件采用 **YAML Frontmatter + Markdown Body** 的组合格式，原因如下：
 
 | 格式组件 | 选择原因 | 学术依据 |
 |----------|----------|----------|
@@ -759,11 +759,11 @@ NSC 源文件采用 **YAML Frontmatter + Markdown Body** 的组合格式，原�
 
 ### 8.3 编译器格式适配策略
 
-NSC 编译器根据目标平台自动优化输出格式：
+SkCC 编译器根据目标平台自动优化输出格式：
 
 ```mermaid
 graph TB
-    A[SKILL.md<br/>YAML + Markdown] --> B[NSC Compiler]
+    A[SKILL.md<br/>YAML + Markdown] --> B[SkCC Compiler]
     
     B --> C[Claude Emitter]
     B --> D[Codex Emitter]

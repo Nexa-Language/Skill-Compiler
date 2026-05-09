@@ -21,7 +21,7 @@
 
 ---
 
-## Fig 1: NSC 系统架构总览图
+## Fig 1: SkCC 系统架构总览图
 
 **位置**: Section 3.1 开头 | **尺寸**: 双栏宽 | **优先级**: 必须
 
@@ -55,7 +55,7 @@
 
 **右半边 — m×n → m+n Compiler Argument**：上下对比：
 - 上半部分（问题）：m 个技能 × n 个平台的矩阵网格，每个交叉点是一个手动适配（红色小方块），标注 "m × n adaptations"
-- 下半部分（解决方案）：m 个技能 → NSC Compiler 中间大框 → n 个 Emitter，标注 "m + n components"
+- 下半部分（解决方案）：m 个技能 → SkCC Compiler 中间大框 → n 个 Emitter，标注 "m + n components"
 - 中间大箭头标注 "O(m×n) → O(m+n)"
 
 ---
@@ -184,7 +184,7 @@
 
 - **左：Traditional Full Loading** — Agent 启动加载 15 个完整 SKILL.md，标注 ≈150K tokens，列出三个问题（注意力分散、高 API 成本、幻觉风险）
 - **右：NSC Progressive Disclosure** — 启动仅加载 routing_manifest.yaml（≈750 tokens，标注 99.5% savings），用户请求后语义路由匹配，仅动态加载 1 个匹配技能（≈10K tokens）
-- 底部对比条形图：Traditional 150K vs NSC 750+10K
+- 底部对比条形图：Traditional 150K vs SkCC 750+10K
 
 ---
 

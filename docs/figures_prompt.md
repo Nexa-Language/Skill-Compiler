@@ -1,6 +1,6 @@
 # 论文配图详细描述与提示词
 
-> **Nexa Skill Compiler 论文配图设计文档**
+> **SkCC 论文配图设计文档**
 >
 > 本文档为每张论文配图提供详细的视觉描述、布局规范、元素清单和风格要求，
 > 作为 AI 画图的输入提示词。每张图独立描述，可分别交给不同工具生成。
@@ -28,7 +28,7 @@
 
 ---
 
-## Fig 1: NSC 系统架构总览图
+## Fig 1: SkCC 系统架构总览图
 
 ### 图表定位
 
@@ -170,7 +170,7 @@
 ### 图表定位
 
 放置在 Section 3.1 (Architecture Overview) 中，用于阐述核心动机。
-左半边展示 NSC 在 Agent 调用链中的位置，右半边展示经典编译器论点 m×n → m+n。
+左半边展示SkCC 在 Agent 调用链中的位置，右半边展示经典编译器论点 m×n → m+n。
 
 ### 整体布局
 
@@ -233,7 +233,7 @@
 
 **下半部分：With Compiler（蓝色/绿色调，表示解决方案）**
 
-- 标题：✅ "With NSC Compiler: m + n Components"
+- 标题：✅ "With SkCC Compiler: m + n Components"
 - 一个简化的线性图：
   - 左侧纵向列出 m 个技能：`skill-1`, `skill-2`, `skill-3`, ..., `skill-m`（用蓝色标签）
   - 中间一个大框标注 **NSC Compiler**（橙色强调）
@@ -506,7 +506,7 @@ Execute PostgreSQL schema migration with rollback support...
 **左右对比布局**：
 
 ```
-[左: Traditional Approach - Context Bloat] | [右: NSC Progressive Routing - Token Savings]
+[左: Traditional Approach - Context Bloat] | [右: SkCC Progressive Routing - Token Savings]
 ```
 
 ### 左半边详细描述
@@ -675,7 +675,7 @@ SkillIR {
 ### 图表定位
 
 放置在 Section 3.2 + 3.4 之间（可选），
-展示 NSC 如何基于实证研究为不同平台选择最优输出格式。
+展示 SkCC 如何基于实证研究为不同平台选择最优输出格式。
 
 ### 整体布局
 

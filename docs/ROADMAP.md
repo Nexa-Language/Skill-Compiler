@@ -1,12 +1,12 @@
 # 项目路线图
 
-> **Nexa Skill Compiler 开发里程碑、功能规划与交付时间表**
+> **SkCC 开发里程碑、功能规划与交付时间表**
 
 ---
 
 ## 1. 项目愿景
 
-Nexa Skill Compiler (NSC) 致力于成为 AI Agent 技能开发的标准编译工具，实现：
+SkCC 致力于成为 AI Agent 技能开发的标准编译工具，实现：
 
 - **标准化**：建立统一的 SKILL.md 规范
 - **多平台**：支持所有主流 Agent 平台

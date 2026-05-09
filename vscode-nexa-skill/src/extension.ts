@@ -1,5 +1,5 @@
 /**
- * Nexa Skill Compiler - VS Code Extension
+ * SkCC - VS Code Extension
  * 
  * Provides syntax highlighting, validation, and compilation for SKILL.md files
  */
@@ -17,7 +17,7 @@ let statusBarManager: StatusBarManager;
 let compiler: SkillCompiler;
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Nexa Skill Compiler extension is now active');
+    console.log('SkCC extension is now active');
 
     // Initialize components
     compiler = new SkillCompiler();
@@ -174,7 +174,7 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 export function deactivate() {
-    console.log('Nexa Skill Compiler extension deactivated');
+    console.log('SkCC extension deactivated');
     if (statusBarManager) {
         statusBarManager.hide();
     }
@@ -309,7 +309,7 @@ async function checkSkill(uri: vscode.Uri): Promise<void> {
         if (result.diagnostics.length === 0) {
             vscode.window.showInformationMessage('No issues found');
         } else {
-            const outputChannel = vscode.window.createOutputChannel('NSC Check');
+            const outputChannel = vscode.window.createOutputChannel('SkCC Check');
             outputChannel.clear();
             
             result.diagnostics.forEach(d => {

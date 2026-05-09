@@ -464,7 +464,7 @@ pub trait Analyzer {
 use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 
-/// Nexa Skill Compiler 核心中间表示
+/// SkCC 核心中间表示
 /// 
 /// 这是编译管线中所有阶段的数据交换载体
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -684,7 +684,7 @@ impl PermissionKind {
 ```rust
 // nexa-skill-core/src/error/diagnostic.rs
 
-/// NSC 诊断信息
+///SkCC 诊断信息
 #[derive(Debug, Clone, Error, Diagnostic)]
 pub struct Diagnostic {
     // 内部字段...

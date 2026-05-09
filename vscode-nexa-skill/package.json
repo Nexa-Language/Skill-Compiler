@@ -1,7 +1,7 @@
 {
   "name": "nexa-skill-compiler",
-  "displayName": "Nexa Skill Compiler",
-  "description": "VS Code extension for Nexa Skill Compiler - Multi-target skill compilation for AI agents",
+  "displayName": "SkCC - Skill Compiler",
+  "description": "VS Code extension for SkCC - Multi-target skill compilation for AI agents",
   "version": "1.0.0",
   "publisher": "Nexa-Language",
   "license": "MIT",
@@ -26,12 +26,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ouyangyipeng/Skill-Compiler.git"
+    "url": "https://github.com/Nexa-Language/Skill-Compiler.git"
   },
   "bugs": {
-    "url": "https://github.com/ouyangyipeng/Skill-Compiler/issues"
+    "url": "https://github.com/Nexa-Language/Skill-Compiler/issues"
   },
-  "homepage": "https://github.com/ouyangyipeng/Skill-Compiler#readme",
+  "homepage": "https://github.com/Nexa-Language/Skill-Compiler#readme",
   "activationEvents": [
     "onLanguage:skill",
     "onCommand:nsc.compile",
@@ -68,38 +68,38 @@
     "commands": [
       {
         "command": "nsc.compile",
-        "title": "NSC: Compile Skill",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Compile Skill",
+        "category": "SkCC",
         "icon": "$(gear)"
       },
       {
         "command": "nsc.compileAll",
-        "title": "NSC: Compile All Skills in Workspace",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Compile All Skills in Workspace",
+        "category": "SkCC",
         "icon": "$(folder)"
       },
       {
         "command": "nsc.validate",
-        "title": "NSC: Validate Skill",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Validate Skill",
+        "category": "SkCC",
         "icon": "$(check)"
       },
       {
         "command": "nsc.check",
-        "title": "NSC: Check Skill",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Check Skill",
+        "category": "SkCC",
         "icon": "$(search)"
       },
       {
         "command": "nsc.init",
-        "title": "NSC: Initialize New Skill",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Initialize New Skill",
+        "category": "SkCC",
         "icon": "$(add)"
       },
       {
         "command": "nsc.showPreview",
-        "title": "NSC: Show Compiled Preview",
-        "category": "Nexa Skill Compiler",
+        "title": "SkCC: Show Compiled Preview",
+        "category": "SkCC",
         "icon": "$(eye)"
       }
     ],
@@ -137,12 +137,12 @@
       ]
     },
     "configuration": {
-      "title": "Nexa Skill Compiler",
+      "title": "SkCC",
       "properties": {
         "nsc.compilerPath": {
           "type": "string",
           "default": "nsc",
-          "description": "Path to the Nexa Skill Compiler binary"
+          "description": "Path to the SkCC binary"
         },
         "nsc.defaultTarget": {
           "type": "string",
@@ -173,7 +173,7 @@
         "nsc.showStatusBar": {
           "type": "boolean",
           "default": true,
-          "description": "Show NSC status bar item"
+          "description": "Show SkCC status bar item"
         }
       }
     },
@@ -186,7 +186,7 @@
         "properties": {
           "task": {
             "type": "string",
-            "description": "The NSC task to run"
+            "description": "The SkCC task to run"
           },
           "file": {
             "type": "string",
