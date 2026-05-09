@@ -5,6 +5,7 @@
 mod build;
 mod check;
 mod clean;
+mod index;
 mod init;
 mod list;
 mod validate;
@@ -15,6 +16,7 @@ use miette::Result;
 pub use build::BuildArgs;
 pub use check::CheckArgs;
 pub use clean::CleanArgs;
+pub use index::IndexArgs;
 pub use init::InitArgs;
 pub use list::ListArgs;
 pub use validate::ValidateArgs;
@@ -34,6 +36,9 @@ pub enum Commands {
     /// Initialize a new skill template
     Init(InitArgs),
 
+    /// Generate routing manifest for progressive disclosure
+    Index(IndexArgs),
+
     /// List compiled skills
     List(ListArgs),
 
@@ -48,6 +53,7 @@ pub fn execute(command: Commands) -> Result<()> {
         Commands::Check(args) => check::execute(args),
         Commands::Validate(args) => validate::execute(args),
         Commands::Init(args) => init::execute(args),
+        Commands::Index(args) => index::execute(args),
         Commands::List(args) => list::execute(args),
         Commands::Clean(args) => clean::execute(args),
     }

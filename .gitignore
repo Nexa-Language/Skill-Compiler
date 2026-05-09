@@ -74,3 +74,5 @@ data/*.db-wal
 # Local-only files
 /request.json
 /skillcompiler-overleaf.zip
+/PAPER_CODE_CONSISTENCY_REPORT.md
+/response.json

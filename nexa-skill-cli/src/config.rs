@@ -14,15 +14,15 @@
 //!
 //! | Variable | Description | Default |
 //! |----------|-------------|---------|
-//! | `NSC_OUT_DIR` | Output directory | `./build/` |
-//! | `NSC_SEMANTIC_CHECK` | Enable LLM semantic check | `false` |
-//! | `NSC_GENERATE_SIGNATURE` | Generate signature files | `false` |
-//! | `NSC_DEFAULT_TARGET` | Default compilation target | `claude` |
-//! | `NSC_MCP_WHITELIST` | MCP server whitelist (comma-separated) | `*` |
-//! | `NSC_ALLOW_UNDECLARED_MCP` | Allow undeclared MCP servers | `false` |
-//! | `NSC_HIGH_RISK_KEYWORDS` | High-risk keywords (comma-separated) | (built-in list) |
-//! | `NSC_FORCE_HITL_CRITICAL` | Force HITL for critical level | `true` |
-//! | `NSC_LOG_LEVEL` | Log level | `info` |
+//! | `SKCC_OUT_DIR` | Output directory | `./build/` |
+//! | `SKCC_SEMANTIC_CHECK` | Enable LLM semantic check | `false` |
+//! | `SKCC_GENERATE_SIGNATURE` | Generate signature files | `false` |
+//! | `SKCC_DEFAULT_TARGET` | Default compilation target | `claude` |
+//! | `SKCC_MCP_WHITELIST` | MCP server whitelist (comma-separated) | `*` |
+//! | `SKCC_ALLOW_UNDECLARED_MCP` | Allow undeclared MCP servers | `false` |
+//! | `SKCC_HIGH_RISK_KEYWORDS` | High-risk keywords (comma-separated) | (built-in list) |
+//! | `SKCC_FORCE_HITL_CRITICAL` | Force HITL for critical level | `true` |
+//! | `SKCC_LOG_LEVEL` | Log level | `info` |
 //! | `OPENAI_API_KEY` | OpenAI API key | - |
 //! | `OPENAI_API_BASE` | OpenAI API base URL | - |
 //! | `GITHUB_TOKEN` | GitHub token | - |
@@ -208,35 +208,45 @@ impl Config {
             openai_api_key: std::env::var("OPENAI_API_KEY").ok(),
             openai_api_base: std::env::var("OPENAI_API_BASE").ok(),
             github_token: std::env::var("GITHUB_TOKEN").ok(),
-            default_out_dir: std::env::var("NSC_OUT_DIR")
+            default_out_dir: std::env::var("SKCC_OUT_DIR")
+                .or_else(|_| std::env::var("NSC_OUT_DIR"))
                 .map(PathBuf::from)
                 .unwrap_or_else(|_| default_out_dir()),
-            default_target: std::env::var("NSC_DEFAULT_TARGET")
+            default_target: std::env::var("SKCC_DEFAULT_TARGET")
+                .or_else(|_| std::env::var("NSC_DEFAULT_TARGET"))
                 .ok()
                 .and_then(|v| v.parse().ok())
                 .unwrap_or_default(),
-            generate_signature: std::env::var("NSC_GENERATE_SIGNATURE")
+            generate_signature: std::env::var("SKCC_GENERATE_SIGNATURE")
+                .or_else(|_| std::env::var("NSC_GENERATE_SIGNATURE"))
                 .map(|v| v == "true" || v == "1")
                 .unwrap_or(false),
-            mcp_whitelist: std::env::var("NSC_MCP_WHITELIST")
+            mcp_whitelist: std::env::var("SKCC_MCP_WHITELIST")
+                .or_else(|_| std::env::var("NSC_MCP_WHITELIST"))
                 .map(|v| v.split(',').map(|s| s.trim().to_string()).collect())
                 .unwrap_or_else(|_| default_mcp_whitelist()),
-            allow_undeclared_mcp: std::env::var("NSC_ALLOW_UNDECLARED_MCP")
+            allow_undeclared_mcp: std::env::var("SKCC_ALLOW_UNDECLARED_MCP")
+                .or_else(|_| std::env::var("NSC_ALLOW_UNDECLARED_MCP"))
                 .map(|v| v == "true" || v == "1")
                 .unwrap_or(false),
-            high_risk_keywords: std::env::var("NSC_HIGH_RISK_KEYWORDS")
+            high_risk_keywords: std::env::var("SKCC_HIGH_RISK_KEYWORDS")
+                .or_else(|_| std::env::var("NSC_HIGH_RISK_KEYWORDS"))
                 .map(|v| v.split(',').map(|s| s.trim().to_string()).collect())
                 .unwrap_or_else(|_| default_high_risk_keywords()),
-            force_hitl_critical: std::env::var("NSC_FORCE_HITL_CRITICAL")
+            force_hitl_critical: std::env::var("SKCC_FORCE_HITL_CRITICAL")
+                .or_else(|_| std::env::var("NSC_FORCE_HITL_CRITICAL"))
                 .map(|v| v != "false" && v != "0")
                 .unwrap_or_else(|_| default_force_hitl_critical()),
-            semantic_check_enabled: std::env::var("NSC_SEMANTIC_CHECK")
+            semantic_check_enabled: std::env::var("SKCC_SEMANTIC_CHECK")
+                .or_else(|_| std::env::var("NSC_SEMANTIC_CHECK"))
                 .map(|v| v == "true" || v == "1")
                 .unwrap_or(false),
-            log_level: std::env::var("NSC_LOG_LEVEL")
+            log_level: std::env::var("SKCC_LOG_LEVEL")
+                .or_else(|_| std::env::var("NSC_LOG_LEVEL"))
                 .or_else(|_| std::env::var("RUST_LOG"))
                 .unwrap_or_else(|_| default_log_level()),
-            verbose: std::env::var("NSC_VERBOSE")
+            verbose: std::env::var("SKCC_VERBOSE")
+                .or_else(|_| std::env::var("NSC_VERBOSE"))
                 .map(|v| v == "true" || v == "1")
                 .unwrap_or(false),
             color_output: std::env::var("NO_COLOR")
@@ -337,36 +347,37 @@ impl Config {
         if let Ok(token) = std::env::var("GITHUB_TOKEN") {
             self.github_token = Some(token);
         }
-        if let Ok(dir) = std::env::var("NSC_OUT_DIR") {
+        // Support both SKCC_* (new) and NSC_* (legacy) env var names
+        if let Ok(dir) = std::env::var("SKCC_OUT_DIR").or_else(|_| std::env::var("NSC_OUT_DIR")) {
             self.default_out_dir = PathBuf::from(dir);
         }
-        if let Ok(target) = std::env::var("NSC_DEFAULT_TARGET") {
+        if let Ok(target) = std::env::var("SKCC_DEFAULT_TARGET").or_else(|_| std::env::var("NSC_DEFAULT_TARGET")) {
             if let Ok(t) = target.parse() {
                 self.default_target = t;
             }
         }
-        if let Ok(sig) = std::env::var("NSC_GENERATE_SIGNATURE") {
+        if let Ok(sig) = std::env::var("SKCC_GENERATE_SIGNATURE").or_else(|_| std::env::var("NSC_GENERATE_SIGNATURE")) {
             self.generate_signature = sig == "true" || sig == "1";
         }
-        if let Ok(whitelist) = std::env::var("NSC_MCP_WHITELIST") {
+        if let Ok(whitelist) = std::env::var("SKCC_MCP_WHITELIST").or_else(|_| std::env::var("NSC_MCP_WHITELIST")) {
             self.mcp_whitelist = whitelist.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(allow) = std::env::var("NSC_ALLOW_UNDECLARED_MCP") {
+        if let Ok(allow) = std::env::var("SKCC_ALLOW_UNDECLARED_MCP").or_else(|_| std::env::var("NSC_ALLOW_UNDECLARED_MCP")) {
             self.allow_undeclared_mcp = allow == "true" || allow == "1";
         }
-        if let Ok(keywords) = std::env::var("NSC_HIGH_RISK_KEYWORDS") {
+        if let Ok(keywords) = std::env::var("SKCC_HIGH_RISK_KEYWORDS").or_else(|_| std::env::var("NSC_HIGH_RISK_KEYWORDS")) {
             self.high_risk_keywords = keywords.split(',').map(|s| s.trim().to_string()).collect();
         }
-        if let Ok(force) = std::env::var("NSC_FORCE_HITL_CRITICAL") {
+        if let Ok(force) = std::env::var("SKCC_FORCE_HITL_CRITICAL").or_else(|_| std::env::var("NSC_FORCE_HITL_CRITICAL")) {
             self.force_hitl_critical = force != "false" && force != "0";
         }
-        if let Ok(check) = std::env::var("NSC_SEMANTIC_CHECK") {
+        if let Ok(check) = std::env::var("SKCC_SEMANTIC_CHECK").or_else(|_| std::env::var("NSC_SEMANTIC_CHECK")) {
             self.semantic_check_enabled = check == "true" || check == "1";
         }
-        if let Ok(level) = std::env::var("NSC_LOG_LEVEL").or_else(|_| std::env::var("RUST_LOG")) {
+        if let Ok(level) = std::env::var("SKCC_LOG_LEVEL").or_else(|_| std::env::var("NSC_LOG_LEVEL")).or_else(|_| std::env::var("RUST_LOG")) {
             self.log_level = level;
         }
-        if let Ok(verbose) = std::env::var("NSC_VERBOSE") {
+        if let Ok(verbose) = std::env::var("SKCC_VERBOSE").or_else(|_| std::env::var("NSC_VERBOSE")) {
             self.verbose = verbose == "true" || verbose == "1";
         }
         if let Ok(no_color) = std::env::var("NO_COLOR") {

@@ -259,10 +259,12 @@ mod tests {
         let validated = ValidatedSkillIR::new(ir, vec![]);
         let emitter = GeminiEmitter::new();
         let result = emitter.emit(&validated).unwrap();
-        assert!(result.contains("# test-skill"));
-        assert!(result.contains("## Description"));
-        assert!(result.contains("Test description"));
-        assert!(result.contains("## Execution Steps"));
+        // Verify YAML frontmatter + Markdown body
+        assert!(result.starts_with("---"), "Expected YAML frontmatter");
+        assert!(result.contains("name: test-skill"));
+        assert!(result.contains("# test-skill")); // H1 title
+        assert!(result.contains("Test description")); // Description content
+        assert!(result.contains("## Procedures")); // Procedures section
     }
 
     #[test]

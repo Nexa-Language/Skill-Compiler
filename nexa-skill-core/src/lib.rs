@@ -34,6 +34,8 @@ pub mod security;
 
 // Re-export main types for convenience
 pub use analyzer::{Analyzer, ValidatedSkillIR};
+#[cfg(feature = "semantic-check")]
+pub use analyzer::{SemanticChecker, SemanticCheckerConfig};
 pub use backend::{ClaudeEmitter, CodexEmitter, Emitter, EmitterRegistry, GeminiEmitter, TargetPlatform};
 pub use error::{CompileError, Diagnostic};
 pub use frontend::{ASTBuilder, RawAST};
@@ -124,6 +126,16 @@ impl Compiler {
             tracing::warn!("[{}] {}", warning.code, warning.message);
         }
 
+        // Phase 3.5: Optional LLM Semantic Check
+        let mut all_warnings = validated_ir.warnings().to_vec();
+        if self.config.semantic_check {
+            let semantic_diagnostics = self.run_semantic_check(validated_ir.as_ref());
+            for d in &semantic_diagnostics {
+                tracing::info!("[semantic_check] {}", d.message);
+            }
+            all_warnings.extend(semantic_diagnostics);
+        }
+
         // Phase 4: Backend - Emit platform-specific output
         self.emit_outputs(&validated_ir, targets, output_dir)?;
 
@@ -132,8 +144,52 @@ impl Compiler {
             output_dir: output_dir.to_string(),
             targets: targets.to_vec(),
             manifest_path: format!("{}/manifest.json", output_dir),
-            warnings: validated_ir.warnings().to_vec(),
+            warnings: all_warnings,
         })
+    }
+
+    /// Run optional LLM semantic check
+    #[cfg(feature = "semantic-check")]
+    fn run_semantic_check(&self, ir: &SkillIR) -> Vec<Diagnostic> {
+        let api_key = std::env::var("OPENAI_API_KEY").unwrap_or_default();
+        let api_base = std::env::var("OPENAI_API_BASE")
+            .unwrap_or_else(|_| "https://api.openai.com/v1".to_string());
+
+        let config = SemanticCheckerConfig {
+            api_key,
+            api_base,
+            model: "gpt-4o-mini".to_string(),
+            max_tokens: 512,
+        };
+
+        let checker = SemanticChecker::new(config);
+        if !checker.is_configured() {
+            return vec![Diagnostic::warning(
+                "semantic_check",
+                "LLM semantic check enabled but OPENAI_API_KEY not set",
+            )];
+        }
+
+        // Run async check synchronously via tokio runtime
+        match tokio::runtime::Handle::try_current() {
+            Ok(handle) => {
+                tokio::task::block_in_place(|| handle.block_on(checker.check(ir)))
+            }
+            Err(_) => {
+                let rt = tokio::runtime::Runtime::new()
+                    .expect("Failed to create tokio runtime for semantic check");
+                rt.block_on(checker.check(ir))
+            }
+        }
+    }
+
+    /// Stub for when semantic-check feature is disabled
+    #[cfg(not(feature = "semantic-check"))]
+    fn run_semantic_check(&self, _ir: &SkillIR) -> Vec<Diagnostic> {
+        vec![Diagnostic::warning(
+            "semantic_check",
+            "LLM semantic check requested but 'semantic-check' feature not enabled. Rebuild with: cargo build --features semantic-check",
+        )]
     }
 
     /// Emit outputs for all target platforms

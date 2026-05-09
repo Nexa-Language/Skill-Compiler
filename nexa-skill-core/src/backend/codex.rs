@@ -206,12 +206,14 @@ mod tests {
         let emitter = CodexEmitter::new();
         let output = emitter.emit(&validated).unwrap();
 
-        // Verify Markdown structure
-        assert!(output.contains("# test-skill")); // H1 title
-        assert!(output.contains("## Identity")); // Role definition
-        assert!(output.contains("## Outcome")); // Result criteria
-        assert!(output.contains("---")); // YAML frontmatter
-        assert!(output.contains("1. First step")); // Ordered list
+        // Verify YAML frontmatter + XML-tagged Markdown structure
+        assert!(output.starts_with("---"), "Expected YAML frontmatter");
+        assert!(output.contains("name: test-skill"));
+        assert!(output.contains("<skill name=\"test-skill\">")); // XML wrapper
+        assert!(output.contains("<instructions>")); // Instructions block
+        assert!(output.contains("A test skill for unit testing")); // Description
+        assert!(output.contains("<output_format>")); // Output format block
+        assert!(output.contains("<edge_cases>")); // Edge cases block
         assert!(!output.contains("assets/")); // No asset references
         assert!(!output.contains(".json")); // No JSON references
     }

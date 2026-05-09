@@ -7,12 +7,16 @@ mod mcp;
 mod nested_data;
 mod permission;
 mod schema;
+#[cfg(feature = "semantic-check")]
+pub mod semantic_check;
 
 pub use anti_skill::AntiSkillInjector;
 pub use mcp::MCPDependencyChecker;
 pub use nested_data::{NestedDataDetector, DEFAULT_YAML_OPTIMIZATION_THRESHOLD};
 pub use permission::PermissionAuditor;
 pub use schema::SchemaValidator;
+#[cfg(feature = "semantic-check")]
+pub use semantic_check::{SemanticChecker, SemanticCheckerConfig};
 
 use crate::error::Diagnostic;
 use crate::ir::SkillIR;
