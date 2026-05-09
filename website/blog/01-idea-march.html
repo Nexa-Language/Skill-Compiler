@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Birth of an Idea: A Compiler for Agent Skills — SkCC Blog</title>
+<meta name="description" content="How the observation of format sensitivity in LLM agents led to the concept of a skill compiler">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
+<style>
+.blog-post{max-width:800px;margin:0 auto}
+.blog-post h2{font-size:1.8rem;font-weight:800;margin:2rem 0 1rem;color:#fff}
+.blog-post h3{font-size:1.3rem;font-weight:700;margin:1.5rem 0 .75rem;color:#e4e4ed}
+.blog-post p{color:#a1a1aa;line-height:1.8;margin-bottom:1rem;font-size:1rem}
+.blog-post ul{color:#a1a1aa;padding-left:1.5rem;margin-bottom:1rem}
+.blog-post li{margin-bottom:.5rem;line-height:1.7}
+.blog-post .highlight{background:rgba(139,92,246,.1);border-left:3px solid #7c3aed;padding:1rem 1.5rem;border-radius:0 .75rem .75rem 0;margin:1.5rem 0}
+.blog-post .highlight p{color:#c4b5fd;margin:0}
+.blog-post code{background:rgba(139,92,246,.15);color:#c4b5fd;padding:.15rem .4rem;border-radius:.3rem;font-family:'JetBrains Mono',monospace;font-size:.9em}
+.back-link{display:inline-flex;align-items:center;gap:.5rem;color:#a78bfa;text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:2rem;transition:color .2s}
+.back-link:hover{color:#c4b5fd}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo"><img src="../logo.png" alt="SkCC"><span>SkCC</span></a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../leaderboard.html">Leaderboard</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../install.html">Install</a>
+      <a href="https://github.com/Nexa-Language/Skill-Compiler" class="nav-cta">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="blog-post">
+    <a href="../blog.html" class="back-link">← Back to Blog</a>
+    <div style="font-size:.75rem;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">March 2026</div>
+    <h1><span class="gradient-text">The Birth of an Idea:<br>A Compiler for Agent Skills</span></h1>
+    <p style="color:#71717a;font-size:.9rem">By Yipeng Ouyang · March 26, 2026</p>
+  </div>
+</section>
+
+<section style="padding-top:2rem">
+  <div class="section-inner">
+    <div class="blog-post reveal">
+      <h2>The Observation</h2>
+      <p>In early March 2026, while working with various LLM agent frameworks — Claude Code, OpenAI Codex, Google Gemini CLI — I noticed something peculiar. The same <code>SKILL.md</code> file, when deployed to different frameworks, produced dramatically different results. A skill that worked flawlessly on Claude Code would fail on Gemini CLI. Another that performed well on Codex would produce mediocre results on Kimi.</p>
+
+      <p>This wasn't a content problem — the instructions were identical. It was a <strong>format problem</strong>. Each framework, trained on different data distributions, had different "format preferences." Claude responded best to XML-structured prompts. GPT models struggled with JSON input (the infamous "format tax"). Gemini parsed YAML nested data with 51.9% accuracy versus JSON's 43.1%.</p>
+
+      <div class="highlight"><p><strong>Key Insight:</strong> Format sensitivity is not a bug — it's a fundamental property of how LLMs process structured information. The same semantic content, presented in different syntactic forms, yields different cognitive outcomes.</p></div>
+
+      <h2>The Compiler Analogy</h2>
+      <p>This immediately reminded me of the classical compiler problem. In the 1950s, programmers faced a similar challenge: writing code for different machine architectures required manual per-platform adaptation. The solution was the <strong>intermediate representation (IR)</strong> — a unified abstraction that decoupled source languages from target machines.</p>
+
+      <p>What if we could apply the same principle to agent skills? A unified IR that captures what a skill <em>means</em>, independent of how it's <em>formatted</em> for any particular framework. Then, platform-specific "emitters" could render that IR into each framework's preferred format.</p>
+
+      <h2>The First Sketch</h2>
+      <p>On March 26, I sketched the initial concept on a whiteboard:</p>
+
+      <ul>
+        <li><strong>Phase 1 — Parse:</strong> Extract structured data from raw SKILL.md (YAML frontmatter + Markdown body)</li>
+        <li><strong>Phase 2 — IR:</strong> Build a strongly-typed intermediate representation capturing procedures, permissions, schemas, and constraints</li>
+        <li><strong>Phase 3 — Optimize:</strong> Analyze and harden the IR — validate structure, audit permissions, inject safety constraints</li>
+        <li><strong>Phase 4 — Emit:</strong> Render the validated IR into framework-native formats through polymorphic emitters</li>
+      </ul>
+
+      <p>The name "Skill Compiler" was born that day. The core insight — reducing O(m×n) adaptation complexity to O(m+n) — became the project's mathematical foundation.</p>
+
+      <h2>Why This Matters</h2>
+      <p>The agent skill ecosystem was growing explosively. Thousands of community-contributed skills were being shared on GitHub. But they were all format-agnostic — a single Markdown file deployed identically everywhere. This was like writing assembly code by hand for each CPU architecture in 2026.</p>
+
+      <p>Meanwhile, Snyk's security audit had just revealed that 37% of community skills contained vulnerabilities. No systematic mechanism existed to enforce security properties before skills reached an agent's context window.</p>
+
+      <p>A compiler could solve both problems simultaneously: <strong>portability</strong> through IR-driven format adaptation, and <strong>security</strong> through compile-time analysis and constraint injection.</p>
+
+      <h2>Next Steps</h2>
+      <p>With the concept validated on paper, the next step was clear: build a working prototype in Rust. The language's type system, performance characteristics, and ecosystem (serde, pulldown-cmark, askama) made it the natural choice for a compiler project.</p>
+
+      <p>The journey from whiteboard sketch to working compiler would begin in April.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><h3>SkCC</h3><p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents.</p></div>
+    <div class="footer-col"><h4>Product</h4><a href="../index.html#features">Features</a><a href="../leaderboard.html">Leaderboard</a><a href="../install.html">Install</a></div>
+    <div class="footer-col"><h4>Resources</h4><a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="../blog.html">Blog</a></div>
+    <div class="footer-col"><h4>Links</h4><a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
+</footer>
+<script src="../common.js"></script>
+</body>
+</html>

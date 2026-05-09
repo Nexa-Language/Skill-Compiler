@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkCC: The Final Form — Paper Submission & Open Source — SkCC Blog</title>
+<meta name="description" content="Unifying the project under SkCC, completing the NeurIPS 2026 paper, and releasing the full open-source compiler">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
+<style>
+.blog-post{max-width:800px;margin:0 auto}
+.blog-post h2{font-size:1.8rem;font-weight:800;margin:2rem 0 1rem;color:#fff}
+.blog-post h3{font-size:1.3rem;font-weight:700;margin:1.5rem 0 .75rem;color:#e4e4ed}
+.blog-post p{color:#a1a1aa;line-height:1.8;margin-bottom:1rem;font-size:1rem}
+.blog-post ul{color:#a1a1aa;padding-left:1.5rem;margin-bottom:1rem}
+.blog-post li{margin-bottom:.5rem;line-height:1.7}
+.blog-post .highlight{background:rgba(139,92,246,.1);border-left:3px solid #7c3aed;padding:1rem 1.5rem;border-radius:0 .75rem .75rem 0;margin:1.5rem 0}
+.blog-post .highlight p{color:#c4b5fd;margin:0}
+.blog-post code{background:rgba(139,92,246,.15);color:#c4b5fd;padding:.15rem .4rem;border-radius:.3rem;font-family:'JetBrains Mono',monospace;font-size:.9em}
+.back-link{display:inline-flex;align-items:center;gap:.5rem;color:#a78bfa;text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:2rem;transition:color .2s}
+.back-link:hover{color:#c4b5fd}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo"><img src="../logo.png" alt="SkCC"><span>SkCC</span></a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../leaderboard.html">Leaderboard</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../install.html">Install</a>
+      <a href="https://github.com/Nexa-Language/Skill-Compiler" class="nav-cta">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="blog-post">
+    <a href="../blog.html" class="back-link">← Back to Blog</a>
+    <div style="font-size:.75rem;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">May 2026</div>
+    <h1><span class="gradient-text">SkCC: The Final Form<br>Paper Submission & Open Source</span></h1>
+    <p style="color:#71717a;font-size:.9rem">By Yipeng Ouyang · May 9, 2026</p>
+  </div>
+</section>
+
+<section style="padding-top:2rem">
+  <div class="section-inner">
+    <div class="blog-post reveal">
+      <h2>The Name</h2>
+      <p>The project had gone by many names: Skill Compiler, Nexa Skill Compiler (NSC), Agent Skill Compiler (ASC). Each captured part of the vision but none felt definitive. In May 2026, we settled on <strong>SkCC</strong> — short, memorable, and directly encoding the project's essence: <strong>Sk</strong>ill <strong>C</strong>ompilation for <strong>C</strong>ross-framework agents.</p>
+
+      <p>The naming wasn't just cosmetic. It reflected a maturation of the project's identity. We weren't just building a tool for the Nexa ecosystem — we were building a <em>standard</em> for the entire agent skill ecosystem. The name needed to stand on its own.</p>
+
+      <div class="highlight"><p><strong>SkCC</strong> = <strong>Sk</strong>ill <strong>C</strong>ompiler for <strong>C</strong>ross-framework LLM Agents. Write once, run anywhere.</p></div>
+
+      <h2>The Paper</h2>
+      <p>With the compiler stable and experiments complete, we turned to writing. The paper — "SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents" — was structured around the "From Engineering Implementation to Scientific Argument" methodology:</p>
+
+      <ul>
+        <li><strong>Motivation:</strong> Format sensitivity is a first-class concern. The O(m×n) adaptation burden is unsustainable. Security vulnerabilities are widespread and unaddressed.</li>
+        <li><strong>Insight:</strong> A unified IR can decouple skill semantics from framework-specific formatting, mirroring classical compiler architecture.</li>
+        <li><strong>Design:</strong> Four-phase pipeline — Syntax Parser → IR Builder → Security Optimizer → Target Emitter.</li>
+        <li><strong>Evidence:</strong> SkillsBench experiments across 4 frameworks, ablation studies proving model-specificity, security and efficiency metrics.</li>
+      </ul>
+
+      <h2>Experimental Results</h2>
+      <p>The numbers told a compelling story. SkCC-compiled skills consistently outperformed format-agnostic baselines:</p>
+
+      <ul>
+        <li><strong>Kimi CLI:</strong> 35.1% → 48.7% pass rate (+13.5pp, p=0.0063)</li>
+        <li><strong>Claude Code:</strong> 21.1% → 33.3% pass rate (+12.2pp, p=0.0103)</li>
+        <li><strong>Codex CLI:</strong> 38.5% → 42.3% pass rate (+3.8pp)</li>
+        <li><strong>Gemini CLI:</strong> 22.2% → 22.2% pass rate (+0.019 reward gain)</li>
+      </ul>
+
+      <p>The ablation study was particularly revealing. The same Kimi-compiled format produced dramatically different effects across models: strongly positive on Kimi (d=+0.33), neutral on GLM-5 (d=−0.03), and slightly negative on DeepSeek (d=−0.14). This proved that compilation gains are <strong>model-specific</strong> — there is no one-size-fits-all optimal format. This finding is the empirical foundation for SkCC's multi-backend architecture.</p>
+
+      <h2>Open Source Release</h2>
+      <p>On May 9, we pushed the final version to GitHub. The repository included:</p>
+
+      <ul>
+        <li>The full Rust compiler (3 crates, 207 tests)</li>
+        <li>npm wrapper package for Node.js users</li>
+        <li>VS Code extension with syntax highlighting and real-time validation</li>
+        <li>Comprehensive documentation (15+ docs files)</li>
+        <li>This website with benchmark leaderboard and development blog</li>
+      </ul>
+
+      <p>The paper was submitted to AgentSkills'26 (workshop at NeurIPS 2026) and uploaded to arXiv (2605.03353).</p>
+
+      <h2>What's Next</h2>
+      <p>SkCC is just the beginning. The compiler architecture is designed for extensibility — new framework emitters can be added by implementing a single trait. We're exploring:</p>
+
+      <ul>
+        <li>Automated anti-pattern discovery from vulnerability corpora</li>
+        <li>Semantic-level adaptation (instruction simplification, procedure decomposition)</li>
+        <li>Runtime feedback integration for iterative optimization</li>
+        <li>WASM bindings for browser-based skill validation</li>
+        <li>Integration with emerging frameworks (OpenHands, Copilot, LangChain)</li>
+      </ul>
+
+      <p>The vision remains the same as that March whiteboard sketch: <strong>write once, run anywhere</strong> — but now it's not just a sketch. It's a working compiler, a submitted paper, and an open-source project ready for the community.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><h3>SkCC</h3><p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents.</p></div>
+    <div class="footer-col"><h4>Product</h4><a href="../index.html#features">Features</a><a href="../leaderboard.html">Leaderboard</a><a href="../install.html">Install</a></div>
+    <div class="footer-col"><h4>Resources</h4><a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="../blog.html">Blog</a></div>
+    <div class="footer-col"><h4>Links</h4><a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
+</footer>
+<script src="../common.js"></script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#06060b;color:#e4e4ed;overflow-x:hidden;line-height:1.6}
+::selection{background:rgba(139,92,246,0.4);color:#fff}
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;transition:all .3s}
+nav.scrolled{background:rgba(6,6,11,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,92,246,.12)}
+.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
+.nav-logo img{height:28px;width:28px;border-radius:6px}
+.nav-links{display:flex;gap:2rem;align-items:center}
+.nav-links a{color:#a1a1aa;text-decoration:none;font-size:.875rem;font-weight:500;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:#fff}
+.nav-cta{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff!important;padding:.5rem 1.25rem;border-radius:9999px;font-weight:600!important}
+section{position:relative;z-index:1;padding:6rem 2rem}
+.section-inner{max-width:1280px;margin:0 auto}
+.section-label{display:inline-block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#a78bfa;margin-bottom:1rem}
+.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.02em;margin-bottom:1rem;line-height:1.2}
+.section-desc{font-size:1.1rem;color:#a1a1aa;max-width:600px;margin-bottom:3rem;line-height:1.7}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:9999px;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .3s;cursor:pointer;border:none}
+.btn-primary{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;box-shadow:0 4px 30px rgba(124,58,237,.35)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(124,58,237,.5)}
+.btn-secondary{background:rgba(255,255,255,.06);color:#e4e4ed;border:1px solid rgba(255,255,255,.12)}
+.btn-secondary:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2rem;transition:all .3s}
+.card:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px)}
+footer{position:relative;z-index:1;padding:4rem 2rem 2rem;border-top:1px solid rgba(255,255,255,.06)}
+.footer-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
+.footer-brand h3{font-size:1.2rem;font-weight:800;margin-bottom:.5rem}
+.footer-brand p{font-size:.85rem;color:#71717a;line-height:1.6}
+.footer-col h4{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#71717a;margin-bottom:1rem}
+.footer-col a{display:block;color:#a1a1aa;text-decoration:none;font-size:.85rem;padding:.3rem 0;transition:color .2s}
+.footer-col a:hover{color:#fff}
+.footer-bottom{max-width:1280px;margin:3rem auto 0;padding-top:2rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.8rem;color:#71717a}
+.footer-bottom a{color:#a1a1aa;text-decoration:none}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.reveal{opacity:0;transform:translateY(40px);transition:all .7s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.page-hero{padding:10rem 2rem 4rem;text-align:center}
+.page-hero h1{font-size:clamp(2.5rem,5vw,4rem);font-weight:900;letter-spacing:-.03em}
+.page-hero .gradient-text{background:linear-gradient(135deg,#a78bfa,#6366f1,#22d3ee);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 4s ease infinite}
+@media(max-width:768px){.footer-inner{grid-template-columns:1fr 1fr}nav{padding:.75rem 1rem}.nav-links{display:none}}

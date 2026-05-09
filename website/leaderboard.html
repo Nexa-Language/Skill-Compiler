@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard — SkCC</title>
+<meta name="description" content="SkCC benchmark leaderboard — SkillsBench results across Claude Code, Kimi CLI, Codex CLI, and Gemini CLI">
+<meta property="og:title" content="SkCC Leaderboard">
+<meta property="og:description" content="Benchmark results for SkCC across four agent frameworks">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
+<style>
+.leaderboard{overflow-x:auto;margin-top:2rem}
+.leaderboard table{width:100%;border-collapse:collapse;font-size:.9rem}
+.leaderboard th{text-align:left;padding:1rem 1.25rem;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#71717a;border-bottom:1px solid rgba(255,255,255,.08)}
+.leaderboard td{padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.leaderboard tr:hover td{background:rgba(139,92,246,.04)}
+.leaderboard .fw{font-weight:600}
+.gain-up{color:#22c55e;font-weight:700}
+.gain-flat{color:#a1a1aa}
+.gain-down{color:#ef4444}
+.rank{font-weight:800;font-size:1.1rem}
+.rank-gold{color:#fbbf24}.rank-silver{color:#a1a1aa}.rank-bronze{color:#cd853f}
+.bench-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:3rem}
+.bench-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:1.8rem}
+.bench-card h4{font-weight:700;font-size:.95rem;margin-bottom:1rem;color:#a78bfa}
+.bench-card .big-num{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.bench-card .unit{font-size:.85rem;color:#71717a;margin-left:.25rem}
+.bench-card .detail{font-size:.85rem;color:#a1a1aa;margin-top:.5rem}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="SkCC"><span>SkCC</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="blog.html">Blog</a>
+      <a href="install.html">Install</a>
+      <a href="https://github.com/Nexa-Language/Skill-Compiler" class="nav-cta">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <h1><span class="gradient-text">Leaderboard</span></h1>
+  <p style="color:#a1a1aa;font-size:1.1rem;margin-top:1rem">SkillsBench (89 real-world tasks) across four mainstream agent frameworks. Pass@1 with reward ≥ 0.5.</p>
+</section>
+
+<section style="padding-top:2rem">
+  <div class="section-inner">
+    <div class="leaderboard reveal">
+      <table>
+        <thead><tr><th>Rank</th><th>Framework</th><th>Model</th><th>Baseline Pass%</th><th>SkCC Pass%</th><th>Δ Pass Rate</th><th>Mean Reward Δ</th><th>p-value</th><th>Cohen's d</th></tr></thead>
+        <tbody>
+          <tr><td><span class="rank rank-gold">#1</span></td><td><span class="fw">Kimi CLI</span></td><td>kimi-k2.5</td><td>35.1%</td><td><span class="fw">48.7%</span></td><td><span class="gain-up">+13.5pp</span></td><td><span class="gain-up">+0.142</span></td><td>0.0063**</td><td>0.33</td></tr>
+          <tr><td><span class="rank rank-silver">#2</span></td><td><span class="fw">Claude Code</span></td><td>claude-opus-4-6</td><td>21.1%</td><td><span class="fw">33.3%</span></td><td><span class="gain-up">+12.2pp</span></td><td><span class="gain-up">+0.274</span></td><td>0.0103*</td><td>0.60</td></tr>
+          <tr><td><span class="rank rank-bronze">#3</span></td><td><span class="fw">Codex CLI</span></td><td>gpt-5.3-codex</td><td>38.5%</td><td><span class="fw">42.3%</span></td><td><span class="gain-up">+3.8pp</span></td><td><span class="gain-up">+0.067</span></td><td>—</td><td>—</td></tr>
+          <tr><td>#4</td><td><span class="fw">Gemini CLI</span></td><td>gemini-2.5-pro</td><td>22.2%</td><td><span class="fw">22.2%</span></td><td><span class="gain-flat">0.0pp</span></td><td><span class="gain-up">+0.019</span></td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="bench-grid">
+      <div class="bench-card reveal"><h4>🔬 Ablation: Format Specificity</h4><div class="big-num">Model-Dependent</div><div class="detail">Same Kimi-compiled format: Kimi +13.5pp (p=0.0063), GLM-5 neutral (p=0.857), DeepSeek slightly negative (p=0.256). Proves per-model emission is necessary.</div></div>
+      <div class="bench-card reveal"><h4>🛡️ Anti-Skill Injection</h4><div class="big-num">94.8<span class="unit">%</span></div><div class="detail">221 of 233 community skills triggered at least one safety rule. HTTP safety: 91.4%, Loop safety: 44.6%, DB safety: 33.5%.</div></div>
+      <div class="bench-card reveal"><h4>⚡ Compilation Latency</h4><div class="big-num">8.93<span class="unit">ms</span></div><div class="detail">Average across 225 skills. Simple: 8.54ms, Medium: 8.58ms, Complex: 9.13ms. Max: 22.89ms.</div></div>
+      <div class="bench-card reveal"><h4>💰 Token Efficiency</h4><div class="big-num">10–46<span class="unit">%</span></div><div class="detail">Runtime token savings across frameworks. Claude: 23% fewer tokens, Codex: 43% faster execution, Gemini: 23% time reduction.</div></div>
+    </div>
+
+    <div style="margin-top:4rem" class="reveal">
+      <h3 style="font-size:1.3rem;font-weight:700;margin-bottom:1.5rem">Ablation Study: Format Specificity</h3>
+      <div class="leaderboard">
+        <table>
+          <thead><tr><th>Model</th><th>Framework</th><th>Backend</th><th>Baseline → SkCC Pass%</th><th>p-value</th><th>Cohen's d</th><th>Verdict</th></tr></thead>
+          <tbody>
+            <tr><td><strong>kimi-k2.5</strong></td><td>Kimi CLI</td><td>Kimi</td><td>35.1% → <strong>48.7%</strong></td><td class="gain-up">0.0063**</td><td class="gain-up">+0.33</td><td class="gain-up">SkCC > Baseline</td></tr>
+            <tr><td>glm-5.1</td><td>OpenHands</td><td>Kimi</td><td>48.9% → 50.0%</td><td class="gain-flat">0.857</td><td class="gain-flat">−0.03</td><td class="gain-flat">SkCC ≈ Baseline</td></tr>
+            <tr><td>deepseek-v4-flash</td><td>OpenHands</td><td>Kimi</td><td>72.7% → 73.9%</td><td class="gain-flat">0.2561</td><td class="gain-down">−0.14</td><td class="gain-down">Baseline > SkCC</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:#71717a;font-size:.85rem;margin-top:1rem">The same Kimi-compiled format produces divergent effects across models, confirming that compilation gains are model-specific — justifying SkCC's multi-backend architecture.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><h3>SkCC</h3><p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents.</p></div>
+    <div class="footer-col"><h4>Product</h4><a href="index.html#features">Features</a><a href="leaderboard.html">Leaderboard</a><a href="install.html">Install</a></div>
+    <div class="footer-col"><h4>Resources</h4><a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="blog.html">Blog</a></div>
+    <div class="footer-col"><h4>Links</h4><a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
+</footer>
+<script src="common.js"></script>
+</body>
+</html>

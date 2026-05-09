@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexa Skill Compiler: From Prototype to Working Compiler — SkCC Blog</title>
+<meta name="description" content="Building the four-phase compilation pipeline in Rust and running the first SkillsBench experiments">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../common.css">
+<style>
+.blog-post{max-width:800px;margin:0 auto}
+.blog-post h2{font-size:1.8rem;font-weight:800;margin:2rem 0 1rem;color:#fff}
+.blog-post h3{font-size:1.3rem;font-weight:700;margin:1.5rem 0 .75rem;color:#e4e4ed}
+.blog-post p{color:#a1a1aa;line-height:1.8;margin-bottom:1rem;font-size:1rem}
+.blog-post ul{color:#a1a1aa;padding-left:1.5rem;margin-bottom:1rem}
+.blog-post li{margin-bottom:.5rem;line-height:1.7}
+.blog-post .highlight{background:rgba(139,92,246,.1);border-left:3px solid #7c3aed;padding:1rem 1.5rem;border-radius:0 .75rem .75rem 0;margin:1.5rem 0}
+.blog-post .highlight p{color:#c4b5fd;margin:0}
+.blog-post code{background:rgba(139,92,246,.15);color:#c4b5fd;padding:.15rem .4rem;border-radius:.3rem;font-family:'JetBrains Mono',monospace;font-size:.9em}
+.back-link{display:inline-flex;align-items:center;gap:.5rem;color:#a78bfa;text-decoration:none;font-weight:600;font-size:.9rem;margin-bottom:2rem;transition:color .2s}
+.back-link:hover{color:#c4b5fd}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-logo"><img src="../logo.png" alt="SkCC"><span>SkCC</span></a>
+    <div class="nav-links">
+      <a href="../index.html">Home</a>
+      <a href="../leaderboard.html">Leaderboard</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../install.html">Install</a>
+      <a href="https://github.com/Nexa-Language/Skill-Compiler" class="nav-cta">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <div class="blog-post">
+    <a href="../blog.html" class="back-link">← Back to Blog</a>
+    <div style="font-size:.75rem;color:#a78bfa;font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem">April 2026</div>
+    <h1><span class="gradient-text">Nexa Skill Compiler:<br>From Prototype to Working Compiler</span></h1>
+    <p style="color:#71717a;font-size:.9rem">By Yipeng Ouyang · April 16, 2026</p>
+  </div>
+</section>
+
+<section style="padding-top:2rem">
+  <div class="section-inner">
+    <div class="blog-post reveal">
+      <h2>Setting Up the Workspace</h2>
+      <p>April 3, 2026. The project — then called <strong>Nexa Skill Compiler (NSC)</strong> — began with a Rust workspace. Three crates: <code>nexa-skill-core</code> for the compilation pipeline, <code>nexa-skill-cli</code> for the command-line interface, and <code>nexa-skill-templates</code> for Askama-based code generation.</p>
+
+      <p>The technology choices were deliberate. <code>pulldown-cmark</code> for Markdown event-stream parsing. <code>serde</code> + <code>serde_yaml</code> for frontmatter extraction. <code>miette</code> for beautiful diagnostic rendering. <code>askama</code> for compile-time-validated Jinja2 templates. Each dependency was chosen for its alignment with the compiler's design philosophy: type safety, zero-cost abstraction, and compile-time guarantees.</p>
+
+      <h2>Building the IR Layer</h2>
+      <p>The heart of any compiler is its intermediate representation. We designed <code>SkillIR</code> — later renamed <strong>SkIR</strong> — as a strongly-typed struct with 25+ fields, organized into semantic categories:</p>
+
+      <ul>
+        <li><strong>Metadata & Routing:</strong> name, version, description</li>
+        <li><strong>Interfaces & MCP:</strong> mcp_servers, input_schema, output_schema</li>
+        <li><strong>Security & Control:</strong> hitl_required, permissions, security_level, anti_skill_constraints</li>
+        <li><strong>Execution Logic:</strong> procedures, approaches, mode, few_shot_examples</li>
+        <li><strong>AST Optimization Flags:</strong> requires_yaml_optimization, nested_data_depth</li>
+      </ul>
+
+      <p>Every string field used <code>Arc<str></code> for zero-copy sharing across compilation phases and target emitters. This wasn't premature optimization — it was architectural necessity for a compiler that needed to process hundreds of skills with sub-10ms latency.</p>
+
+      <div class="highlight"><p><strong>Design Decision:</strong> SkIR abstracts what a skill <em>means</em>, not how it's <em>formatted</em>. This is the key architectural property that enables O(m+n) complexity — m skills pass through the shared frontend once, and n emitters consume the same optimized IR.</p></div>
+
+      <h2>Multi-Strategy Procedure Extraction</h2>
+      <p>One of the hardest problems was parsing real-world SKILL.md files. Community skills use wildly different structures — some use ordered lists, others use heading hierarchies, still others use phase-based sections. A single parsing strategy would fail on most real inputs.</p>
+
+      <p>We implemented <strong>6 extraction strategies</strong> with automatic routing based on <code>SectionKind</code> classification:</p>
+
+      <ul>
+        <li><strong>Heading-based:</strong> Extract steps from numbered headings</li>
+        <li><strong>List-based:</strong> Parse ordered/unordered list items as steps</li>
+        <li><strong>Phase-based:</strong> Treat sequential sections as execution phases</li>
+        <li><strong>Mode-selector:</strong> Identify alternative approaches under a mode selector</li>
+        <li><strong>Reference-based:</strong> Extract operations from reference sections</li>
+        <li><strong>Body-segmentation:</strong> Fallback — treat entire body as a single procedure</li>
+      </ul>
+
+      <h2>Anti-Skill Injection</h2>
+      <p>April 13. The security optimizer came together. Four anti-pattern rules, each with trigger keywords and injected constraints:</p>
+
+      <ul>
+        <li><strong>HTTP Safety:</strong> Detects HTTP/GET/POST/fetch → injects timeout and retry constraints</li>
+        <li><strong>Loop Safety:</strong> Detects while/loop/repeat → injects max iteration limits</li>
+        <li><strong>DB Safety:</strong> Detects DROP/DELETE/TRUNCATE → requires user confirmation</li>
+        <li><strong>Parse Safety:</strong> Detects BeautifulSoup/HTML parse → prevents unsafe parsing patterns</li>
+      </ul>
+
+      <p>The key insight: safety constraints should be a property of the <em>compilation process</em>, not of individual author diligence. By operating at the IR level, injected constraints survive format translation and appear consistently across all target frameworks.</p>
+
+      <h2>First Experiments</h2>
+      <p>By April 16, we had a working compiler. 206 unit tests passing. 32 of 34 real-world skills compiling successfully (2 correctly blocked by security validation). The first SkillsBench experiments showed promising results: compiled skills outperformed format-agnostic baselines across all four frameworks.</p>
+
+      <p>The project was ready for its final form. But first, it needed a name that would stick.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand"><h3>SkCC</h3><p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents.</p></div>
+    <div class="footer-col"><h4>Product</h4><a href="../index.html#features">Features</a><a href="../leaderboard.html">Leaderboard</a><a href="../install.html">Install</a></div>
+    <div class="footer-col"><h4>Resources</h4><a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="../blog.html">Blog</a></div>
+    <div class="footer-col"><h4>Links</h4><a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
+</footer>
+<script src="../common.js"></script>
+</body>
+</html>

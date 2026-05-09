@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SkCC — Portable & Secure Skill Compilation for LLM Agents</title>
-<meta name="description" content="SkCC is a compiler for LLM agents that introduces classical compilation design into agent skill development. Write once, run anywhere across Claude Code, Codex, Gemini CLI, and Kimi CLI.">
+<meta name="description" content="SkCC is a compiler for LLM agents. Write once, run anywhere across Claude Code, Codex, Gemini CLI, and Kimi CLI.">
 <meta property="og:title" content="SkCC — Skill Compiler for LLM Agents">
 <meta property="og:description" content="Portable and Secure Skill Compilation for Cross-Framework LLM Agents">
 <meta property="og:type" content="website">
@@ -12,23 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:#06060b;color:#e4e4ed;overflow-x:hidden;line-height:1.6}
-::selection{background:rgba(139,92,246,0.4);color:#fff}
-#particles{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;transition:all .3s}
-nav.scrolled{background:rgba(6,6,11,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(139,92,246,.12)}
-.nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
-.nav-logo{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:#fff;font-weight:700;font-size:1.25rem;letter-spacing:-.02em}
-.nav-logo svg{height:28px;width:28px}
-.nav-links{display:flex;gap:2rem;align-items:center}
-.nav-links a{color:#a1a1aa;text-decoration:none;font-size:.875rem;font-weight:500;transition:color .2s}
-.nav-links a:hover{color:#fff}
-.nav-cta{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff!important;padding:.5rem 1.25rem;border-radius:9999px;font-weight:600!important}
-
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 6rem}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:8rem 2rem 6rem}
 .hero-content{max-width:900px}
 .hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);border-radius:9999px;padding:.4rem 1.2rem;font-size:.8rem;font-weight:500;color:#a78bfa;margin-bottom:2rem;animation:fadeInUp .6s ease}
 .hero-badge .dot{width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite}
@@ -36,22 +22,10 @@ nav.scrolled{background:rgba(6,6,11,.88);backdrop-filter:blur(20px);-webkit-back
 .hero h1 .gradient-text{background:linear-gradient(135deg,#a78bfa 0%,#6366f1 30%,#22d3ee 70%,#a78bfa 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradientShift 4s ease infinite}
 .hero-subtitle{font-size:clamp(1.1rem,2vw,1.35rem);color:#a1a1aa;max-width:650px;margin:0 auto 2.5rem;font-weight:400;line-height:1.7;animation:fadeInUp .6s .2s ease both}
 .hero-actions{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;animation:fadeInUp .6s .3s ease both}
-.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 2rem;border-radius:9999px;font-weight:600;font-size:.95rem;text-decoration:none;transition:all .3s;cursor:pointer;border:none}
-.btn-primary{background:linear-gradient(135deg,#7c3aed,#6366f1);color:#fff;box-shadow:0 4px 30px rgba(124,58,237,.35)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(124,58,237,.5)}
-.btn-secondary{background:rgba(255,255,255,.06);color:#e4e4ed;border:1px solid rgba(255,255,255,.12)}
-.btn-secondary:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
 .hero-stats{display:flex;gap:3rem;justify-content:center;margin-top:4rem;animation:fadeInUp .6s .4s ease both}
 .hero-stat{text-align:center}
 .hero-stat-value{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-stat-label{font-size:.8rem;color:#71717a;margin-top:.25rem;text-transform:uppercase;letter-spacing:.08em}
-
-section{position:relative;z-index:1;padding:6rem 2rem}
-.section-inner{max-width:1280px;margin:0 auto}
-.section-label{display:inline-block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:#a78bfa;margin-bottom:1rem}
-.section-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;letter-spacing:-.02em;margin-bottom:1rem;line-height:1.2}
-.section-desc{font-size:1.1rem;color:#a1a1aa;max-width:600px;margin-bottom:3rem;line-height:1.7}
-
 .problem-solution{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem}
 .ps-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2.5rem;transition:all .3s}
 .ps-card:hover{border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.04)}
@@ -67,7 +41,6 @@ section{position:relative;z-index:1;padding:6rem 2rem}
 .complexity-old{color:#ef4444;text-decoration:line-through;text-decoration-thickness:2px}
 .complexity-arrow{color:#a78bfa;font-size:2rem}
 .complexity-new{color:#22c55e;font-size:2rem}
-
 .pipeline{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin-top:2rem}
 .pipeline-phase{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:1.5rem 1.8rem;text-align:center;min-width:180px;transition:all .3s}
 .pipeline-phase:hover{transform:translateY(-4px);border-color:rgba(139,92,246,.4);box-shadow:0 8px 30px rgba(139,92,246,.15)}
@@ -79,67 +52,21 @@ section{position:relative;z-index:1;padding:6rem 2rem}
 .pipeline-io{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);border-radius:1rem;padding:1.2rem 1.5rem;text-align:center;min-width:140px}
 .pipeline-io .label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#71717a;margin-bottom:.3rem}
 .pipeline-io .value{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.9rem}
-
 .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:2rem}
 .feature-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2rem;transition:all .3s}
 .feature-card:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px)}
 .feature-card .f-icon{font-size:2rem;margin-bottom:1rem}
 .feature-card h4{font-weight:700;font-size:1.05rem;margin-bottom:.5rem}
 .feature-card p{font-size:.9rem;color:#a1a1aa;line-height:1.6}
-
-.benchmark-section{background:rgba(255,255,255,.02);border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06)}
-.leaderboard{overflow-x:auto;margin-top:2rem}
-.leaderboard table{width:100%;border-collapse:collapse;font-size:.9rem}
-.leaderboard th{text-align:left;padding:1rem 1.25rem;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:#71717a;border-bottom:1px solid rgba(255,255,255,.08)}
-.leaderboard td{padding:1rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.04)}
-.leaderboard tr:hover td{background:rgba(139,92,246,.04)}
-.leaderboard .fw{font-weight:600}
-.leaderboard .gain-up{color:#22c55e;font-weight:700}
-.leaderboard .gain-flat{color:#a1a1aa}
-.leaderboard .gain-down{color:#ef4444}
-.leaderboard .rank{font-weight:800;font-size:1.1rem}
-.rank-gold{color:#fbbf24}.rank-silver{color:#a1a1aa}.rank-bronze{color:#cd853f}
-
-.benchmark-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:3rem}
-.bench-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:1.8rem}
-.bench-card h4{font-weight:700;font-size:.95rem;margin-bottom:1rem;color:#a78bfa}
-.bench-card .big-num{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.bench-card .unit{font-size:.85rem;color:#71717a;margin-left:.25rem}
-.bench-card .detail{font-size:.85rem;color:#a1a1aa;margin-top:.5rem}
-
-.install-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;margin-top:2rem}
-.install-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:1.8rem}
-.install-card h4{font-weight:700;font-size:.95rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
-.install-card pre{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);border-radius:.75rem;padding:1rem 1.25rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#e4e4ed;overflow-x:auto;line-height:1.7}
-.install-card pre .c1{color:#22d3ee}
-.install-card pre .c2{color:#71717a}
-
-footer{position:relative;z-index:1;padding:4rem 2rem 2rem;border-top:1px solid rgba(255,255,255,.06)}
-.footer-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem}
-.footer-brand h3{font-size:1.2rem;font-weight:800;margin-bottom:.5rem}
-.footer-brand p{font-size:.85rem;color:#71717a;line-height:1.6}
-.footer-col h4{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#71717a;margin-bottom:1rem}
-.footer-col a{display:block;color:#a1a1aa;text-decoration:none;font-size:.85rem;padding:.3rem 0;transition:color .2s}
-.footer-col a:hover{color:#fff}
-.footer-bottom{max-width:1280px;margin:3rem auto 0;padding-top:2rem;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;font-size:.8rem;color:#71717a}
-.footer-bottom a{color:#a1a1aa;text-decoration:none}
-
-@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
-@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.reveal{opacity:0;transform:translateY(40px);transition:all .7s cubic-bezier(.16,1,.3,1)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-
-@media(max-width:768px){
-  .problem-solution{grid-template-columns:1fr}
-  .pipeline{flex-direction:column;gap:.5rem}
-  .pipeline-arrow{transform:rotate(90deg)}
-  .hero-stats{flex-direction:column;gap:1.5rem}
-  .footer-inner{grid-template-columns:1fr 1fr}
-  .complexity-formula{font-size:1.1rem}
-  nav{padding:.75rem 1rem}
-  .nav-links{display:none}
-}
+.contributors-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;margin-top:2rem}
+.contributor-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:1.25rem;padding:2rem;text-align:center;transition:all .3s}
+.contributor-card:hover{border-color:rgba(139,92,246,.3);transform:translateY(-2px)}
+.contributor-card .avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#6366f1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#fff;margin:0 auto 1rem}
+.contributor-card h4{font-weight:700;font-size:1rem;margin-bottom:.25rem}
+.contributor-card .role{font-size:.8rem;color:#a78bfa;margin-bottom:.5rem}
+.contributor-card a{color:#a1a1aa;text-decoration:none;font-size:.8rem;transition:color .2s}
+.contributor-card a:hover{color:#22d3ee}
+@media(max-width:768px){.problem-solution{grid-template-columns:1fr}.pipeline{flex-direction:column;gap:.5rem}.pipeline-arrow{transform:rotate(90deg)}.hero-stats{flex-direction:column;gap:1.5rem}.complexity-formula{font-size:1.1rem}}
 </style>
 </head>
 <body>
@@ -147,30 +74,25 @@ footer{position:relative;z-index:1;padding:4rem 2rem 2rem;border-top:1px solid r
 
 <nav id="nav">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">
-      <img src="logo.png" alt="SkCC" height="28" width="28" style="border-radius:6px">
-      <span>SkCC</span>
-    </a>
+    <a href="index.html" class="nav-logo"><img src="logo.png" alt="SkCC"><span>SkCC</span></a>
     <div class="nav-links">
-      <a href="#what">What</a>
-      <a href="#architecture">Architecture</a>
-      <a href="#features">Features</a>
-      <a href="#benchmark">Benchmark</a>
-      <a href="#install">Install</a>
+      <a href="index.html">Home</a>
+      <a href="leaderboard.html">Leaderboard</a>
+      <a href="blog.html">Blog</a>
+      <a href="install.html">Install</a>
       <a href="https://github.com/Nexa-Language/Skill-Compiler" class="nav-cta">GitHub ↗</a>
     </div>
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-content">
     <div style="margin-bottom:1.5rem"><img src="logo.png" alt="SkCC" height="64" width="64" style="border-radius:14px;box-shadow:0 4px 20px rgba(124,58,237,.3)"></div>
-    <div class="hero-badge"><span class="dot"></span> AgentSkill'26 — Under Review</div>
+    <div class="hero-badge"><span class="dot"></span> AgentSkills'26 — Under Review</div>
     <h1><span class="gradient-text">Write Once,</span><br>Run Anywhere</h1>
     <p class="hero-subtitle">SkCC is a compiler for LLM agents. Author skills once as SKILL.md, compile to Claude Code, Codex, Gemini CLI & Kimi CLI — with built-in security hardening.</p>
     <div class="hero-actions">
-      <a href="#install" class="btn btn-primary">Get Started</a>
+      <a href="install.html" class="btn btn-primary">Get Started</a>
       <a href="https://github.com/Nexa-Language/Skill-Compiler" class="btn btn-secondary">View on GitHub</a>
       <a href="https://arxiv.org/abs/2605.03353" class="btn btn-secondary" target="_blank" style="border-color:rgba(34,211,238,.3);color:#22d3ee">📄 Read Paper (arXiv)</a>
     </div>
@@ -183,76 +105,34 @@ footer{position:relative;z-index:1;padding:4rem 2rem 2rem;border-top:1px solid r
   </div>
 </section>
 
-<!-- WHAT IS SkCC -->
 <section id="what">
   <div class="section-inner">
-    <div class="reveal">
-      <span class="section-label">The Problem</span>
-      <h2 class="section-title">One Skill, Four Frameworks,<br>Four Different Results</h2>
-      <p class="section-desc">LLM agents are highly sensitive to prompt formatting — the same SKILL.md can vary up to 40% in performance across frameworks. Manual per-platform rewriting is unsustainable.</p>
-    </div>
+    <div class="reveal"><span class="section-label">The Problem</span><h2 class="section-title">One Skill, Four Frameworks,<br>Four Different Results</h2><p class="section-desc">LLM agents are highly sensitive to prompt formatting — the same SKILL.md can vary up to 40% in performance across frameworks. Manual per-platform rewriting is unsustainable.</p></div>
     <div class="problem-solution">
-      <div class="ps-card problem reveal">
-        <h3>🔴 Without SkCC</h3>
-        <ul>
-          <li>Format-agnostic SKILL.md deployed identically everywhere</li>
-          <li>Up to 40% performance variation from format alone</li>
-          <li>37% of community skills contain security vulnerabilities</li>
-          <li>O(m × n) manual adaptations for m skills × n frameworks</li>
-        </ul>
-      </div>
-      <div class="ps-card solution reveal">
-        <h3>🟢 With SkCC</h3>
-        <ul>
-          <li>Author once, compile to framework-native formats</li>
-          <li>Consistent pass rate improvements across all targets</li>
-          <li>94.8% Anti-Skill Injection coverage at compile time</li>
-          <li>O(m + n) — m skills + n Emitters, no manual rewrites</li>
-        </ul>
-      </div>
-      <div class="complexity-viz reveal">
-        <h3>Adaptation Complexity</h3>
-        <div class="complexity-formula">
-          <span class="complexity-old">O(m × n)</span>
-          <span class="complexity-arrow">→</span>
-          <span class="complexity-new">O(m + n)</span>
-        </div>
-      </div>
+      <div class="ps-card problem reveal"><h3>🔴 Without SkCC</h3><ul><li>Format-agnostic SKILL.md deployed identically everywhere</li><li>Up to 40% performance variation from format alone</li><li>37% of community skills contain security vulnerabilities</li><li>O(m × n) manual adaptations for m skills × n frameworks</li></ul></div>
+      <div class="ps-card solution reveal"><h3>🟢 With SkCC</h3><ul><li>Author once, compile to framework-native formats</li><li>Consistent pass rate improvements across all targets</li><li>94.8% Anti-Skill Injection coverage at compile time</li><li>O(m + n) — m skills + n Emitters, no manual rewrites</li></ul></div>
+      <div class="complexity-viz reveal"><h3>Adaptation Complexity</h3><div class="complexity-formula"><span class="complexity-old">O(m × n)</span><span class="complexity-arrow">→</span><span class="complexity-new">O(m + n)</span></div></div>
     </div>
   </div>
 </section>
 
-<!-- ARCHITECTURE -->
 <section id="architecture">
   <div class="section-inner">
-    <div class="reveal">
-      <span class="section-label">Architecture</span>
-      <h2 class="section-title">Four-Phase Compilation Pipeline</h2>
-      <p class="section-desc">Inspired by classical compiler design (LLVM, MLIR). A unified SkIR decouples skill semantics from framework-specific formatting.</p>
-    </div>
+    <div class="reveal"><span class="section-label">Architecture</span><h2 class="section-title">Four-Phase Compilation Pipeline</h2><p class="section-desc">Inspired by classical compiler design (LLVM, MLIR). A unified SkIR decouples skill semantics from framework-specific formatting.</p></div>
     <div class="pipeline reveal">
-      <div class="pipeline-io"><div class="label">Input</div><div class="value">SKILL.md</div></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-phase"><div class="phase-num">Phase 1</div><div class="phase-icon">🔍</div><div class="phase-title">Syntax Parser</div><div class="phase-desc">YAML frontmatter<br>+ Markdown AST</div></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-phase"><div class="phase-num">Phase 2</div><div class="phase-icon">🧠</div><div class="phase-title">IR Builder</div><div class="phase-desc">Strongly-typed<br>SkIR</div></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-phase"><div class="phase-num">Phase 3</div><div class="phase-icon">🛡️</div><div class="phase-title">Security Optimizer</div><div class="phase-desc">Anti-Skill Injection<br>+ Validation</div></div>
-      <div class="pipeline-arrow">→</div>
-      <div class="pipeline-phase"><div class="phase-num">Phase 4</div><div class="phase-icon">🚀</div><div class="phase-title">Target Emitter</div><div class="phase-desc">Claude · Codex<br>Gemini · Kimi</div></div>
-      <div class="pipeline-arrow">→</div>
+      <div class="pipeline-io"><div class="label">Input</div><div class="value">SKILL.md</div></div><div class="pipeline-arrow">→</div>
+      <div class="pipeline-phase"><div class="phase-num">Phase 1</div><div class="phase-icon">🔍</div><div class="phase-title">Syntax Parser</div><div class="phase-desc">YAML frontmatter<br>+ Markdown AST</div></div><div class="pipeline-arrow">→</div>
+      <div class="pipeline-phase"><div class="phase-num">Phase 2</div><div class="phase-icon">🧠</div><div class="phase-title">IR Builder</div><div class="phase-desc">Strongly-typed<br>SkIR</div></div><div class="pipeline-arrow">→</div>
+      <div class="pipeline-phase"><div class="phase-num">Phase 3</div><div class="phase-icon">🛡️</div><div class="phase-title">Security Optimizer</div><div class="phase-desc">Anti-Skill Injection<br>+ Validation</div></div><div class="pipeline-arrow">→</div>
+      <div class="pipeline-phase"><div class="phase-num">Phase 4</div><div class="phase-icon">🚀</div><div class="phase-title">Target Emitter</div><div class="phase-desc">Claude · Codex<br>Gemini · Kimi</div></div><div class="pipeline-arrow">→</div>
       <div class="pipeline-io"><div class="label">Output</div><div class="value">Platform Skills</div></div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
 <section id="features">
   <div class="section-inner">
-    <div class="reveal">
-      <span class="section-label">Features</span>
-      <h2 class="section-title">Built for Production</h2>
-    </div>
+    <div class="reveal"><span class="section-label">Features</span><h2 class="section-title">Built for Production</h2></div>
     <div class="features-grid">
       <div class="feature-card reveal"><div class="f-icon">🎯</div><h4>Multi-Framework Emission</h4><p>Compile to Claude Code (XML), Codex (XML-Markdown), Gemini CLI (Markdown+YAML), and Kimi CLI (Full Markdown) from a single source.</p></div>
       <div class="feature-card reveal"><div class="f-icon">🛡️</div><h4>Anti-Skill Injection</h4><p>Automatic compile-time safety constraint injection. 4 rule categories covering HTTP, Loop, DB, and Parse safety — 94.8% trigger rate on real skills.</p></div>
@@ -264,167 +144,27 @@ footer{position:relative;z-index:1;padding:4rem 2rem 2rem;border-top:1px solid r
   </div>
 </section>
 
-<!-- BENCHMARK -->
-<section id="benchmark" class="benchmark-section">
+<section id="contributors">
   <div class="section-inner">
-    <div class="reveal">
-      <span class="section-label">Benchmark</span>
-      <h2 class="section-title">Leaderboard</h2>
-      <p class="section-desc">SkillsBench (89 real-world tasks) across four mainstream agent frameworks. Pass@1 with reward ≥ 0.5.</p>
-    </div>
-    <div class="leaderboard reveal">
-      <table>
-        <thead>
-          <tr><th>Rank</th><th>Framework</th><th>Model</th><th>Baseline Pass%</th><th>SkCC Pass%</th><th>Δ Pass Rate</th><th>Mean Reward Δ</th><th>p-value</th><th>Cohen's d</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="rank rank-gold">#1</span></td>
-            <td><span class="fw">Kimi CLI</span></td><td>kimi-k2.5</td>
-            <td>35.1%</td><td><span class="fw">48.7%</span></td>
-            <td><span class="gain-up">+13.5pp</span></td>
-            <td><span class="gain-up">+0.142</span></td>
-            <td>0.0063**</td><td>0.33</td>
-          </tr>
-          <tr>
-            <td><span class="rank rank-silver">#2</span></td>
-            <td><span class="fw">Claude Code</span></td><td>claude-opus-4-6</td>
-            <td>21.1%</td><td><span class="fw">33.3%</span></td>
-            <td><span class="gain-up">+12.2pp</span></td>
-            <td><span class="gain-up">+0.274</span></td>
-            <td>0.0103*</td><td>0.60</td>
-          </tr>
-          <tr>
-            <td><span class="rank rank-bronze">#3</span></td>
-            <td><span class="fw">Codex CLI</span></td><td>gpt-5.3-codex</td>
-            <td>38.5%</td><td><span class="fw">42.3%</span></td>
-            <td><span class="gain-up">+3.8pp</span></td>
-            <td><span class="gain-up">+0.067</span></td>
-            <td>—</td><td>—</td>
-          </tr>
-          <tr>
-            <td>#4</td>
-            <td><span class="fw">Gemini CLI</span></td><td>gemini-2.5-pro</td>
-            <td>22.2%</td><td><span class="fw">22.2%</span></td>
-            <td><span class="gain-flat">0.0pp</span></td>
-            <td><span class="gain-up">+0.019</span></td>
-            <td>—</td><td>—</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="benchmark-grid">
-      <div class="bench-card reveal"><h4>🔬 Ablation: Format Specificity</h4><div class="big-num">Model-Dependent</div><div class="detail">Same Kimi-compiled format: Kimi +13.5pp (p=0.0063), GLM-5 neutral (p=0.857), DeepSeek slightly negative (p=0.256). Proves per-model emission is necessary.</div></div>
-      <div class="bench-card reveal"><h4>🛡️ Anti-Skill Injection</h4><div class="big-num">94.8<span class="unit">%</span></div><div class="detail">221 of 233 community skills triggered at least one safety rule. HTTP safety: 91.4%, Loop safety: 44.6%, DB safety: 33.5%.</div></div>
-      <div class="bench-card reveal"><h4>⚡ Compilation Latency</h4><div class="big-num">8.93<span class="unit">ms</span></div><div class="detail">Average across 225 skills. Simple: 8.54ms, Medium: 8.58ms, Complex: 9.13ms. Max: 22.89ms — well below human perception.</div></div>
-      <div class="bench-card reveal"><h4>💰 Token Efficiency</h4><div class="big-num">10–46<span class="unit">%</span></div><div class="detail">Runtime token savings across frameworks. Claude: 23% fewer tokens, Codex: 43% faster execution, Gemini: 23% time reduction.</div></div>
+    <div class="reveal"><span class="section-label">Team</span><h2 class="section-title">Contributors</h2></div>
+    <div class="contributors-grid">
+      <div class="contributor-card reveal"><div class="avatar">O</div><h4>Yipeng Ouyang</h4><div class="role">Lead Author</div><a href="https://ouyangyipeng.github.io/" target="_blank">ouyangyipeng.github.io</a></div>
+      <div class="contributor-card reveal"><div class="avatar">G</div><h4>Yuhao Gu</h4><div class="role">Author</div><a href="https://yhgu2000.github.io/" target="_blank">yhgu2000.github.io</a></div>
+      <div class="contributor-card reveal"><div class="avatar">X</div><h4>Yi Xiao</h4><div class="role">Author</div><span style="font-size:.8rem;color:#71717a">—</span></div>
+      <div class="contributor-card reveal"><div class="avatar">Z</div><h4>Xianwei Zhang</h4><div class="role">Author</div><a href="https://xianweiz.github.io/" target="_blank">xianweiz.github.io</a></div>
     </div>
   </div>
 </section>
 
-<!-- INSTALLATION -->
-<section id="install">
-  <div class="section-inner">
-    <div class="reveal">
-      <span class="section-label">Install</span>
-      <h2 class="section-title">Get Started in Seconds</h2>
-    </div>
-    <div class="install-grid">
-      <div class="install-card reveal">
-        <h4>📦 npm</h4>
-        <pre><span class="c2"># Global install</span>
-<span class="c1">npm</span> install -g nexa-skill-compiler
-
-<span class="c2"># Compile a skill</span>
-<span class="c1">nsc</span> build skill.md --all</pre>
-      </div>
-      <div class="install-card reveal">
-        <h4>🦀 Cargo</h4>
-        <pre><span class="c2"># Install from crates.io</span>
-<span class="c1">cargo</span> install nexa-skill-cli
-
-<span class="c2"># Or from source</span>
-<span class="c1">git clone</span> https://github.com/Nexa-Language/Skill-Compiler
-<span class="c1">cargo</span> install --path nexa-skill-cli</pre>
-      </div>
-      <div class="install-card reveal">
-        <h4>⚡ Quick Start</h4>
-        <pre><span class="c2"># Compile for all platforms</span>
-<span class="c1">nsc</span> build skill.md --all
-
-<span class="c2"># Target specific framework</span>
-<span class="c1">nsc</span> build skill.md --target claude
-
-<span class="c2"># Validate without emitting</span>
-<span class="c1">nsc</span> validate skill.md</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
 <footer>
   <div class="footer-inner">
-    <div class="footer-brand">
-      <h3>SkCC</h3>
-      <p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents. Part of the Nexa-lang Project.</p>
-    </div>
-    <div class="footer-col">
-      <h4>Product</h4>
-      <a href="#features">Features</a><a href="#benchmark">Benchmark</a><a href="#install">Install</a>
-    </div>
-    <div class="footer-col">
-      <h4>Resources</h4>
-      <a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="https://github.com/Nexa-Language/Skill-Compiler/blob/main/docs/USER_GUIDE.md">Docs</a>
-    </div>
-    <div class="footer-col">
-      <h4>Links</h4>
-      <a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a><a href="https://github.com/Nexa-Language/Skill-Compiler/issues">Issues</a>
-    </div>
+    <div class="footer-brand"><h3>SkCC</h3><p>Portable and Secure Skill Compilation for Cross-Framework LLM Agents. Part of the Nexa-lang Project.</p></div>
+    <div class="footer-col"><h4>Product</h4><a href="index.html#features">Features</a><a href="leaderboard.html">Leaderboard</a><a href="install.html">Install</a></div>
+    <div class="footer-col"><h4>Resources</h4><a href="https://github.com/Nexa-Language/Skill-Compiler">GitHub</a><a href="https://arxiv.org/abs/2605.03353">Paper (arXiv)</a><a href="blog.html">Blog</a></div>
+    <div class="footer-col"><h4>Links</h4><a href="https://www.nexa-lang.com/">Nexa-lang</a><a href="https://arcsysu.tech/">arcSYSu Lab</a><a href="https://github.com/Nexa-Language/Skill-Compiler/issues">Issues</a></div>
   </div>
-  <div class="footer-bottom">
-    <span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span>
-    <span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span>
-  </div>
+  <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
 </footer>
-
-<script>
-// Particle background
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let particles = [];
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
-resize();window.addEventListener('resize',resize);
-
-class Particle{
-  constructor(){this.reset();this.y=Math.random()*canvas.height}
-  reset(){this.x=Math.random()*canvas.width;this.y=-10;this.size=Math.random()*1.5+0.5;this.speed=Math.random()*0.4+0.1;this.opacity=Math.random()*0.5+0.2}
-  update(){this.y+=this.speed;if(this.y>canvas.height+10)this.reset()}
-  draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(139,92,246,${this.opacity})`;ctx.fill()}
-}
-for(let i=0;i<120;i++){particles.push(new Particle())}
-function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);particles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(animate)}
-animate();
-
-// Nav scroll
-window.addEventListener('scroll',()=>{document.getElementById('nav').classList.toggle('scrolled',window.scrollY>50)});
-
-// Scroll reveal
-const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.15});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-// Smooth counter animation for hero stats
-function animateValue(el,start,end,duration){
-  const range=end-start;let startTime=null;
-  function step(timestamp){
-    if(!startTime)startTime=timestamp;
-    const progress=Math.min((timestamp-startTime)/duration,1);
-    const eased=1-Math.pow(1-progress,3);
-    el.textContent=(start+range*eased).toFixed(end<10?0:1)+(end<10?'':end===94.8?'%':'');
-    if(progress<1)requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-</script>
+<script src="common.js"></script>
 </body>
 </html>
