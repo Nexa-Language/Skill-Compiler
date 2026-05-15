@@ -29,13 +29,22 @@
 .hero-stat-value{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,#a78bfa,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero-stat-label{font-size:.75rem;color:#71717a;margin-top:.25rem;text-transform:uppercase;letter-spacing:.08em}
 .hero-right{position:relative}
-.hero-code{border-radius:16px;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.08);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.5)}
-.hero-code-header{display:flex;align-items:center;gap:8px;padding:12px 18px;background:rgba(255,255,255,.03);border-bottom:1px solid rgba(255,255,255,.06)}
+.hero-terminal{border-radius:16px;background:#0d1117;border:1px solid rgba(255,255,255,.1);overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.hero-terminal-bar{display:flex;align-items:center;gap:8px;padding:10px 16px;background:rgba(255,255,255,.04);border-bottom:1px solid rgba(255,255,255,.06)}
 .hero-code-dot{width:10px;height:10px;border-radius:50%}
 .hero-code-dot.r{background:#ff5f57}.hero-code-dot.y{background:#febc2e}.hero-code-dot.g{background:#28c840}
-.hero-code-label{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#71717a}
-.hero-code pre{padding:20px;margin:0;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.76rem;line-height:1.75;color:#e0e0e0}
-.hero-code .kw{color:#c792ea}.hero-code .str{color:#c3e88d}.hero-code .cm{color:#546e7a;font-style:italic}.hero-code .fn{color:#82aaff}.hero-code .tp{color:#ffcb6b}.hero-code .tag{color:#89ddff}
+.hero-terminal-title{margin-left:8px;font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#8b949e}
+.hero-terminal-body{padding:16px 20px;font-family:'JetBrains Mono',monospace;font-size:.73rem;line-height:1.8;color:#c9d1d9}
+.term-line{white-space:pre}
+.term-prompt{color:#58a6ff;font-weight:600}
+.term-dim{color:#8b949e}
+.term-skill{color:#d2a8ff;font-weight:600}
+.term-tag{color:#7ee787}
+.term-attr{color:#79c0ff}
+.term-val{color:#a5d6ff}
+.term-warn{color:#d29922;font-weight:600}
+.term-safe{color:#7ee787}
+.term-success{color:#3fb950}
 .hero-annotations{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
 .hero-anno{position:absolute;display:flex;align-items:flex-start;gap:10px;font-size:.8rem;color:#a78bfa;font-weight:500;opacity:0;animation:annoIn .6s cubic-bezier(.16,1,.3,1) forwards}
 .hero-anno:nth-child(1){top:18%;right:-200px;animation-delay:.8s}
@@ -124,31 +133,38 @@
       </div>
     </div>
     <div class="hero-right">
-      <div class="hero-code">
-        <div class="hero-code-header">
+      <div class="hero-terminal">
+        <div class="hero-terminal-bar">
           <span class="hero-code-dot r"></span><span class="hero-code-dot y"></span><span class="hero-code-dot g"></span>
-          <span class="hero-code-label">SKILL.md → SkCC → Claude Code</span>
+          <span class="hero-terminal-title">Claude Code — Terminal</span>
         </div>
-        <pre><span class="cm"><!-- Compiled for Claude Code — XML Semantic Layering --></span>
-<span class="tag"><agent_skill></span>
-  <span class="tag"><metadata></span>
-    <span class="tag"><name></span>database-migration<span class="tag"></name></span>
-    <span class="tag"><security_level></span>high<span class="tag"></security_level></span>
-  <span class="tag"></metadata></span>
-  <span class="tag"><execution_steps></span>
-    <span class="tag"><step</span> <span class="kw">order</span>=<span class="str">"1"</span> <span class="kw">critical</span>=<span class="str">"true"</span><span class="tag">></span>
-      Validate schema compatibility
-    <span class="tag"></step></span>
-    <span class="tag"><step</span> <span class="kw">order</span>=<span class="str">"2"</span><span class="tag">></span>
-      Execute migration with rollback plan
-    <span class="tag"></step></span>
-  <span class="tag"></execution_steps></span>
-  <span class="tag"><strict_constraints></span>
-    <span class="tag"><anti_pattern</span> <span class="kw">source</span>=<span class="str">"anti-skill-injector"</span><span class="tag">></span>
-      No destructive DB ops without confirmation
-    <span class="tag"></anti_pattern></span>
-  <span class="tag"></strict_constraints></span>
-<span class="tag"></agent_skill></span></pre>
+        <div class="hero-terminal-body">
+          <div class="term-line"><span class="term-prompt">~</span> claude</div>
+          <div class="term-line term-dim">Starting Claude Code (claude-opus-4-6)...</div>
+          <div class="term-line term-dim">Loading compiled skill: <span class="term-skill">database-migration</span></div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line"><span class="term-tag"><agent_skill></span></div>
+          <div class="term-line">  <span class="term-tag"><metadata></span></div>
+          <div class="term-line">    <span class="term-tag"><name></span>database-migration<span class="term-tag"></name></span></div>
+          <div class="term-line">    <span class="term-tag"><security_level></span><span class="term-warn">high</span><span class="term-tag"></security_level></span></div>
+          <div class="term-line">  <span class="term-tag"></metadata></span></div>
+          <div class="term-line">  <span class="term-tag"><execution_steps></span></div>
+          <div class="term-line">    <span class="term-tag"><step</span> <span class="term-attr">order</span>=<span class="term-val">"1"</span> <span class="term-attr">critical</span>=<span class="term-val">"true"</span><span class="term-tag">></span></div>
+          <div class="term-line">      Validate schema compatibility</div>
+          <div class="term-line">    <span class="term-tag"></step></span></div>
+          <div class="term-line">    <span class="term-tag"><step</span> <span class="term-attr">order</span>=<span class="term-val">"2"</span><span class="term-tag">></span></div>
+          <div class="term-line">      Execute migration with rollback plan</div>
+          <div class="term-line">    <span class="term-tag"></step></span></div>
+          <div class="term-line">  <span class="term-tag"></execution_steps></span></div>
+          <div class="term-line">  <span class="term-tag"><strict_constraints></span></div>
+          <div class="term-line">    <span class="term-tag"><anti_pattern</span> <span class="term-attr">source</span>=<span class="term-val">"anti-skill-injector"</span><span class="term-tag">></span></div>
+          <div class="term-line">      <span class="term-safe">No destructive DB ops without confirmation</span></div>
+          <div class="term-line">    <span class="term-tag"></anti_pattern></span></div>
+          <div class="term-line">  <span class="term-tag"></strict_constraints></span></div>
+          <div class="term-line"><span class="term-tag"></agent_skill></span></div>
+          <div class="term-line">&nbsp;</div>
+          <div class="term-line term-success">✓ Skill loaded. Ready.</div>
+        </div>
       </div>
       <div class="hero-annotations">
         <div class="hero-anno"><span class="hero-anno-dot"></span><span class="hero-anno-line"></span>XML semantic layering — Claude's preferred format</div>
