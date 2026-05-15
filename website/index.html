@@ -130,6 +130,7 @@
         <div class="hero-stat"><div class="hero-stat-value"><10<span style="font-size:1rem">ms</span></div><div class="hero-stat-label">Compilation</div></div>
         <div class="hero-stat"><div class="hero-stat-value">94.8<span style="font-size:1rem">%</span></div><div class="hero-stat-label">Security Coverage</div></div>
         <div class="hero-stat"><div class="hero-stat-value">4</div><div class="hero-stat-label">Frameworks</div></div>
+        <div class="hero-stat"><div class="hero-stat-value" id="visitorCount" style="font-size:1.4rem">···</div><div class="hero-stat-label">Visitors</div></div>
       </div>
     </div>
     <div class="hero-right">
@@ -249,6 +250,22 @@
     line([' ']),
     line([['term-success','\u2713 Skill loaded. Ready.']])
   ]);
+})();
+
+// Visitor counter (localStorage-based, increments per unique session)
+(function(){
+  var el=document.getElementById('visitorCount');
+  if(!el)return;
+  var key='skcc_visitor_count';
+  var count=parseInt(localStorage.getItem(key)||'0',10);
+  var base=128;
+  var visited=sessionStorage.getItem('skcc_visited');
+  if(!visited){
+    count++;
+    localStorage.setItem(key,count);
+    sessionStorage.setItem('skcc_visited','1');
+  }
+  el.textContent=base+count;
 })();
 </script>
 </body>
