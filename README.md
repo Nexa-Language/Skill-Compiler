@@ -65,17 +65,17 @@ nsc init my-skill
 
 | 条件 | 任务数 | 通过 | 通过率 | 平均奖励 |
 |------|--------|------|--------|----------|
-| Claude-O | 38 | 8 | 21.1% | 0.245 |
-| **Claude-C** | **27** | **9** | **33.3%** | **0.378** |
-| Kimi-O | 75 | 26 | 35.1% | 0.341 |
-| **Kimi-C** | **76** | **36** | **48.7%** | **0.483** |
-| Codex-O | 26 | 10 | 38.5% | 0.433 |
-| **Codex-C** | **26** | **11** | **42.3%** | **0.499** |
-| Gemini-O | 18 | 4 | 22.2% | 0.250 |
-| **Gemini-C** | **18** | **4** | **22.2%** | **0.269** |
+| Claude-Baseline | 38 | 8 | 21.1% | 0.245 |
+| **Claude-SkCC** | **27** | **9** | **33.3%** | **0.378** |
+| Kimi-Baseline | 75 | 26 | 35.1% | 0.341 |
+| **Kimi-SkCC** | **76** | **36** | **48.7%** | **0.483** |
+| Codex-Baseline | 26 | 10 | 38.5% | 0.433 |
+| **Codex-SkCC** | **26** | **11** | **42.3%** | **0.499** |
+| Gemini-Baseline | 18 | 4 | 22.2% | 0.250 |
+| **Gemini-SkCC** | **18** | **4** | **22.2%** | **0.269** |
 
 - **Claude Code**：$p=0.0103$，$d=0.60$（中到大效应量）。22 个配对任务中 7 胜 0 负。
-- **Kimi CLI**：$p=0.0063$，$d=0.33$（最强统计显著性）。16 个区分性任务中 Compiled 胜 13 个。
+- **Kimi CLI**：$p=0.0063$，$d=0.33$（最强统计显著性）。16 个区分性任务中 SkCC 胜 13 个。
 - **Codex CLI**：奖励增益 $+0.067$。3 个任务从完全失败翻转为完全成功。
 - **Gemini CLI**：奖励增益 $+0.019$。格式容忍度较高，YAML 优化仅在嵌套深度 $\geq 3$ 时激活。
 
@@ -83,11 +83,11 @@ nsc init my-skill
 
 同一 Kimi 编译格式在三个模型上产生截然不同的效果，证明编译增益严格模型依赖：
 
-| 模型 | 通过率 (O → C) | p 值 | 效果 |
+| 模型 | 通过率 (Baseline → SkCC) | p 值 | 效果 |
 |------|---------------|------|------|
-| kimi-k2.5 | 35.1% → **48.7%** | **0.0063** | C > O |
-| glm-5.1 | 48.9% → 50.0% | 0.857 | C ≈ O |
-| deepseek-v4-flash | 72.7% → 73.9% | 0.2561 | O > C |
+| kimi-k2.5 | 35.1% → **48.7%** | **0.0063** | SkCC > Baseline |
+| glm-5.1 | 48.9% → 50.0% | 0.857 | SkCC ≈ Baseline |
+| deepseek-v4-flash | 72.7% → 73.9% | 0.2561 | Baseline > SkCC |
 
 ### EX3：编译性能
 
@@ -328,14 +328,14 @@ All experiments use [SkillsBench](https://arxiv.org/abs/2602.12670) (89 real-wor
 
 | Condition | Tasks | Pass | Pass% | Mean Reward |
 |-----------|-------|------|-------|-------------|
-| Claude-O | 38 | 8 | 21.1% | 0.245 |
-| **Claude-C** | **27** | **9** | **33.3%** | **0.378** |
-| Kimi-O | 75 | 26 | 35.1% | 0.341 |
-| **Kimi-C** | **76** | **36** | **48.7%** | **0.483** |
-| Codex-O | 26 | 10 | 38.5% | 0.433 |
-| **Codex-C** | **26** | **11** | **42.3%** | **0.499** |
-| Gemini-O | 18 | 4 | 22.2% | 0.250 |
-| **Gemini-C** | **18** | **4** | **22.2%** | **0.269** |
+| Claude-Baseline | 38 | 8 | 21.1% | 0.245 |
+| **Claude-SkCC** | **27** | **9** | **33.3%** | **0.378** |
+| Kimi-Baseline | 75 | 26 | 35.1% | 0.341 |
+| **Kimi-SkCC** | **76** | **36** | **48.7%** | **0.483** |
+| Codex-Baseline | 26 | 10 | 38.5% | 0.433 |
+| **Codex-SkCC** | **26** | **11** | **42.3%** | **0.499** |
+| Gemini-Baseline | 18 | 4 | 22.2% | 0.250 |
+| **Gemini-SkCC** | **18** | **4** | **22.2%** | **0.269** |
 
 - **Claude Code**: $p=0.0103$, $d=0.60$ (medium-to-large effect). 7 wins, 0 losses in 22 paired tasks.
 - **Kimi CLI**: $p=0.0063$, $d=0.33$ (strongest statistical result). 13 of 16 discriminative tasks won by Compiled.
@@ -346,11 +346,11 @@ All experiments use [SkillsBench](https://arxiv.org/abs/2602.12670) (89 real-wor
 
 The same Kimi-compiled format tested on three models proves compilation gains are strictly model-dependent:
 
-| Model | Pass% (O → C) | p-value | Effect |
+| Model | Pass% (Baseline → SkCC) | p-value | Effect |
 |-------|---------------|---------|--------|
-| kimi-k2.5 | 35.1% → **48.7%** | **0.0063** | C > O |
-| glm-5.1 | 48.9% → 50.0% | 0.857 | C ≈ O |
-| deepseek-v4-flash | 72.7% → 73.9% | 0.2561 | O > C |
+| kimi-k2.5 | 35.1% → **48.7%** | **0.0063** | SkCC > Baseline |
+| glm-5.1 | 48.9% → 50.0% | 0.857 | SkCC ≈ Baseline |
+| deepseek-v4-flash | 72.7% → 73.9% | 0.2561 | Baseline > SkCC |
 
 ### EX3: Compilation Performance
 
