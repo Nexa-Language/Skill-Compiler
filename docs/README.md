@@ -1,5 +1,7 @@
 # SkCC
 
+> **论文状态**：已被 ACM CAIS 2026 — AgentSkills'26 Workshop 接收（poster）。arXiv: [2605.03353](https://arxiv.org/abs/2605.03353)
+
 > **将人类可读的 SKILL.md 编译为 AI Agent 可执行的过程性知识库**
 
 [![Rust](https://img.shields.io/badge/Rust-Edition%202024-orange.svg)](https://www.rust-lang.org/)

@@ -2,6 +2,8 @@
 
 > **SkCC 的整体架构设计、模块划分与数据流**
 >
+> **论文状态**：已被 ACM CAIS 2026 — AgentSkills'26 Workshop 接收（poster）。arXiv: [2605.03353](https://arxiv.org/abs/2605.03353)
+>
 > **架构版本**：v2.0（基于《高级提示词工程格式与智能体技能架构》调研报告重构）
 
 > ⚠️ **实现状态声明 (Updated 2026-04-16):** 本文档描述的架构设计大部分已在源码中实现。部分早期设计（如 Codex 双负载架构、Analyzer trait 统一接口、Warning 诊断保留）在实现过程中进行了简化，详见下方各节标注。完整审查见 [审查报告](../old_backup/dev_plans/plans/RE_AUDIT_REPORT_20260416.md)。实现状态如下：

@@ -1,14 +1,15 @@
 <div align="center">
   <img src="docs/img/nsc-logo.png" alt="SkCC Logo" width="100" />
   <h1>SkCC</h1>
-  <p><b><i>Write Once, Run Anywhere for AI Agent Skills</i></b></p>
+  <p><b><i>Compilation for Skills: Capable, Portable, and Securable</i></b></p>
   <p>
     <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License"/>
-    <img src="https://img.shields.io/badge/Rust-1.75%2B-orange.svg?style=for-the-badge" alt="Rust"/>
+    <img src="https://img.shields.io/badge/Rust-1.85%2B-orange.svg?style=for-the-badge" alt="Rust"/>
     <img src="https://img.shields.io/badge/Platforms-4-blueviolet.svg?style=for-the-badge" alt="Platforms"/>
+    <img src="https://img.shields.io/badge/Paper-ACM_CAIS_2026_AgentSkills'26-7c3aed.svg?style=for-the-badge" alt="Paper"/>
   </p>
   
-  **中文版** | **[English](#english)**
+  🌐 **Website**: [skcc.nexa-lang.com](https://skcc.nexa-lang.com) · 📄 **arXiv**: [2605.03353](https://arxiv.org/abs/2605.03353)
   
   📚 **文档**: [中文](docs/USER_GUIDE.md) | [API Reference](docs/API_REFERENCE.md)
 </div>
@@ -52,7 +53,7 @@ nsc init my-skill
 
 ## ⚡ 什么是 SkCC？
 
-**SkCC** 是一个将经典编译器设计引入 Agent 技能开发的编译框架。通过四阶段流水线——前端格式解析、中间表示构建、语义分析与安全增强（Anti-Skill Injection）、多态后端生成——它将统一的 `SKILL.md` 源文件转换为面向 Claude Code、OpenAI Codex、Google Gemini CLI 和 Kimi CLI 的平台原生技能产物。该架构将适配复杂度从 $O(m \times n)$ 降至 $O(m + n)$，同时解决格式敏感性和安全漏洞两大挑战。
+**SkCC**（Skill Compiler for Cross-framework LLM Agents）是一个将经典编译器设计引入 Agent 技能开发的编译框架。通过四阶段流水线——Syntax Parser → IR Builder → Security Optimizer → Target Emitter——它将统一的 `SKILL.md` 源文件编译为面向 Claude Code、OpenAI Codex、Google Gemini CLI 和 Kimi CLI 的平台原生技能产物。核心创新在于 **SkIR**（统一中间表示），将技能语义与框架格式解耦，将适配复杂度从 $O(m \times n)$ 降至 $O(m + n)$，同时通过编译期 Anti-Skill Injection 实现安全加固。论文已被 **ACM CAIS 2026 — AgentSkills'26 Workshop** 接收（poster）。
 
 ---
 
@@ -205,6 +206,9 @@ SkCC 遵循经典的四阶段编译器架构：
 - ✅ Anti-Skill 注入（94.8% 覆盖率，4 类规则）
 - ✅ 亚 10ms 编译延迟
 - ✅ 渐进式路由清单生成
+- ✅ LLM 语义检查（可选 `semantic-check` feature）
+- ✅ npm 包 + VS Code 扩展
+- ✅ 论文被 ACM CAIS 2026 — AgentSkills'26 Workshop 接收
 
 ### 计划中
 - 🔲 基于漏洞语料库的自动反模式发现
@@ -247,15 +251,15 @@ MIT License - 详见 [LICENSE](LICENSE)。
 
 ## 📖 引用
 
-如果您在研究中使用了 SkCC，请引用：
+如果您在研究中使用了 SkCC，请引用我们的论文（已被 ACM CAIS 2026 — AgentSkills'26 Workshop 接收）：
 
 ```bibtex
-@misc{ouyang2026skcc,
+@inproceedings{ouyang2026skcc,
   title     = {SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents},
   author    = {Yipeng Ouyang and Yi Xiao and Yuhao Gu and Xianwei Zhang},
+  booktitle = {Proceedings of the AgentSkills'26 Workshop at ACM CAIS 2026},
   year      = {2026},
-  eprint    = {2605.03353},
-  archivePrefix = {arXiv},
+  note      = {arXiv:2605.03353},
 }
 ```
 
@@ -312,7 +316,7 @@ nsc init my-skill
 
 ## ⚡ What is SkCC?
 
-**SkCC** is a compilation framework that introduces classical compiler design into agent skill development. Through a four-phase pipeline—Frontend parsing, IR construction, Analyzer validation (with Anti-Skill Injection), and Backend emission—it transforms a unified `SKILL.md` source into platform-native skill artifacts for Claude Code, OpenAI Codex, Google Gemini CLI, and Kimi CLI. The architecture reduces adaptation complexity from $O(m \times n)$ to $O(m + n)$ while simultaneously addressing format sensitivity and security vulnerability challenges.
+**SkCC** (Skill Compiler for Cross-framework LLM Agents) introduces classical compilation design into agent skill development. Through a four-phase pipeline—Syntax Parser → IR Builder → Security Optimizer → Target Emitter—it compiles a unified `SKILL.md` source into platform-native skill artifacts for Claude Code, OpenAI Codex, Google Gemini CLI, and Kimi CLI. The core innovation is **SkIR**, a unified intermediate representation that decouples skill semantics from framework-specific formatting, reducing adaptation complexity from $O(m \times n)$ to $O(m + n)$ while providing compile-time security hardening via Anti-Skill Injection. The paper has been accepted at **ACM CAIS 2026 — AgentSkills'26 Workshop** (poster).
 
 ---
 
@@ -413,11 +417,11 @@ The same Kimi-compiled format tested on three models proves compilation gains ar
 
 ## 🏗️ Architecture
 
-SkCC follows a classic four-phase compiler architecture:
+SkCC follows a classic four-phase compiler architecture, inspired by LLVM and MLIR:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    SkCC Pipeline                                 │
+│                    SkCC Compilation Pipeline                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐  │
@@ -466,6 +470,9 @@ SkCC follows a classic four-phase compiler architecture:
 - ✅ Anti-Skill Injection (94.8% coverage, 4 rule categories)
 - ✅ Sub-10ms compilation latency
 - ✅ Progressive routing manifest generation
+- ✅ LLM semantic check (optional `semantic-check` feature)
+- ✅ npm package + VS Code extension
+- ✅ Paper accepted at ACM CAIS 2026 — AgentSkills'26 Workshop
 
 ### Planned
 - 🔲 Automated anti-pattern discovery from vulnerability corpora
@@ -508,15 +515,15 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## 📖 Citation
 
-If you use SkCC in your research, please cite:
+If you use SkCC in your research, please cite our paper (accepted at ACM CAIS 2026 — AgentSkills'26 Workshop):
 
 ```bibtex
-@misc{ouyang2026skcc,
+@inproceedings{ouyang2026skcc,
   title     = {SkCC: Portable and Secure Skill Compilation for Cross-Framework LLM Agents},
   author    = {Yipeng Ouyang and Yi Xiao and Yuhao Gu and Xianwei Zhang},
+  booktitle = {Proceedings of the AgentSkills'26 Workshop at ACM CAIS 2026},
   year      = {2026},
-  eprint    = {2605.03353},
-  archivePrefix = {arXiv},
+  note      = {arXiv:2605.03353},
 }
 ```
 
