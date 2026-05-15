@@ -133,43 +133,19 @@
       </div>
     </div>
     <div class="hero-right">
+      <div class="hero-terminal" style="margin-bottom:16px">
+        <div class="hero-terminal-bar">
+          <span class="hero-code-dot r"></span><span class="hero-code-dot y"></span><span class="hero-code-dot g"></span>
+          <span class="hero-terminal-title">SkCC Compiler</span>
+        </div>
+        <div class="hero-terminal-body" id="term-compiler"></div>
+      </div>
       <div class="hero-terminal">
         <div class="hero-terminal-bar">
           <span class="hero-code-dot r"></span><span class="hero-code-dot y"></span><span class="hero-code-dot g"></span>
           <span class="hero-terminal-title">Claude Code — Terminal</span>
         </div>
-        <div class="hero-terminal-body">
-          <div class="term-line"><span class="term-prompt">~</span> claude</div>
-          <div class="term-line term-dim">Starting Claude Code (claude-opus-4-6)...</div>
-          <div class="term-line term-dim">Loading compiled skill: <span class="term-skill">database-migration</span></div>
-          <div class="term-line">&nbsp;</div>
-          <div class="term-line"><span class="term-tag"><agent_skill></span></div>
-          <div class="term-line">  <span class="term-tag"><metadata></span></div>
-          <div class="term-line">    <span class="term-tag"><name></span>database-migration<span class="term-tag"></name></span></div>
-          <div class="term-line">    <span class="term-tag"><security_level></span><span class="term-warn">high</span><span class="term-tag"></security_level></span></div>
-          <div class="term-line">  <span class="term-tag"></metadata></span></div>
-          <div class="term-line">  <span class="term-tag"><execution_steps></span></div>
-          <div class="term-line">    <span class="term-tag"><step</span> <span class="term-attr">order</span>=<span class="term-val">"1"</span> <span class="term-attr">critical</span>=<span class="term-val">"true"</span><span class="term-tag">></span></div>
-          <div class="term-line">      Validate schema compatibility</div>
-          <div class="term-line">    <span class="term-tag"></step></span></div>
-          <div class="term-line">    <span class="term-tag"><step</span> <span class="term-attr">order</span>=<span class="term-val">"2"</span><span class="term-tag">></span></div>
-          <div class="term-line">      Execute migration with rollback plan</div>
-          <div class="term-line">    <span class="term-tag"></step></span></div>
-          <div class="term-line">  <span class="term-tag"></execution_steps></span></div>
-          <div class="term-line">  <span class="term-tag"><strict_constraints></span></div>
-          <div class="term-line">    <span class="term-tag"><anti_pattern</span> <span class="term-attr">source</span>=<span class="term-val">"anti-skill-injector"</span><span class="term-tag">></span></div>
-          <div class="term-line">      <span class="term-safe">No destructive DB ops without confirmation</span></div>
-          <div class="term-line">    <span class="term-tag"></anti_pattern></span></div>
-          <div class="term-line">  <span class="term-tag"></strict_constraints></span></div>
-          <div class="term-line"><span class="term-tag"></agent_skill></span></div>
-          <div class="term-line">&nbsp;</div>
-          <div class="term-line term-success">✓ Skill loaded. Ready.</div>
-        </div>
-      </div>
-      <div class="hero-annotations">
-        <div class="hero-anno"><span class="hero-anno-dot"></span><span class="hero-anno-line"></span>XML semantic layering — Claude's preferred format</div>
-        <div class="hero-anno"><span class="hero-anno-dot"></span><span class="hero-anno-line"></span>Anti-Skill constraints injected at compile time</div>
-        <div class="hero-anno"><span class="hero-anno-dot"></span><span class="hero-anno-line"></span>Critical steps flagged for HITL confirmation</div>
+        <div class="hero-terminal-body" id="term-claude"></div>
       </div>
       <div class="hero-gain-badge">📈 +12.2pp Pass Rate on Claude Code</div>
     </div>
@@ -237,5 +213,54 @@
   <div class="footer-bottom"><span>© 2026 Nexa-lang Project & arcSYSu Lab, Sun Yat-sen University</span><span><a href="https://github.com/Nexa-Language/Skill-Compiler">MIT License</a></span></div>
 </footer>
 <script src="common.js"></script>
+<script>
+(function(){
+  function line(parts){var d=document.createElement('div');d.className='term-line';parts.forEach(function(p){if(typeof p==='string'){d.appendChild(document.createTextNode(p))}else{var s=document.createElement('span');s.className=p[0];s.textContent=p[1];d.appendChild(s)}});return d}
+  function addLines(el,lines){lines.forEach(function(l){el.appendChild(l)})}
+
+  var compiler=document.getElementById('term-compiler');
+  var claude=document.getElementById('term-claude');
+  if(!compiler||!claude)return;
+
+  addLines(compiler,[
+    line([['term-prompt','$'],' nsc build database-migration/SKILL.md --target claude']),
+    line([['term-dim','Compiling...']]),
+    line([['term-dim','  Phase 1: Syntax Parser'],['term-success',' \u2713']]),
+    line([['term-dim','  Phase 2: IR Builder (SkIR)'],['term-success',' \u2713']]),
+    line([['term-dim','  Phase 3: Security Optimizer'],['term-success',' \u2713']]),
+    line([['term-dim','    Anti-Skill Injection: 2 rules triggered']]),
+    line([['term-dim','  Phase 4: Target Emitter \u2192 Claude'],['term-success',' \u2713']]),
+    line([['term-success','\u2713 Compiled: build/database-migration/SKILL.md']])
+  ]);
+
+  addLines(claude,[
+    line([['term-prompt','~'],' claude']),
+    line([['term-dim','Starting Claude Code (claude-opus-4-6)...']]),
+    line([['term-dim','Loading compiled skill: '],['term-skill','database-migration']]),
+    line([' ']),
+    line([['term-tag','<agent_skill>']]),
+    line([['term-tag','  <metadata>']]),
+    line([['term-tag','    <name>'],'database-migration',['term-tag','</name>']]),
+    line([['term-tag','    <security_level>'],['term-warn','high'],['term-tag','</security_level>']]),
+    line([['term-tag','  </metadata>']]),
+    line([['term-tag','  <execution_steps>']]),
+    line([['term-tag','    <step '],['term-attr','order'],['term-tag','='],['term-val','"1"'],['term-tag',' '],['term-attr','critical'],['term-tag','='],['term-val','"true"'],['term-tag','>']]),
+    line(['      Validate schema compatibility']),
+    line([['term-tag','    </step>']]),
+    line([['term-tag','    <step '],['term-attr','order'],['term-tag','='],['term-val','"2"'],['term-tag','>']]),
+    line(['      Execute migration with rollback plan']),
+    line([['term-tag','    </step>']]),
+    line([['term-tag','  </execution_steps>']]),
+    line([['term-tag','  <strict_constraints>']]),
+    line([['term-tag','    <anti_pattern '],['term-attr','source'],['term-tag','='],['term-val','"anti-skill-injector"'],['term-tag','>']]),
+    line([['term-safe','      No destructive DB ops without confirmation']]),
+    line([['term-tag','    </anti_pattern>']]),
+    line([['term-tag','  </strict_constraints>']]),
+    line([['term-tag','</agent_skill>']]),
+    line([' ']),
+    line([['term-success','\u2713 Skill loaded. Ready.']])
+  ]);
+})();
+</script>
 </body>
 </html>
